@@ -183,19 +183,19 @@ export function isHebrew(text: string): boolean {
 }
 
 /**
- * Translate free-form Hebrew text to English using Google Translate (free, no key)
+ * Translate free-form text to English using Google Translate (free, no key)
+ * Supports auto-detection of Hebrew, Arabic, Farsi
  * Falls back to original text on failure
  */
 export async function translateFreeText(text: string): Promise<string> {
   if (!text) return text;
 
   try {
-    const encoded = encodeURIComponent(text);
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encoded}`;
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`;
 
     const res = await fetch(url, {
       signal: AbortSignal.timeout(3000),
-      headers: { 'User-Agent': 'IronSight/1.0' },
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
     });
 
     if (!res.ok) return text;

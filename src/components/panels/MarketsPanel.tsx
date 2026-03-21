@@ -46,11 +46,11 @@ export default function MarketsPanel() {
                 </div>
                 <div className="text-right flex items-center gap-3">
                   <span className="text-[11px] font-bold">
-                    {item.error ? 'N/A' : formatPrice(item.price, item.price > 100 ? 0 : 2)}
+                    {item.error ? 'N/A' : `$${formatPrice(item.price)}`}
                   </span>
                   {!item.error && (
                     <span className={`text-[9px] w-16 text-right ${item.change >= 0 ? 'value-up' : 'value-down'}`}>
-                      {formatChange(item.change, item.changePercent)}
+                      {item.changePercent >= 0 ? '+' : ''}{item.changePercent.toFixed(2)}%
                     </span>
                   )}
                 </div>
