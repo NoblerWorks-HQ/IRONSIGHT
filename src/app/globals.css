@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0a0e17;
+  --bg-secondary: #111827;
+  --bg-panel: #1a1f2e;
+  --bg-panel-header: #141924;
+  --border-color: #1e3a5f;
+  --border-glow: #00d4ff;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-accent: #00d4ff;
+  --green: #00ff88;
+  --red: #ff3366;
+  --amber: #ffaa00;
+  --blue: #00aaff;
+  --cyan: #00d4ff;
+  --purple: #aa66ff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* Scanline overlay effect */
+.scanlines::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 212, 255, 0.015) 2px,
+    rgba(0, 212, 255, 0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Panel glow effect */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+  opacity: 0.5;
+}
+
+.panel-header {
+  background: var(--bg-panel-header);
+  border-bottom: 1px solid var(--border-color);
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-header .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Radar sweep animation */
+@keyframes radar-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.radar-sweep {
+  animation: radar-sweep 4s linear infinite;
+}
+
+/* Threat level colors */
+.threat-low { color: var(--green); }
+.threat-guarded { color: var(--blue); }
+.threat-elevated { color: var(--amber); }
+.threat-high { color: #ff6600; }
+.threat-critical { color: var(--red); }
+
+/* Alert flash animation */
+@keyframes alert-flash {
+  0%, 100% { background-color: rgba(127, 29, 29, 0.3); }
+  50% { background-color: rgba(127, 29, 29, 0.6); }
+}
+
+.alert-flash {
+  animation: alert-flash 1.5s ease-in-out infinite;
+}
+
+/* Map highlight pulse */
+@keyframes highlight-pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.highlight-pulse {
+  animation: highlight-pulse 1.5s ease-in-out infinite;
+}
+
+/* Ticker animation */
+@keyframes ticker {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.ticker-scroll {
+  animation: ticker 30s linear infinite;
+}
+
+/* Glow text */
+.glow-text {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+/* Data table styles */
+.data-row {
+  border-bottom: 1px solid rgba(30, 58, 95, 0.3);
+  padding: 6px 12px;
+  font-size: 12px;
+  transition: background 0.15s;
+}
+
+.data-row:hover {
+  background: rgba(0, 212, 255, 0.05);
+}
+
+/* Positive/negative indicators */
+.value-up { color: var(--green); }
+.value-down { color: var(--red); }
+.value-neutral { color: var(--text-secondary); }
+
+/* Loading shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, var(--bg-panel) 25%, rgba(0,212,255,0.08) 50%, var(--bg-panel) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
