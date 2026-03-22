@@ -186,22 +186,21 @@ function animateMarker(marker: L.Marker, targetLat: number, targetLon: number, d
   requestAnimationFrame(step);
 }
 
-// Draw an animated arc between two points (missile trajectory)
-function drawMissileArc(map: L.Map, from: [number, number], to: [number, number], color: string, layerGroup: L.LayerGroup) {
-  if (!L) return;
+// Draw an animated arc between two points (missile trajectory) — loops until cancelled
+function drawMissileArc(map: L.Map, from: [number, number], to: [number, number], color: string, layerGroup: L.LayerGroup): () => void {
+  if (!L) return () => {};
   const points: [number, number][] = [];
   const steps = 40;
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
     const lat = from[0] + (to[0] - from[0]) * t;
     const lon = from[1] + (to[1] - from[1]) * t;
-    // Arc height peaks at midpoint
     const arcHeight = Math.sin(t * Math.PI) * 3;
     points.push([lat + arcHeight, lon]);
   }
 
-  // Animate: draw segments progressively
-  let currentStep = 0;
+  let cancelled = false;
+
   const polyline = L.polyline([], {
     color,
     weight: 2,
@@ -210,37 +209,50 @@ function drawMissileArc(map: L.Map, from: [number, number], to: [number, number]
     className: 'missile-arc',
   }).addTo(layerGroup);
 
-  // Warhead marker at the tip
   const warhead = L.circleMarker(from, {
     radius: 4, color, fillColor: color, fillOpacity: 1, weight: 0,
   }).addTo(layerGroup);
 
-  function animateArc() {
-    if (currentStep >= points.length) {
-      // Impact flash
-      const impact = L!.circleMarker(to, {
-        radius: 15, color: '#ff3366', fillColor: '#ff3366', fillOpacity: 0.6, weight: 2,
-        className: 'alert-flash',
-      }).addTo(layerGroup);
-      setTimeout(() => { try { layerGroup.removeLayer(impact); } catch {} }, 3000);
-      try { layerGroup.removeLayer(warhead); } catch {}
-      return;
-    }
-    const latLngs = points.slice(0, currentStep + 1);
-    polyline.setLatLngs(latLngs);
-    warhead.setLatLng(points[currentStep]);
-    currentStep++;
-    setTimeout(animateArc, 50);
-  }
-  animateArc();
+  function animateLoop() {
+    if (cancelled) return;
+    let currentStep = 0;
 
-  // Auto-remove arc after 15 seconds
-  setTimeout(() => {
+    function step() {
+      if (cancelled) return;
+      if (currentStep >= points.length) {
+        // Impact flash
+        const impact = L!.circleMarker(to, {
+          radius: 15, color: '#ff3366', fillColor: '#ff3366', fillOpacity: 0.6, weight: 2,
+          className: 'alert-flash',
+        }).addTo(layerGroup);
+        setTimeout(() => { try { layerGroup.removeLayer(impact); } catch {} }, 2000);
+
+        // Reset and loop after a pause
+        setTimeout(() => {
+          if (cancelled) return;
+          polyline.setLatLngs([]);
+          warhead.setLatLng(from);
+          animateLoop();
+        }, 3000);
+        return;
+      }
+      polyline.setLatLngs(points.slice(0, currentStep + 1));
+      warhead.setLatLng(points[currentStep]);
+      currentStep++;
+      setTimeout(step, 50);
+    }
+    step();
+  }
+  animateLoop();
+
+  // Return cancel function
+  return () => {
+    cancelled = true;
     try {
       layerGroup.removeLayer(polyline);
       layerGroup.removeLayer(warhead);
     } catch {}
-  }, 15000);
+  };
 }
 
 // Geocode a strike — ONLY match specific locations, not generic country names
@@ -316,6 +328,7 @@ export default function ConflictMap({ className }: MapProps) {
 
   // Previous alert status for detecting new alerts
   const prevAlertStatusRef = useRef<string>('CLEAR');
+  const arcCancellersRef = useRef<(() => void)[]>([]);
 
   // Data feeds
   const { data: flights } = useDataFeed<FlightData>('/api/flights', 30000);
@@ -700,9 +713,24 @@ export default function ConflictMap({ className }: MapProps) {
   // === ALERTS with missile arcs ===
   useEffect(() => {
     if (!L || !alertLayerRef.current || !mapRef.current) return;
-    alertLayerRef.current.clearLayers();
 
-    if (alerts?.status === 'ACTIVE' && alerts.alerts.length > 0) {
+    // Only clear layers when transitioning states, not on every poll
+    // This prevents missile arcs from being wiped after 5 seconds
+    const wasActive = prevAlertStatusRef.current === 'ACTIVE';
+    const isActive = alerts?.status === 'ACTIVE' && alerts.alerts.length > 0;
+
+    if (!isActive) {
+      // Cancel all looping arcs
+      arcCancellersRef.current.forEach(cancel => cancel());
+      arcCancellersRef.current = [];
+      alertLayerRef.current.clearLayers();
+    }
+
+    if (isActive) {
+      // Clear and redraw alert markers (but arcs persist from initial draw)
+      if (!wasActive) {
+        alertLayerRef.current.clearLayers();
+      }
       const alertCircle = L.circle([31.5, 34.8], {
         radius: 150000, color: '#ff3366', fillColor: '#ff3366', fillOpacity: 0.15,
         weight: 2, dashArray: '5, 10', className: 'alert-flash',
@@ -729,29 +757,43 @@ export default function ConflictMap({ className }: MapProps) {
         });
       });
 
-      // Draw missile arcs on NEW alerts
+      // Draw missile arcs on NEW alerts — only to specific alert cities
       if (prevAlertStatusRef.current !== 'ACTIVE') {
         const alertType = alerts.alerts[0]?.type || '';
         const isFromIran = alertType === 'MISSILE' || alerts.alerts.some(a => a.threat.toLowerCase().includes('iran') || a.threat.toLowerCase().includes('ballistic'));
         const isFromLebanon = alerts.alerts.some(a => a.threat.toLowerCase().includes('lebanon') || a.threat.toLowerCase().includes('hezbollah'));
 
         const origin: [number, number] = isFromIran ? [33.5, 48.0] : isFromLebanon ? [33.89, 35.50] : [33.5, 48.0];
-        const target: [number, number] = [31.5, 34.8]; // Central Israel
 
-        drawMissileArc(mapRef.current, origin, target, '#ff3366', alertLayerRef.current);
-
-        // Draw additional arcs to specific alert cities
+        // Collect all unique alert city coordinates
+        const targetCoords: [number, number][] = [];
+        const seenCoords = new Set<string>();
         alerts.alerts.forEach(alert => {
           alert.locations.forEach(loc => {
             const coords = ALERT_CITIES[loc.toLowerCase().trim()];
-            if (coords && (coords[0] !== target[0] || coords[1] !== target[1])) {
-              setTimeout(() => {
-                if (alertLayerRef.current) {
-                  drawMissileArc(mapRef.current!, origin, coords, '#ff336688', alertLayerRef.current);
-                }
-              }, Math.random() * 2000);
+            if (coords) {
+              const key = `${coords[0]},${coords[1]}`;
+              if (!seenCoords.has(key)) {
+                seenCoords.add(key);
+                targetCoords.push(coords);
+              }
             }
           });
+        });
+
+        // If no specific cities found, fall back to central Israel
+        if (targetCoords.length === 0) {
+          targetCoords.push([31.5, 34.8]);
+        }
+
+        // Draw one arc per target city
+        targetCoords.forEach((coords, i) => {
+          setTimeout(() => {
+            if (alertLayerRef.current) {
+              const c = drawMissileArc(mapRef.current!, origin, coords, '#ff3366', alertLayerRef.current);
+              arcCancellersRef.current.push(c);
+            }
+          }, i * 500);
         });
       }
     }

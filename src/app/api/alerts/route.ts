@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { fetchWithTimeout } from '@/lib/fetcher';
-import { translateHebrew, translateCities, isHebrew, translateFreeText } from '@/lib/hebrew';
+import { translateHebrew, translateCities, isHebrew, translateFreeText, CITY_TRANSLATIONS } from '@/lib/hebrew';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,8 +28,17 @@ export async function GET() {
           const rawThreat = alert.threat || alert.title || 'Alert';
           const rawCities = Array.isArray(alert.cities) ? alert.cities : [alert.data || 'Unknown'];
 
-          const translatedThreat = translateHebrew(rawThreat);
+          let translatedThreat = translateHebrew(rawThreat);
           const translatedLocations = translateCities(rawCities);
+
+          // If the "threat" field is actually a city name (API sometimes puts city in wrong field),
+          // move it to locations and use a generic threat label
+          if (CITY_TRANSLATIONS[rawThreat]) {
+            if (!rawCities.includes(rawThreat)) {
+              translatedLocations.push(CITY_TRANSLATIONS[rawThreat]);
+            }
+            translatedThreat = 'Rocket/Missile Alert';
+          }
 
           alerts.push({
             id: `tzeva-${i}-${Date.now()}`,
