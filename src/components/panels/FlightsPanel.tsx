@@ -62,7 +62,7 @@ function focusOnMapTarget(id: string, lat: number, lon: number, type: 'aircraft'
 }
 
 export default function FlightsPanel() {
-  const { data, loading } = useDataFeed<FlightDataResponse>('/api/flights', 30000);
+  const { data, loading } = useDataFeed<FlightDataResponse>('/api/flights', 180000);
 
   // Group by type
   const byType: Record<string, number> = {};

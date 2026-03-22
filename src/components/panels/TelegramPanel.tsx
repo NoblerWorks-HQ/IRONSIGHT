@@ -19,7 +19,7 @@ interface TelegramData {
 }
 
 export default function TelegramPanel() {
-  const { data, loading } = useDataFeed<TelegramData>('/api/telegram', 60000);
+  const { data, loading, lastUpdated } = useDataFeed<TelegramData>('/api/telegram', 60000);
 
   return (
     <div className="panel h-full flex flex-col">
@@ -27,7 +27,7 @@ export default function TelegramPanel() {
         <span className="status-dot" style={{ background: 'var(--cyan)' }} />
         TELEGRAM OSINT (UNVERIFIED)
         <span className="ml-auto text-[9px] text-[var(--text-secondary)] font-normal normal-case tracking-normal">
-          {data?.posts.length || 0} posts // {data?.channels.length || 0} channels
+          {data?.posts.length || 0} posts // {data?.channels.length || 0} channels{lastUpdated ? ` // ${new Date(lastUpdated).toLocaleTimeString()}` : ''}
         </span>
       </div>
       <div className="flex-1 overflow-y-auto">

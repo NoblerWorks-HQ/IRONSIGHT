@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export function useDataFeed<T>(url: string, interval: number = 60000, initialData: T | null = null) {
   const [data, setData] = useState<T | null>(initialData);
@@ -13,7 +13,12 @@ export function useDataFeed<T>(url: string, interval: number = 60000, initialDat
       const res = await fetch(bustUrl, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      setData(json);
+      // Keep previous data if new response is empty (likely rate limited)
+      const isEmpty = Array.isArray(json) ? json.length === 0 :
+                      json && typeof json === 'object' && 'posts' in json ? json.posts?.length === 0 : false;
+      if (!isEmpty || !data) {
+        setData(json);
+      }
       setLastUpdated(new Date());
       setError(null);
     } catch (err) {

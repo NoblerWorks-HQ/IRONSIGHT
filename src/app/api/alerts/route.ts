@@ -5,6 +5,10 @@ import { translateHebrew, translateCities, isHebrew, translateFreeText, CITY_TRA
 
 export const dynamic = 'force-dynamic';
 
+// Sticky alert cache — keep alerts visible for 90 seconds after they clear from the API
+const STICKY_DURATION = 90_000; // 90 seconds
+let stickyAlerts: (AlertEvent & { firstSeen: number })[] = [];
+
 // Israeli Home Front Command (Pikud HaOref) alerts via Tzeva Adom API
 // Returns real-time rocket/missile/drone alerts sent to Israeli civilians
 // Empty array = no active alerts (which is good)
@@ -68,13 +72,30 @@ export async function GET() {
     );
   }));
 
-  // The API returns [] when there are no active alerts
-  const status = alerts.length > 0 ? 'ACTIVE' : 'CLEAR';
+  // Add new alerts to sticky cache
+  const now = Date.now();
+  for (const alert of alerts) {
+    const exists = stickyAlerts.find(s => s.threatOriginal === alert.threatOriginal && s.locationsOriginal.join() === alert.locationsOriginal.join());
+    if (!exists) {
+      stickyAlerts.push({ ...alert, firstSeen: now });
+    }
+  }
+
+  // Remove alerts older than 90 seconds
+  stickyAlerts = stickyAlerts.filter(s => now - s.firstSeen < STICKY_DURATION);
+
+  // Mark alerts that are no longer live from the API as clearing
+  const allAlerts = stickyAlerts.map(s => ({
+    ...s,
+    active: alerts.some(a => a.threatOriginal === s.threatOriginal && a.locationsOriginal.join() === s.locationsOriginal.join()),
+  }));
+
+  const status = allAlerts.length > 0 ? 'ACTIVE' : 'CLEAR';
 
   return NextResponse.json({
     status,
-    activeCount: alerts.length,
-    alerts,
+    activeCount: allAlerts.length,
+    alerts: allAlerts,
     lastChecked: new Date().toISOString(),
     source: 'Pikud HaOref / Tzeva Adom',
   }, {

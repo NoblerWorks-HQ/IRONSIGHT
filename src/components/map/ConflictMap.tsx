@@ -331,7 +331,7 @@ export default function ConflictMap({ className }: MapProps) {
   const arcCancellersRef = useRef<(() => void)[]>([]);
 
   // Data feeds
-  const { data: flights } = useDataFeed<FlightData>('/api/flights', 30000);
+  const { data: flights } = useDataFeed<FlightData>('/api/flights', 180000);
   const { data: naval } = useDataFeed<NavalData>('/api/ships', 300000);
   const { data: alerts } = useDataFeed<AlertData>('/api/alerts', 5000);
   const { data: conflicts } = useDataFeed<ConflictEvent[]>('/api/conflicts', 180000);
