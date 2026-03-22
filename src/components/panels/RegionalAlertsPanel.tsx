@@ -125,11 +125,11 @@ export default function RegionalAlertsPanel() {
                       {isCollapsed ? '▸' : '▾'}
                     </span>
                     <span className="text-xs">{country.flag}</span>
-                    <span className="text-[10px] font-bold" style={{ color: countryColor }}>
+                    <span className="text-[11px] font-bold" style={{ color: countryColor }}>
                       {country.name}
                     </span>
                     {hasEvents && (
-                      <span className="text-[8px] text-[var(--text-secondary)]">
+                      <span className="text-[9px] text-[var(--text-secondary)]">
                         {country.events[0].hoursAgo < 1
                           ? `${Math.max(1, Math.round(country.events[0].hoursAgo * 60))}m ago`
                           : `${Math.round(country.events[0].hoursAgo)}h ago`
@@ -138,7 +138,7 @@ export default function RegionalAlertsPanel() {
                     )}
                   </div>
                   <span
-                    className="text-[8px] font-bold px-1.5 py-0.5 rounded"
+                    className="text-[9px] font-bold px-1.5 py-0.5 rounded"
                     style={{
                       color: levelConfig.color,
                       border: `1px solid ${levelConfig.color}30`,
@@ -165,10 +165,10 @@ export default function RegionalAlertsPanel() {
                         style={{ background: SEVERITY_COLORS[event.severity] }}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="text-[9px] leading-tight text-[var(--text-primary)] line-clamp-1">
+                        <p className="text-[10px] leading-tight text-[var(--text-primary)] line-clamp-1">
                           {event.title}
                         </p>
-                        <span className="text-[8px] text-[var(--text-secondary)]">
+                        <span className="text-[9px] text-[var(--text-secondary)]">
                           {event.source} • {timeAgo(event.time)}
                         </span>
                       </div>

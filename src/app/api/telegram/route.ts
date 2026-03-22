@@ -37,6 +37,8 @@ const CHANNELS = [
   { name: 'SaberinFa', label: 'Saberin (IRGC)', color: '#884422' },
   { name: 'defapress_ir', label: 'DefaPress (Iran MOD)', color: '#556644' },
   { name: 'sepah', label: 'IRGC Official', color: '#774433' },
+  { name: 'wamnews_en', label: 'WAM (UAE)', color: '#c4a535' },
+  { name: 'gulfnewsUAE', label: 'Gulf News', color: '#e6b800' },
 ];
 
 interface TelegramPost {

@@ -9,8 +9,8 @@ Built with Next.js, TypeScript, Tailwind CSS, and Leaflet. No API keys required.
 ## Features
 
 - **Live Intel Feed** — 20+ RSS news sources with keyword relevance filtering
-- **Telegram OSINT** — 25+ channels scraped in real-time with auto-translation (Hebrew/Arabic/Farsi)
-- **Theater Map** — Interactive Leaflet map with military aircraft, naval vessels, strike markers, missile trajectory arcs, range rings, and distance measurement
+- **Telegram OSINT** — 27 channels scraped in real-time with auto-translation (Hebrew/Arabic/Farsi), including GCC sources
+- **Theater Map** — Interactive Leaflet map with military aircraft, naval vessels, strike markers from news and Telegram, missile trajectory arcs, range rings, and distance measurement
 - **Israel Alert Status** — Live Pikud HaOref / Tzeva Adom missile alerts with audio notifications
 - **Conflict Monitor** — Categorized events (strikes, defense, diplomatic, nuclear)
 - **Missile / Strike Tracker** — Weapon type classification and severity
@@ -18,6 +18,7 @@ Built with Next.js, TypeScript, Tailwind CSS, and Leaflet. No API keys required.
 - **Military Airspace** — Live military aircraft tracking via adsb.lol
 - **Naval Tracker** — Vessel monitoring in the Persian Gulf and Eastern Mediterranean
 - **Defense & Markets** — Defense contractor stocks, indices, VIX, gold, USD
+- **Crypto Markets** — Bitcoin, Ethereum, Solana, BNB with 24h price changes
 - **Energy Markets** — WTI, Brent, natural gas, heating oil, gasoline
 - **Satellite Thermal Detect** — NASA FIRMS fire/explosion detection
 
@@ -82,6 +83,8 @@ All data sources are free and require no API keys.
 | @thecradlemedia | The Cradle |
 | @dropsitenews | Drop Site News |
 | @france24_en | France 24 |
+| @wamnews_en | WAM - Emirates News Agency (UAE) |
+| @gulfnewsUAE | Gulf News (UAE/GCC) |
 
 ### APIs
 
@@ -94,6 +97,7 @@ All data sources are free and require no API keys.
 | adsb.lol | Military aircraft ADS-B tracking | Community ADS-B network | Free, no key |
 | EIA | US gas prices | US Energy Information Administration | Free, public demo key |
 | GDELT | Global event data (naval tracking) | GDELT Project | Free, no key |
+| CoinGecko | Cryptocurrency prices (BTC, ETH, SOL, BNB) | CoinGecko | Free, no key |
 | Google Translate | Hebrew/Arabic/Farsi auto-translation | Google (unofficial) | Free, no key |
 
 ### Polling Intervals
@@ -105,7 +109,7 @@ All data sources are free and require no API keys.
 | News RSS | 90 seconds |
 | Strikes | 2 minutes |
 | Conflicts | 3 minutes |
-| Markets & Oil | 5 minutes |
+| Markets, Oil & Crypto | 5 minutes |
 | Fires (NASA FIRMS) | 10 minutes |
 
 ## Getting Started

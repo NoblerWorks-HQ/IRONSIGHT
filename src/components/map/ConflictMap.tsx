@@ -73,6 +73,18 @@ interface StrikeData {
   country: string;
 }
 
+interface TelegramData {
+  posts: {
+    channel: string;
+    channelLabel: string;
+    color: string;
+    postId: number;
+    text: string;
+    date: string;
+    url: string;
+  }[];
+}
+
 interface MapProps {
   className?: string;
 }
@@ -206,7 +218,7 @@ function drawMissileArc(map: L.Map, from: [number, number], to: [number, number]
   function animateArc() {
     if (currentStep >= points.length) {
       // Impact flash
-      const impact = L.circleMarker(to, {
+      const impact = L!.circleMarker(to, {
         radius: 15, color: '#ff3366', fillColor: '#ff3366', fillOpacity: 0.6, weight: 2,
         className: 'alert-flash',
       }).addTo(layerGroup);
@@ -311,6 +323,7 @@ export default function ConflictMap({ className }: MapProps) {
   const { data: alerts } = useDataFeed<AlertData>('/api/alerts', 5000);
   const { data: conflicts } = useDataFeed<ConflictEvent[]>('/api/conflicts', 180000);
   const { data: strikes } = useDataFeed<StrikeData[]>('/api/strikes', 120000);
+  const { data: telegram } = useDataFeed<TelegramData>('/api/telegram', 60000);
 
   const [showMilAir, setShowMilAir] = useState(true);
   const [showNaval, setShowNaval] = useState(true);
@@ -745,7 +758,7 @@ export default function ConflictMap({ className }: MapProps) {
     prevAlertStatusRef.current = alerts?.status || 'CLEAR';
   }, [alerts]);
 
-  // === STRIKE MARKERS from both conflict feed AND strikes API ===
+  // === STRIKE MARKERS from conflict feed, strikes API, AND Telegram ===
   useEffect(() => {
     if (!L || !strikeLayerRef.current || !mapRef.current) return;
 
@@ -753,11 +766,12 @@ export default function ConflictMap({ className }: MapProps) {
 
     const cutoff = Date.now() - 24 * 60 * 60 * 1000;
     const plotted = new Set<string>(); // Dedup by title prefix
+    const plottedLocations = new Set<string>(); // Dedup Telegram by location
 
-    // Merge both data sources into a common format
-    const allStrikes: { title: string; date: string; source: string; type: string }[] = [];
+    // Merge news data sources into a common format
+    const allStrikes: { title: string; date: string; source: string; type: string; fromTelegram?: boolean }[] = [];
 
-    // From conflicts API
+    // From conflicts API (priority — plotted first)
     if (conflicts) {
       conflicts.forEach(e => {
         if (e.type === 'STRIKE' || e.type === 'DRONE') {
@@ -766,7 +780,7 @@ export default function ConflictMap({ className }: MapProps) {
       });
     }
 
-    // From strikes API (usually has more specific data)
+    // From strikes API (priority — plotted first)
     if (strikes) {
       strikes.forEach(s => {
         if (s.category === 'MISSILE' || s.category === 'STRIKE' || s.category === 'DRONE') {
@@ -775,18 +789,48 @@ export default function ConflictMap({ className }: MapProps) {
       });
     }
 
+    // From Telegram posts (added last so they only fill gaps)
+    if (telegram?.posts) {
+      telegram.posts.forEach(post => {
+        const t = post.text.toLowerCase();
+        // Only include posts that mention strike-related keywords
+        const strikeWords = ['strike', 'struck', 'hit', 'attack', 'bomb', 'missile', 'rocket',
+          'drone', 'target', 'destroy', 'intercept', 'fire', 'launch', 'blast', 'explosion',
+          'airstrike', 'killed', 'impact', 'barrage'];
+        if (!strikeWords.some(w => t.includes(w))) return;
+
+        let type = 'STRIKE';
+        if (t.match(/missile|ballistic/)) type = 'MISSILE';
+        else if (t.match(/drone|uav|shahed/)) type = 'DRONE';
+        else if (t.match(/rocket/)) type = 'ROCKET';
+        else if (t.match(/airstrike|air strike/)) type = 'AIRSTRIKE';
+
+        allStrikes.push({
+          title: post.text.length > 200 ? post.text.substring(0, 200) + '...' : post.text,
+          date: post.date,
+          source: `Telegram: ${post.channelLabel}`,
+          type,
+          fromTelegram: true,
+        });
+      });
+    }
+
     allStrikes.forEach(event => {
       const t = new Date(event.date).getTime();
       if (isNaN(t) || t < cutoff) return;
 
-      // Dedup
+      // Dedup by title
       const key = event.title.toLowerCase().substring(0, 40);
       if (plotted.has(key)) return;
 
       const geo = geocodeStrike(event.title, '');
       if (!geo) return;
 
+      // If this is from Telegram, skip if a news source already has a marker at this location
+      if (event.fromTelegram && plottedLocations.has(geo.place.toLowerCase())) return;
+
       plotted.add(key);
+      plottedLocations.add(geo.place.toLowerCase());
 
       const pos: [number, number] = [
         geo.coords[0] + (Math.random() - 0.5) * 0.15,
@@ -795,11 +839,12 @@ export default function ConflictMap({ className }: MapProps) {
 
       const timeStr = new Date(event.date).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
       const typeColor = event.type === 'MISSILE' ? '#ff0044' : event.type === 'DRONE' ? '#ff6600' : '#ff3300';
+      const sourceTag = event.fromTelegram ? '📡 ' : '';
       const popupHtml = `
         <div style="font-family:monospace;font-size:11px;color:#000;min-width:220px;max-width:300px;">
           <strong style="color:${typeColor};font-size:12px;">${event.type} — ${geo.place}</strong><br/>
           <div style="margin:4px 0;line-height:1.4;">${event.title}</div>
-          <em style="color:#666;font-size:9px;">${event.source} • ${timeStr}</em>
+          <em style="color:#666;font-size:9px;">${sourceTag}${event.source} • ${timeStr}</em>
         </div>
       `;
 
@@ -817,7 +862,7 @@ export default function ConflictMap({ className }: MapProps) {
     });
 
     console.log(`[MAP] Plotted ${plotted.size} strike markers`);
-  }, [conflicts, strikes]);
+  }, [conflicts, strikes, telegram]);
 
   // === MISSILE RANGE RINGS ===
   useEffect(() => {

@@ -52,7 +52,7 @@ export default function TelegramPanel() {
             >
               <div className="flex items-center gap-2 mb-0.5">
                 <span
-                  className="text-[8px] font-bold px-1.5 py-0.5 rounded shrink-0"
+                  className="text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0"
                   style={{
                     color: post.color,
                     backgroundColor: `${post.color}15`,
@@ -61,11 +61,11 @@ export default function TelegramPanel() {
                 >
                   {post.channelLabel}
                 </span>
-                <span className="text-[8px] text-[var(--text-secondary)] ml-auto shrink-0">
+                <span className="text-[9px] text-[var(--text-secondary)] ml-auto shrink-0">
                   {timeAgo(post.date)}
                 </span>
               </div>
-              <p className="text-[10px] leading-snug text-[var(--text-primary)] line-clamp-3">
+              <p className="text-[11px] leading-snug text-[var(--text-primary)] line-clamp-3">
                 {post.text}
               </p>
             </a>
