@@ -50,7 +50,7 @@ export default function MarketsPanel() {
                   </span>
                   {!item.error && (
                     <span className={`text-[9px] w-16 text-right ${item.change >= 0 ? 'value-up' : 'value-down'}`}>
-                      {item.changePercent >= 0 ? '+' : ''}{item.changePercent.toFixed(2)}%
+                      {(item.changePercent ?? 0) >= 0 ? '+' : ''}{(item.changePercent ?? 0).toFixed(2)}%
                     </span>
                   )}
                 </div>
@@ -72,7 +72,7 @@ export default function MarketsPanel() {
                   </span>
                   {!item.error && (
                     <span className={`text-[9px] w-16 text-right ${item.change >= 0 ? 'value-up' : 'value-down'}`}>
-                      {item.changePercent >= 0 ? '+' : ''}{item.changePercent.toFixed(2)}%
+                      {(item.changePercent ?? 0) >= 0 ? '+' : ''}{(item.changePercent ?? 0).toFixed(2)}%
                     </span>
                   )}
                 </div>

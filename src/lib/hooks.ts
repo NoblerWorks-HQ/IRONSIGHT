@@ -66,6 +66,8 @@ export function formatPrice(price: number, decimals: number = 2): string {
 }
 
 export function formatChange(change: number, percent: number): string {
-  const sign = change >= 0 ? '+' : '';
-  return `${sign}${change.toFixed(2)} (${sign}${percent.toFixed(2)}%)`;
+  const c = change ?? 0;
+  const p = percent ?? 0;
+  const sign = c >= 0 ? '+' : '';
+  return `${sign}${c.toFixed(2)} (${sign}${p.toFixed(2)}%)`;
 }
