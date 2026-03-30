@@ -53,7 +53,7 @@ export default function Dashboard() {
               <div className="absolute inset-2 rounded-full border border-[var(--cyan)] opacity-10" />
               <div
                 className="absolute top-1/2 left-1/2 w-0.5 h-4 bg-[var(--cyan)] origin-bottom radar-sweep"
-                style={{ transform: 'translateX(-50%)' }}
+                style={{ transform: 'translateX(-50%)', top: '0px' }}
               />
               <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-[var(--cyan)] rounded-full -translate-x-1/2 -translate-y-1/2" />
             </div>
