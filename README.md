@@ -1,3 +1,13 @@
+[![Nobler Works](https://raw.githubusercontent.com/Noblerworks/IRONSIGHT/main/nobler-works-banner.JPG)](https://noblerworks.com/)
+
+### Built by [Nobler Works](https://noblerworks.com/)
+
+We build OSINT tools, real-time dashboards, and custom software for clients who need to move fast and see clearly. If you want something like IRONSIGHT built for your domain, [get in touch](https://noblerworks.com/).
+
+**Follow us:** [Website](https://noblerworks.com/) · [X / Twitter](https://x.com/Nobler_Works) · [YouTube](https://www.youtube.com/@NoblerWorks) · [TikTok](https://www.tiktok.com/@noblerworks) · [Threads](https://www.threads.com/@noblerworks)
+
+---
+
 # IRONSIGHT
 
 ![IRONSIGHT Dashboard](https://raw.githubusercontent.com/Noblerworks/IRONSIGHT/main/Ironsight.png?v=2)
