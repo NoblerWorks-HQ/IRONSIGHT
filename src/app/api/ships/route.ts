@@ -312,5 +312,5 @@ async function getOSINTNavalPositions(): Promise<NavalVessel[]> {
     },
   ];
 
-  return [...knownDeployments, ...vessels];
+  return knownDeployments;
 }
