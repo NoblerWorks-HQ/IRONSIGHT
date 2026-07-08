@@ -154,6 +154,25 @@ npm run build
 npm start
 ```
 
+## Run with Docker
+
+Prefer to run it isolated from your host (no local Node install, sandboxed dependencies and network)? A multi-stage `Dockerfile` produces a slim (~215 MB) standalone image that runs as a non-root user. No API keys or environment variables are needed.
+
+```bash
+docker compose up --build
+```
+
+Then open [http://localhost:3000](http://localhost:3000). Stop with `Ctrl+C` (or `docker compose down`).
+
+Or without Compose:
+
+```bash
+docker build -t ironsight .
+docker run --rm -p 3000:3000 ironsight
+```
+
+To use a different host port, map it (e.g. `-p 8080:3000`) or edit the `ports` mapping in `docker-compose.yml`.
+
 ## Tech Stack
 
 - **Framework:** Next.js 16 (App Router)

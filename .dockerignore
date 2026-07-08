@@ -1,0 +1,19 @@
+node_modules
+.next
+.git
+.gitignore
+npm-debug.log*
+Dockerfile
+.dockerignore
+docker-compose.yml
+*.md
+.claude
+graphify-out
+.env*
+.vscode
+.idea
+.DS_Store
+tsconfig.tsbuildinfo
+# Repo-root doc/screenshot assets (not needed in the image)
+/ironsight2.png
+/nobler-works-banner.JPG
