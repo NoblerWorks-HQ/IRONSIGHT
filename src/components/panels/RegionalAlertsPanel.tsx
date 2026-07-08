@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useDataFeed, timeAgo, useTick } from '@/lib/hooks';
+import { useConflictFeed, timeAgo, useTick } from '@/lib/hooks';
+import { useConflict } from '@/lib/conflicts/context';
 
 interface CountryEvent {
   title: string;
@@ -24,21 +25,6 @@ interface RegionalData {
   updated: string;
 }
 
-// Unique color per country
-const COUNTRY_COLORS: Record<string, string> = {
-  'Lebanon': '#e06030',
-  'Iran': '#cc3355',
-  'Iraq': '#cc8833',
-  'Syria': '#aa7744',
-  'Yemen': '#55aa55',
-  'Kuwait': '#44bbaa',
-  'Bahrain': '#dd6699',
-  'UAE': '#8866cc',
-  'Saudi Arabia': '#33aa77',
-  'Qatar': '#7744aa',
-  'Jordan': '#4488cc',
-};
-
 const LEVEL_CONFIG: Record<string, { color: string; label: string }> = {
   CLEAR: { color: 'var(--green)', label: 'CLEAR' },
   MONITORING: { color: 'var(--blue)', label: 'MONITOR' },
@@ -54,7 +40,9 @@ const SEVERITY_COLORS: Record<string, string> = {
 };
 
 export default function RegionalAlertsPanel() {
-  const { data, loading } = useDataFeed<RegionalData>('/api/regional-alerts', 60000);
+  const { config } = useConflict();
+  const COUNTRY_COLORS = config.client.countryColors;
+  const { data, loading } = useConflictFeed<RegionalData>('/api/regional-alerts', 60000);
   useTick(15000);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useConflict } from './conflicts/context';
 
 export function useDataFeed<T>(url: string, interval: number = 60000, initialData: T | null = null) {
   const [data, setData] = useState<T | null>(initialData);
@@ -35,6 +36,17 @@ export function useDataFeed<T>(url: string, interval: number = 60000, initialDat
   }, [fetchData, interval]);
 
   return { data, loading, error, lastUpdated, refetch: fetchData };
+}
+
+/**
+ * Like useDataFeed, but automatically appends the active conflict as a
+ * `?conflict=<key>` query param. When the user toggles conflicts the URL
+ * changes, so the feed re-fetches for the newly selected theater.
+ */
+export function useConflictFeed<T>(path: string, interval: number = 60000, initialData: T | null = null) {
+  const { key } = useConflict();
+  const url = `${path}${path.includes('?') ? '&' : '?'}conflict=${key}`;
+  return useDataFeed<T>(url, interval, initialData);
 }
 
 /** Forces a re-render every `ms` milliseconds so relative timestamps stay fresh. */

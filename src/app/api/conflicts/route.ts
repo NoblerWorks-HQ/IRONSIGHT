@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
 import { fetchWithTimeout, parseXML, getTextContent } from '@/lib/fetcher';
+import { getConflictFromRequest } from '@/lib/conflicts';
 import type { ConflictEvent } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
 // Two Google News queries: general conflict + specific strike locations
-export async function GET() {
-  const queries = [
-    'Iran Israel war military conflict strike attack',
-    'missile OR rocket OR drone strike OR attack Arad OR Dimona OR "Tel Aviv" OR Haifa OR Eilat OR Tehran OR Isfahan OR Beirut OR "South Pars" OR Natanz OR "Diego Garcia"',
-  ];
+export async function GET(req: Request) {
+  const { server } = getConflictFromRequest(req);
+  const queries = server.conflictQueries;
 
   const allEvents: ConflictEvent[] = [];
   const seenTitles = new Set<string>();
@@ -48,35 +47,10 @@ export async function GET() {
         else if (t.match(/nuclear|enrichment|iaea|uranium/)) type = 'NUCLEAR';
         else if (t.match(/drone|uav|shahed/)) type = 'DRONE';
 
-        let location = 'Middle East';
-        if (t.includes('arad')) location = 'Arad, Israel';
-        else if (t.includes('dimona') || t.includes('nuclear town')) location = 'Dimona, Israel';
-        else if (t.includes('tel aviv')) location = 'Tel Aviv, Israel';
-        else if (t.includes('haifa')) location = 'Haifa, Israel';
-        else if (t.includes('eilat')) location = 'Eilat, Israel';
-        else if (t.includes('ashkelon')) location = 'Ashkelon, Israel';
-        else if (t.includes('ashdod')) location = 'Ashdod, Israel';
-        else if (t.includes('negev')) location = 'Negev, Israel';
-        else if (t.includes('natanz')) location = 'Natanz, Iran';
-        else if (t.includes('isfahan')) location = 'Isfahan, Iran';
-        else if (t.includes('tehran')) location = 'Tehran, Iran';
-        else if (t.includes('south pars')) location = 'South Pars, Iran';
-        else if (t.includes('bushehr')) location = 'Bushehr, Iran';
-        else if (t.includes('tabriz')) location = 'Tabriz, Iran';
-        else if (t.includes('beirut')) location = 'Beirut, Lebanon';
-        else if (t.includes('lebanon')) location = 'Lebanon';
-        else if (t.includes('damascus')) location = 'Damascus, Syria';
-        else if (t.includes('syria')) location = 'Syria';
-        else if (t.includes('baghdad')) location = 'Baghdad, Iraq';
-        else if (t.includes('iraq')) location = 'Iraq';
-        else if (t.includes('diego garcia')) location = 'Diego Garcia';
-        else if (t.includes('qatar') || t.includes('doha')) location = 'Qatar';
-        else if (t.includes('kuwait')) location = 'Kuwait';
-        else if (t.includes('saudi')) location = 'Saudi Arabia';
-        else if (t.includes('yemen') || t.includes('houthi')) location = 'Yemen';
-        else if (t.includes('gaza')) location = 'Gaza';
-        else if (t.includes('israel')) location = 'Israel';
-        else if (t.includes('iran')) location = 'Iran';
+        let location = server.defaultCountry;
+        for (const rule of server.conflictLocations) {
+          if (rule.match.some(m => t.includes(m))) { location = rule.location; break; }
+        }
 
         events.push({
           id: `gn-${allEvents.length + events.length}-${Date.now()}`,

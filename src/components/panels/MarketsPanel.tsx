@@ -1,6 +1,6 @@
 'use client';
 
-import { useDataFeed, formatPrice, formatChange } from '@/lib/hooks';
+import { useConflictFeed, formatPrice, formatChange } from '@/lib/hooks';
 
 interface MarketItem {
   symbol: string;
@@ -12,7 +12,7 @@ interface MarketItem {
 }
 
 export default function MarketsPanel() {
-  const { data: markets, loading } = useDataFeed<MarketItem[]>('/api/markets', 600000);
+  const { data: markets, loading } = useConflictFeed<MarketItem[]>('/api/markets', 600000);
 
   const indices = markets?.filter(m =>
     ['^DJI', '^GSPC', '^VIX', 'GC=F', 'DX-Y.NYB'].includes(m.symbol)

@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useDataFeed } from '@/lib/hooks';
+import { useConflictFeed } from '@/lib/hooks';
+import { useConflict } from '@/lib/conflicts/context';
+import type { ColorMatchRule } from '@/lib/conflicts';
 
 let L: typeof import('leaflet') | null = null;
 
@@ -85,89 +87,39 @@ interface TelegramData {
   }[];
 }
 
+interface DroneTrack {
+  id: string;
+  type: string;
+  label: string;
+  color: string;
+  lat: number;
+  lng: number;
+  heading: number;
+  count: number;
+  place: string;
+  text: string;
+  time: string;
+  confidence: number;
+  trail: [number, number][];
+}
+
+interface DroneData {
+  drones: DroneTrack[];
+  count: number;
+  ballisticThreat: boolean;
+  source: string | null;
+}
+
 interface MapProps {
   className?: string;
 }
 
-// === STATIC DATA ===
+// === HELPERS (conflict data comes from config via useConflict) ===
 
-const CITIES = [
-  { name: 'Tehran', lat: 35.6892, lon: 51.3890, country: 'Iran', capital: true },
-  { name: 'Isfahan', lat: 32.6546, lon: 51.6680, country: 'Iran', capital: false },
-  { name: 'Shiraz', lat: 29.5918, lon: 52.5837, country: 'Iran', capital: false },
-  { name: 'Tabriz', lat: 38.0800, lon: 46.2919, country: 'Iran', capital: false },
-  { name: 'Bandar Abbas', lat: 27.1865, lon: 56.2808, country: 'Iran', capital: false },
-  { name: 'Tel Aviv', lat: 32.0853, lon: 34.7818, country: 'Israel', capital: false },
-  { name: 'Jerusalem', lat: 31.7683, lon: 35.2137, country: 'Israel', capital: true },
-  { name: 'Haifa', lat: 32.7940, lon: 34.9896, country: 'Israel', capital: false },
-  { name: 'Baghdad', lat: 33.3152, lon: 44.3661, country: 'Iraq', capital: true },
-  { name: 'Damascus', lat: 33.5138, lon: 36.2765, country: 'Syria', capital: true },
-  { name: 'Beirut', lat: 33.8938, lon: 35.5018, country: 'Lebanon', capital: true },
-  { name: 'Riyadh', lat: 24.7136, lon: 46.6753, country: 'Saudi Arabia', capital: true },
-  { name: 'Dubai', lat: 25.2048, lon: 55.2708, country: 'UAE', capital: false },
-  { name: 'Doha', lat: 25.2854, lon: 51.5310, country: 'Qatar', capital: true },
-  { name: 'Manama', lat: 26.2285, lon: 50.5860, country: 'Bahrain', capital: true },
-  { name: 'Kuwait City', lat: 29.3759, lon: 47.9774, country: 'Kuwait', capital: true },
-  { name: 'Amman', lat: 31.9454, lon: 35.9284, country: 'Jordan', capital: true },
-  { name: 'Cairo', lat: 30.0444, lon: 31.2357, country: 'Egypt', capital: true },
-  { name: 'Ankara', lat: 39.9334, lon: 32.8597, country: 'Turkey', capital: true },
-  { name: "Sana'a", lat: 15.3694, lon: 44.1910, country: 'Yemen', capital: true },
-  { name: 'Aden', lat: 12.7855, lon: 45.0187, country: 'Yemen', capital: false },
-  { name: 'Muscat', lat: 23.5880, lon: 58.3829, country: 'Oman', capital: true },
-  { name: 'Dimona', lat: 31.0700, lon: 35.0300, country: 'Israel', capital: false },
-];
-
-const NAVY_COLORS: Record<string, string> = {
-  'US Navy': '#00aaff', 'Royal Navy': '#4488cc', 'French Navy': '#6666cc',
-  'Israeli Navy': '#00d4ff', 'Iran Navy': '#ff3366', 'IRGC Navy': '#ff3366', 'Saudi Navy': '#00ff88',
-};
-
-const ALERT_CITIES: Record<string, [number, number]> = {
-  'tel aviv': [32.085, 34.782], 'haifa': [32.794, 34.990], 'jerusalem': [31.768, 35.214],
-  'beer sheva': [31.252, 34.791], 'ashkelon': [31.669, 34.574], 'ashdod': [31.804, 34.655],
-  'sderot': [31.525, 34.596], 'eilat': [29.558, 34.952], 'tiberias': [32.796, 35.530],
-  'nahariya': [33.010, 35.098], 'dimona': [31.070, 35.030], 'arad': [31.261, 35.213],
-};
-
-// Iranian missile launch sites (known/approximate)
-const IRAN_LAUNCH_SITES = [
-  { name: 'Tabriz IRGC Base', lat: 38.08, lon: 46.29, range: 2000 },
-  { name: 'Isfahan Missile Base', lat: 32.65, lon: 51.67, range: 2000 },
-  { name: 'Shiraz Air Base', lat: 29.54, lon: 52.59, range: 1800 },
-  { name: 'Khorramabad Base', lat: 33.49, lon: 48.35, range: 2000 },
-];
-
-// Geocode strike locations from conflict descriptions
-const STRIKE_LOCATIONS: Record<string, [number, number]> = {
-  // Iran
-  'tehran': [35.69, 51.39], 'isfahan': [32.65, 51.67], 'natanz': [33.51, 51.73],
-  'shiraz': [29.59, 52.58], 'tabriz': [38.08, 46.29], 'bushehr': [28.97, 50.84],
-  'bandar abbas': [27.19, 56.28], 'kharg island': [29.24, 50.31], 'south pars': [27.5, 52.6],
-  'iran': [32.5, 53.0],
-  // Israel
-  'tel aviv': [32.09, 34.78], 'haifa': [32.79, 34.99], 'dimona': [31.07, 35.03],
-  'jerusalem': [31.77, 35.21], 'beer sheva': [31.25, 34.79], 'eilat': [29.56, 34.95],
-  'negev': [30.85, 34.78], 'arad': [31.26, 35.21], 'ashdod': [31.80, 34.66],
-  'ashkelon': [31.67, 34.57], 'ben gurion': [32.01, 34.87], 'nuclear': [31.07, 35.03],
-  'israel': [31.5, 34.8],
-  // Lebanon
-  'beirut': [33.89, 35.50], 'hezbollah': [33.60, 35.50], 'litani': [33.35, 35.30],
-  'south lebanon': [33.30, 35.40], 'lebanon': [33.85, 35.86],
-  // Others
-  'syria': [34.80, 38.99], 'damascus': [33.51, 36.28],
-  'iraq': [33.31, 44.37], 'baghdad': [33.31, 44.37],
-  'yemen': [15.37, 44.19], 'houthi': [15.37, 44.19], 'red sea': [14.5, 42.5],
-  'gaza': [31.42, 34.36], 'strait of hormuz': [26.56, 56.25],
-  'qatar': [25.29, 51.53], 'doha': [25.29, 51.53],
-  'saudi': [24.71, 46.68], 'diego garcia': [-7.32, 72.42],
-  'kuwait': [29.38, 47.98],
-};
-
-function getFlightColor(origin: string): string {
-  if (origin.includes('US') || origin === 'United States') return '#00aaff';
-  if (origin.includes('Israel')) return '#00d4ff';
-  if (origin.includes('Iran')) return '#ff3366';
-  if (origin.includes('UK') || origin.includes('Royal')) return '#4488cc';
+function getFlightColor(origin: string, rules: ColorMatchRule[]): string {
+  for (const rule of rules) {
+    if (origin.includes(rule.match)) return rule.color;
+  }
   return '#ffaa00';
 }
 
@@ -255,29 +207,16 @@ function drawMissileArc(map: L.Map, from: [number, number], to: [number, number]
   };
 }
 
-// Geocode a strike — ONLY match specific locations, not generic country names
-// This prevents "Iran war: day 22" from placing a random pin on the map
-function geocodeStrike(description: string, location: string): { coords: [number, number]; place: string } | null {
+// Geocode a strike — ONLY match specific locations, not generic country names.
+// This prevents "Iran war: day 22" from placing a random pin on the map.
+// targets/strikeLocations come from the active conflict config.
+function geocodeStrike(
+  description: string,
+  location: string,
+  targets: [string, string][],
+  strikeLocations: Record<string, [number, number]>,
+): { coords: [number, number]; place: string } | null {
   const text = `${description} ${location}`.toLowerCase();
-
-  // Only match specific cities/targets — never generic "iran" or "israel"
-  const targets: [string, string][] = [
-    // Israel targets
-    ['arad', 'Arad'], ['dimona', 'Dimona'], ['natanz', 'Natanz'], ['ben gurion', 'Ben Gurion Airport'],
-    ['tel aviv', 'Tel Aviv'], ['haifa', 'Haifa'], ['beer sheva', 'Beer Sheva'], ['eilat', 'Eilat'],
-    ['ashkelon', 'Ashkelon'], ['ashdod', 'Ashdod'], ['negev', 'Negev'], ['sderot', 'Sderot'],
-    ['jerusalem', 'Jerusalem'], ['nuclear town', 'Dimona'],
-    // Iran targets
-    ['tehran', 'Tehran'], ['isfahan', 'Isfahan'], ['shiraz', 'Shiraz'], ['tabriz', 'Tabriz'],
-    ['bandar abbas', 'Bandar Abbas'], ['bushehr', 'Bushehr'], ['kharg island', 'Kharg Island'],
-    ['south pars', 'South Pars'],
-    // Lebanon
-    ['beirut', 'Beirut'], ['litani', 'Litani River'], ['south lebanon', 'South Lebanon'],
-    // Others
-    ['damascus', 'Damascus'], ['baghdad', 'Baghdad'], ['diego garcia', 'Diego Garcia'],
-    ['strait of hormuz', 'Strait of Hormuz'], ['red sea', 'Red Sea'],
-    ['gaza', 'Gaza'], ['doha', 'Doha'], ['kuwait', 'Kuwait'],
-  ];
 
   // Also require a strike-indicating word to avoid matching city mentions in non-strike articles
   const strikeWords = ['strike', 'struck', 'hit', 'attack', 'bomb', 'missile', 'rocket',
@@ -287,8 +226,8 @@ function geocodeStrike(description: string, location: string): { coords: [number
   if (!hasStrikeWord) return null;
 
   for (const [key, place] of targets) {
-    if (text.includes(key) && STRIKE_LOCATIONS[key]) {
-      return { coords: STRIKE_LOCATIONS[key], place };
+    if (text.includes(key) && strikeLocations[key]) {
+      return { coords: strikeLocations[key], place };
     }
   }
 
@@ -296,6 +235,8 @@ function geocodeStrike(description: string, location: string): { coords: [number
 }
 
 export default function ConflictMap({ className }: MapProps) {
+  const { config } = useConflict();
+  const cfg = config.client;
   const [mounted, setMounted] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
 
@@ -307,10 +248,13 @@ export default function ConflictMap({ className }: MapProps) {
   const strikeLayerRef = useRef<L.LayerGroup | null>(null);
   const rangeLayerRef = useRef<L.LayerGroup | null>(null);
   const toolLayerRef = useRef<L.LayerGroup | null>(null);
+  const droneLayerRef = useRef<L.LayerGroup | null>(null);
 
   // Marker tracking
   const airMarkersRef = useRef<Map<string, L.Marker>>(new Map());
   const navalMarkersRef = useRef<Map<string, L.Marker>>(new Map());
+  const droneMarkersRef = useRef<Map<string, L.Marker>>(new Map());
+  const droneTrailsRef = useRef<Map<string, L.Polyline>>(new Map());
   const citiesDrawnRef = useRef(false);
   const highlightRef = useRef<L.CircleMarker | null>(null);
 
@@ -330,13 +274,14 @@ export default function ConflictMap({ className }: MapProps) {
   const prevAlertStatusRef = useRef<string>('CLEAR');
   const arcCancellersRef = useRef<(() => void)[]>([]);
 
-  // Data feeds
-  const { data: flights } = useDataFeed<FlightData>('/api/flights', 180000);
-  const { data: naval } = useDataFeed<NavalData>('/api/ships', 300000);
-  const { data: alerts } = useDataFeed<AlertData>('/api/alerts', 15000);
-  const { data: conflicts } = useDataFeed<ConflictEvent[]>('/api/conflicts', 180000);
-  const { data: strikes } = useDataFeed<StrikeData[]>('/api/strikes', 120000);
-  const { data: telegram } = useDataFeed<TelegramData>('/api/telegram', 60000);
+  // Data feeds (conflict-aware — append ?conflict= automatically)
+  const { data: flights } = useConflictFeed<FlightData>('/api/flights', 180000);
+  const { data: naval } = useConflictFeed<NavalData>('/api/ships', 300000);
+  const { data: alerts } = useConflictFeed<AlertData>('/api/alerts', 15000);
+  const { data: conflicts } = useConflictFeed<ConflictEvent[]>('/api/conflicts', 180000);
+  const { data: strikes } = useConflictFeed<StrikeData[]>('/api/strikes', 120000);
+  const { data: telegram } = useConflictFeed<TelegramData>('/api/telegram', 60000);
+  const { data: droneData } = useConflictFeed<DroneData>('/api/drones', 20000);
 
   const [showMilAir, setShowMilAir] = useState(true);
   const [showNaval, setShowNaval] = useState(true);
@@ -354,7 +299,7 @@ export default function ConflictMap({ className }: MapProps) {
     if (!container || mapRef.current) return;
 
     const map = L.map('conflict-map', {
-      center: [30.0, 48.0], zoom: 5, zoomControl: false, attributionControl: false,
+      center: cfg.mapCenter, zoom: cfg.mapZoom, zoomControl: false, attributionControl: false,
     });
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
@@ -367,6 +312,7 @@ export default function ConflictMap({ className }: MapProps) {
     strikeLayerRef.current = L.layerGroup().addTo(map);
     rangeLayerRef.current = L.layerGroup().addTo(map);
     toolLayerRef.current = L.layerGroup().addTo(map);
+    droneLayerRef.current = L.layerGroup().addTo(map);
     measureLayerRef.current = L.layerGroup().addTo(map);
 
     mapRef.current = map;
@@ -381,11 +327,38 @@ export default function ConflictMap({ className }: MapProps) {
       strikeLayerRef.current = null;
       rangeLayerRef.current = null;
       toolLayerRef.current = null;
+      droneLayerRef.current = null;
       measureLayerRef.current = null;
       airMarkersRef.current.clear();
       navalMarkersRef.current.clear();
+      droneMarkersRef.current.clear();
+      droneTrailsRef.current.clear();
       citiesDrawnRef.current = false;
       flightTrailsRef.current.clear();
+    };
+  }, [mounted]);
+
+  // === COUNTRY BORDERS OVERLAY ===
+  // The CartoDB dark basemap draws political borders very faintly; add a crisp
+  // admin-0 boundary-lines overlay (Natural Earth) so country borders stand out.
+  useEffect(() => {
+    if (!L || !mapRef.current) return;
+    let layer: L.GeoJSON | null = null;
+    let cancelled = false;
+    fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_boundary_lines_land.geojson')
+      .then(r => (r.ok ? r.json() : null))
+      .then(geo => {
+        if (cancelled || !geo || !L || !mapRef.current) return;
+        layer = L.geoJSON(geo, {
+          style: { color: '#5578a8', weight: 1, opacity: 0.55, fill: false },
+          interactive: false,
+        });
+        layer.addTo(mapRef.current);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      if (layer && mapRef.current) { try { mapRef.current.removeLayer(layer); } catch {} }
     };
   }, [mounted]);
 
@@ -484,9 +457,9 @@ export default function ConflictMap({ className }: MapProps) {
 
   useEffect(() => {
     if (!L || !cityLayerRef.current || citiesDrawnRef.current) return;
-    CITIES.forEach(city => {
+    cfg.cities.forEach(city => {
       const size = city.capital ? 5 : 3;
-      const color = city.country === 'Iran' ? '#ff6666' : city.country === 'Israel' ? '#66ccff' : '#999999';
+      const color = cfg.cityColors[city.country] || cfg.cityColors.default || '#999999';
       const marker = L!.circleMarker([city.lat, city.lon], { radius: size, color, fillColor: color, fillOpacity: 0.6, weight: 1 });
       marker.bindTooltip(city.name, { permanent: city.capital, direction: 'right', offset: [8, 0], className: 'city-label' });
       marker.bindPopup(''); // Will be set dynamically on click
@@ -500,7 +473,7 @@ export default function ConflictMap({ className }: MapProps) {
   useEffect(() => {
     if (!cityMarkersRef.current.size) return;
 
-    CITIES.forEach(city => {
+    cfg.cities.forEach(city => {
       const marker = cityMarkersRef.current.get(city.name);
       if (!marker) return;
 
@@ -603,7 +576,7 @@ export default function ConflictMap({ className }: MapProps) {
     flights.flights.forEach(f => {
       const id = f.icao24;
       currentIds.add(id);
-      const color = getFlightColor(f.origin);
+      const color = getFlightColor(f.origin, cfg.flightColors);
 
       // Record position for trail
       if (!flightTrailsRef.current.has(id)) flightTrailsRef.current.set(id, []);
@@ -679,7 +652,7 @@ export default function ConflictMap({ className }: MapProps) {
     naval.ships.forEach(ship => {
       const id = ship.name;
       currentNames.add(id);
-      const color = NAVY_COLORS[ship.navy] || '#888888';
+      const color = cfg.navyColors[ship.navy] || '#888888';
       const isSub = ship.type.toLowerCase().includes('submarine');
       const existing = navalMarkersRef.current.get(id);
       if (existing) {
@@ -710,6 +683,69 @@ export default function ConflictMap({ className }: MapProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [naval]);
 
+  // === LIVE DRONE / MISSILE TRACKS (Neptun) — always on, drones + missiles together ===
+  useEffect(() => {
+    if (!L || !droneLayerRef.current) return;
+    const drones = droneData?.drones || [];
+    const currentIds = new Set<string>();
+
+    drones.forEach(d => {
+      currentIds.add(d.id);
+      const timeStr = new Date(d.time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+      const popupHtml = `
+        <div style="font-family:monospace;font-size:11px;color:#000;min-width:200px;max-width:280px;">
+          <strong style="color:${d.color};font-size:12px;">${d.label}${d.count > 1 ? ` ×${d.count}` : ''}</strong><br/>
+          ${d.place ? `<span style="color:#333;">→ ${d.place}</span><br/>` : ''}
+          <span style="color:#555;">Heading ${d.heading}° • Confidence ${d.confidence}%</span>
+          ${d.text ? `<div style="margin:4px 0;line-height:1.35;">${d.text}</div>` : ''}
+          <em style="color:#888;font-size:9px;">Neptun • ${timeStr}</em>
+        </div>`;
+      const iconHtml = `<div style="width:20px;height:20px;position:relative;">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:rotate(${d.heading}deg);color:${d.color};font-size:15px;line-height:1;filter:drop-shadow(0 0 5px ${d.color});">▲</div>
+      </div>`;
+
+      // Movement trail
+      if (d.trail.length >= 2) {
+        const existingTrail = droneTrailsRef.current.get(d.id);
+        if (existingTrail) {
+          existingTrail.setLatLngs(d.trail);
+        } else {
+          const pl = L!.polyline(d.trail, { color: d.color, weight: 1.5, opacity: 0.5, dashArray: '3, 4' }).addTo(droneLayerRef.current!);
+          droneTrailsRef.current.set(d.id, pl);
+        }
+      }
+
+      const existing = droneMarkersRef.current.get(d.id);
+      if (existing) {
+        animateMarker(existing, d.lat, d.lng, 2000);
+        existing.setIcon(L!.divIcon({ className: 'drone-marker', html: iconHtml, iconSize: [20, 20], iconAnchor: [10, 10] }));
+        existing.setPopupContent(popupHtml);
+      } else {
+        const marker = L!.marker([d.lat, d.lng], {
+          icon: L!.divIcon({ className: 'drone-marker', html: iconHtml, iconSize: [20, 20], iconAnchor: [10, 10] }),
+        });
+        marker.bindPopup(popupHtml);
+        marker.bindTooltip(`${d.label}${d.place ? ` → ${d.place}` : ''}`, { direction: 'top', offset: [0, -8], className: 'drone-label' });
+        droneLayerRef.current!.addLayer(marker);
+        droneMarkersRef.current.set(d.id, marker);
+      }
+    });
+
+    // Remove tracks that are no longer active
+    droneMarkersRef.current.forEach((marker, id) => {
+      if (!currentIds.has(id)) {
+        droneLayerRef.current!.removeLayer(marker);
+        droneMarkersRef.current.delete(id);
+      }
+    });
+    droneTrailsRef.current.forEach((pl, id) => {
+      if (!currentIds.has(id)) {
+        droneLayerRef.current!.removeLayer(pl);
+        droneTrailsRef.current.delete(id);
+      }
+    });
+  }, [droneData]);
+
   // === ALERTS with missile arcs ===
   useEffect(() => {
     if (!L || !alertLayerRef.current || !mapRef.current) return;
@@ -731,7 +767,7 @@ export default function ConflictMap({ className }: MapProps) {
       if (!wasActive) {
         alertLayerRef.current.clearLayers();
       }
-      const alertCircle = L.circle([31.5, 34.8], {
+      const alertCircle = L.circle(cfg.alertFallbackCenter, {
         radius: 150000, color: '#ff3366', fillColor: '#ff3366', fillOpacity: 0.15,
         weight: 2, dashArray: '5, 10', className: 'alert-flash',
       });
@@ -746,7 +782,7 @@ export default function ConflictMap({ className }: MapProps) {
       alerts.alerts.forEach(alert => {
         alert.locations.forEach(loc => {
           const key = loc.toLowerCase().trim();
-          const coords = ALERT_CITIES[key];
+          const coords = cfg.alertCities[key];
           if (coords) {
             const sirens = L!.circleMarker(coords, {
               radius: 12, color: '#ff3366', fillColor: '#ff3366', fillOpacity: 0.4, weight: 2, className: 'alert-flash',
@@ -759,18 +795,18 @@ export default function ConflictMap({ className }: MapProps) {
 
       // Draw missile arcs on NEW alerts — only to specific alert cities
       if (prevAlertStatusRef.current !== 'ACTIVE') {
-        const alertType = alerts.alerts[0]?.type || '';
-        const isFromIran = alertType === 'MISSILE' || alerts.alerts.some(a => a.threat.toLowerCase().includes('iran') || a.threat.toLowerCase().includes('ballistic'));
-        const isFromLebanon = alerts.alerts.some(a => a.threat.toLowerCase().includes('lebanon') || a.threat.toLowerCase().includes('hezbollah'));
-
-        const origin: [number, number] = isFromIran ? [33.5, 48.0] : isFromLebanon ? [33.89, 35.50] : [33.5, 48.0];
+        // Determine launch origin: match a threat keyword to a named origin,
+        // else use the conflict's default origin.
+        const threatText = alerts.alerts.map(a => a.threat.toLowerCase()).join(' ');
+        const namedOrigin = cfg.missileOrigins.find(o => threatText.includes(o.match));
+        const origin: [number, number] = namedOrigin ? namedOrigin.coords : cfg.defaultMissileOrigin;
 
         // Collect all unique alert city coordinates
         const targetCoords: [number, number][] = [];
         const seenCoords = new Set<string>();
         alerts.alerts.forEach(alert => {
           alert.locations.forEach(loc => {
-            const coords = ALERT_CITIES[loc.toLowerCase().trim()];
+            const coords = cfg.alertCities[loc.toLowerCase().trim()];
             if (coords) {
               const key = `${coords[0]},${coords[1]}`;
               if (!seenCoords.has(key)) {
@@ -781,9 +817,9 @@ export default function ConflictMap({ className }: MapProps) {
           });
         });
 
-        // If no specific cities found, fall back to central Israel
+        // If no specific cities found, fall back to the theater center
         if (targetCoords.length === 0) {
-          targetCoords.push([31.5, 34.8]);
+          targetCoords.push(cfg.alertFallbackCenter);
         }
 
         // Draw one arc per target city
@@ -865,7 +901,7 @@ export default function ConflictMap({ className }: MapProps) {
       const key = event.title.toLowerCase().substring(0, 40);
       if (plotted.has(key)) return;
 
-      const geo = geocodeStrike(event.title, '');
+      const geo = geocodeStrike(event.title, '', cfg.strikeTargets, cfg.strikeLocations);
       if (!geo) return;
 
       // If this is from Telegram, skip if a news source already has a marker at this location
@@ -913,7 +949,7 @@ export default function ConflictMap({ className }: MapProps) {
 
     if (!showRangeRings) return;
 
-    IRAN_LAUNCH_SITES.forEach(site => {
+    cfg.launchSites.forEach(site => {
       // Range circle
       const circle = L!.circle([site.lat, site.lon], {
         radius: site.range * 1000,
@@ -978,7 +1014,7 @@ export default function ConflictMap({ className }: MapProps) {
       </div>
 
       <style jsx global>{`
-        .city-label, .aircraft-label, .naval-label {
+        .city-label, .aircraft-label, .naval-label, .drone-label {
           background: rgba(10, 14, 23, 0.9) !important;
           border: 1px solid rgba(30, 58, 95, 0.5) !important;
           color: #94a3b8 !important;
@@ -988,12 +1024,13 @@ export default function ConflictMap({ className }: MapProps) {
           border-radius: 2px !important;
           box-shadow: none !important;
         }
-        .city-label::before, .aircraft-label::before, .naval-label::before {
+        .city-label::before, .aircraft-label::before, .naval-label::before, .drone-label::before {
           border-right-color: rgba(30, 58, 95, 0.5) !important;
         }
         .aircraft-label { color: #00aaff !important; }
         .naval-label { color: #00d4ff !important; }
-        .mil-aircraft-marker, .naval-marker, .strike-marker, .measure-label { background: none !important; border: none !important; }
+        .drone-label { color: #ff5588 !important; }
+        .mil-aircraft-marker, .naval-marker, .strike-marker, .measure-label, .drone-marker { background: none !important; border: none !important; }
         .missile-arc { filter: drop-shadow(0 0 4px #ff3366); }
       `}</style>
     </div>

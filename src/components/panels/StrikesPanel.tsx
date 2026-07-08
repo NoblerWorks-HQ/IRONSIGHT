@@ -1,6 +1,6 @@
 'use client';
 
-import { useDataFeed, timeAgo, useTick } from '@/lib/hooks';
+import { useConflictFeed, timeAgo, useTick } from '@/lib/hooks';
 
 interface StrikeEvent {
   id: string;
@@ -31,7 +31,7 @@ const SEVERITY_COLORS: Record<string, string> = {
 };
 
 export default function StrikesPanel() {
-  const { data: strikes, loading } = useDataFeed<StrikeEvent[]>('/api/strikes', 120000);
+  const { data: strikes, loading } = useConflictFeed<StrikeEvent[]>('/api/strikes', 120000);
   useTick(15000);
 
   // Count by category

@@ -1,17 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-const TIME_ZONES = [
-  { label: 'DC', zone: 'America/New_York', flag: '🇺🇸' },
-  { label: 'LON', zone: 'Europe/London', flag: '🇬🇧' },
-  { label: 'TLV', zone: 'Asia/Jerusalem', flag: '🇮🇱' },
-  { label: 'THR', zone: 'Asia/Tehran', flag: '🇮🇷' },
-  { label: 'RYD', zone: 'Asia/Riyadh', flag: '🇸🇦' },
-  { label: 'MSK', zone: 'Asia/Shanghai', flag: '🇨🇳' },
-];
+import { useConflict } from '@/lib/conflicts/context';
 
 export default function ThreatClock() {
+  const { config } = useConflict();
+  const TIME_ZONES = config.client.timeZones;
   const [time, setTime] = useState<Date | null>(null);
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { translateFreeText } from '@/lib/hebrew';
+import { getConflictFromRequest } from '@/lib/conflicts';
 
 // Detect non-Latin scripts (Hebrew, Arabic, Farsi, Cyrillic, etc.)
 function hasNonLatinText(text: string): boolean {
@@ -10,40 +11,7 @@ export const dynamic = 'force-dynamic';
 
 // Scrape public Telegram channels via embed endpoint
 // Completely free, no API key, no bot needed
-
-const CHANNELS = [
-  { name: 'IDFofficial', label: 'IDF Official', color: '#3388ff' },
-  { name: 'RocketAlert', label: 'Rocket Alert', color: '#ff3366' },
-  { name: 'PressTV', label: 'PressTV (Iran)', color: '#cc3333' },
-  { name: 'OSINTdefender', label: 'OSINT Defender', color: '#00aaff' },
-  { name: 'middle_east_spectator', label: 'ME Spectator', color: '#ff6600' },
-  { name: 'iranintl_en', label: 'Iran Intl', color: '#00ff88' },
-  { name: 'Alertisrael', label: 'Alert Israel', color: '#ff6688' },
-  { name: 'QudsNen', label: 'Quds News', color: '#33cc66' },
-  { name: 'TimesofIsrael', label: 'Times of Israel', color: '#0066cc' },
-  { name: 'FarsNews_EN', label: 'Fars News', color: '#669933' },
-  { name: 'FotrosResistancee', label: 'Fotros Resist.', color: '#dd4444' },
-  { name: 'Alsaa_plus_EN', label: 'Al-Saa EN', color: '#ee8833' },
-  { name: 'warfareanalysis', label: 'Warfare Analysis', color: '#8888cc' },
-  { name: 'rnintel', label: 'RN Intel', color: '#44aacc' },
-  { name: 'GeoPWatch', label: 'GeoPol Watch', color: '#cc66aa' },
-  { name: 'thecradlemedia', label: 'The Cradle', color: '#aa8844' },
-  { name: 'Middle_East_Spectator', label: 'ME Spectator 2', color: '#ff8844' },
-  { name: 'HAMASW', label: 'Hamas-Israel War', color: '#339933' },
-  { name: 'TasnimNewsEN', label: 'Tasnim News', color: '#557733' },
-  { name: 'AbuAliExpress', label: 'Abu Ali Express', color: '#dd7733' },
-  { name: 'dropsitenews', label: 'Drop Site News', color: '#e63946' },
-  { name: 'france24_en', label: 'France 24', color: '#2266bb' },
-  { name: 'SaberinFa', label: 'Saberin (IRGC)', color: '#884422' },
-  { name: 'defapress_ir', label: 'DefaPress (Iran MOD)', color: '#556644' },
-  { name: 'sepah', label: 'IRGC Official', color: '#774433' },
-  { name: 'wamnews_en', label: 'WAM (UAE)', color: '#c4a535' },
-  { name: 'gulfnewsUAE', label: 'Gulf News', color: '#e6b800' },
-  { name: 'Alibk3', label: 'Ali Bk', color: '#44bb88' },
-  { name: 'aljazeeraglobal', label: 'Al Jazeera', color: '#d4a843' },
-  { name: 'bintjbeilnews', label: 'Bint Jbeil', color: '#55aa77' },
-  { name: 'kianmeli1', label: 'Kian Meli (Iran)', color: '#7744aa' },
-];
+// Channel list is per-conflict (see src/lib/conflicts/*).
 
 interface TelegramPost {
   channel: string;
@@ -167,10 +135,13 @@ async function findLatestPostId(channel: string): Promise<number> {
   return low;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { server } = getConflictFromRequest(req);
+  const channels = server.telegramChannels;
+
   // Process ALL channels in parallel — each finds latest + fetches 3 posts
   const channelResults = await Promise.allSettled(
-    CHANNELS.map(async (channel) => {
+    channels.map(async (channel) => {
       const latestId = await findLatestPostId(channel.name);
       const posts: TelegramPost[] = [];
 
@@ -210,7 +181,7 @@ export async function GET() {
 
   return NextResponse.json({
     posts: allPosts,
-    channels: CHANNELS.map(c => c.label),
+    channels: channels.map(c => c.label),
     updated: new Date().toISOString(),
   }, {
     headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },

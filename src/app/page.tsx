@@ -16,6 +16,8 @@ import NavalPanel from '@/components/panels/NavalPanel';
 import RegionalAlertsPanel from '@/components/panels/RegionalAlertsPanel';
 import CryptoPanel from '@/components/panels/CryptoPanel';
 import PolymarketPanel from '@/components/panels/PolymarketPanel';
+import ConflictToggle from '@/components/ConflictToggle';
+import { useConflict } from '@/lib/conflicts/context';
 import { useState, useEffect } from 'react';
 
 const ConflictMap = dynamic(() => import('@/components/map/ConflictMap'), {
@@ -24,6 +26,7 @@ const ConflictMap = dynamic(() => import('@/components/map/ConflictMap'), {
 });
 
 export default function Dashboard() {
+  const { key: conflictKey, config } = useConflict();
   const [uptime, setUptime] = useState(0);
 
   useEffect(() => {
@@ -52,8 +55,7 @@ export default function Dashboard() {
               <div className="absolute inset-1 rounded-full border border-[var(--cyan)] opacity-20" />
               <div className="absolute inset-2 rounded-full border border-[var(--cyan)] opacity-10" />
               <div
-                className="absolute top-1/2 left-1/2 w-0.5 h-4 bg-[var(--cyan)] origin-bottom radar-sweep"
-                style={{ transform: 'translateX(-50%)' }}
+                className="absolute bottom-1/2 left-1/2 -ml-px w-0.5 h-4 bg-[var(--cyan)] origin-bottom radar-sweep"
               />
               <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-[var(--cyan)] rounded-full -translate-x-1/2 -translate-y-1/2" />
             </div>
@@ -66,6 +68,7 @@ export default function Dashboard() {
           </div>
           <MetricsBar />
           <div className="flex items-center gap-4 text-[9px] text-[var(--text-secondary)]">
+            <ConflictToggle />
             <span>SESSION {formatUptime(uptime)}</span>
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--green)] animate-pulse" />
@@ -87,7 +90,7 @@ export default function Dashboard() {
           <NewsFeed />
         </div>
         <div className="col-span-4 min-h-0">
-          <ConflictMap className="h-full" />
+          <ConflictMap key={conflictKey} className="h-full" />
         </div>
         <div className="col-span-2 min-h-0">
           <AlertsPanel />
@@ -135,7 +138,7 @@ export default function Dashboard() {
 
       {/* Bottom status bar */}
       <footer className="border-t border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-1 flex items-center justify-between text-[9px] text-[var(--text-secondary)] shrink-0">
-        <span>FEEDS: NEWS | GDELT | TELEGRAM | OPENSKY | OCHA | YAHOO FIN | PIKUD HAOREF | NASA FIRMS | ADSB.LOL</span>
+        <span>FEEDS: NEWS | GDELT | TELEGRAM | OPENSKY | OCHA | YAHOO FIN | {config.client.alertSystemName.toUpperCase()} | NASA FIRMS | ADSB.LOL</span>
         <div className="flex items-center gap-4">
           <span>ALERTS: 5s | NEWS: 2m | MARKETS: 5m</span>
           <span>ALL DATA: PUBLIC / OSINT</span>

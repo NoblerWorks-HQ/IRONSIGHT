@@ -1,6 +1,6 @@
 'use client';
 
-import { useDataFeed, timeAgo, useTick } from '@/lib/hooks';
+import { useConflictFeed, timeAgo, useTick } from '@/lib/hooks';
 import type { ConflictEvent } from '@/types';
 
 const TYPE_COLORS: Record<string, string> = {
@@ -13,7 +13,7 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 export default function ConflictFeed() {
-  const { data: rawEvents, loading } = useDataFeed<ConflictEvent[]>('/api/conflicts', 180000);
+  const { data: rawEvents, loading } = useConflictFeed<ConflictEvent[]>('/api/conflicts', 180000);
   useTick(15000);
 
   // Sort most recent first

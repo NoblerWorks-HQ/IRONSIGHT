@@ -1,6 +1,6 @@
 'use client';
 
-import { useDataFeed } from '@/lib/hooks';
+import { useConflictFeed } from '@/lib/hooks';
 
 interface MarketOutcome {
   label: string;
@@ -31,7 +31,7 @@ function formatVolume(v: number): string {
 }
 
 export default function PolymarketPanel() {
-  const { data, loading } = useDataFeed<PolymarketData>('/api/polymarket', 600000);
+  const { data, loading } = useConflictFeed<PolymarketData>('/api/polymarket', 600000);
 
   return (
     <div className="panel h-full flex flex-col">

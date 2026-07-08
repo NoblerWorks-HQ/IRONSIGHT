@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 
 import { fetchWithTimeout } from '@/lib/fetcher';
+import { getConflictFromRequest } from '@/lib/conflicts';
 
 export const dynamic = 'force-dynamic';
 
 // NASA FIRMS (Fire Information for Resource Management System)
 // Detects thermal anomalies from satellites - includes fires AND large explosions
 // Free, no API key needed for the open data CSV
-export async function GET() {
+export async function GET(req: Request) {
+  const { server } = getConflictFromRequest(req);
+  const bbox = server.firesBBox;
   try {
     // Download global 24h fire data and filter to Middle East region
     const url = 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Global_24h.csv';
@@ -28,7 +31,7 @@ export async function GET() {
     const frpIdx = header.indexOf('frp'); // Fire Radiative Power - higher = bigger
     const dayIdx = header.indexOf('daynight');
 
-    // Filter to Middle East bounding box: lat 20-42, lon 25-65
+    // Filter to the active conflict's bounding box
     const events = lines.slice(1)
       .map(line => {
         const cols = line.split(',');
@@ -37,8 +40,8 @@ export async function GET() {
         const lat = parseFloat(cols[latIdx]);
         const lon = parseFloat(cols[lonIdx]);
 
-        // Middle East filter
-        if (lat < 20 || lat > 42 || lon < 25 || lon > 65) return null;
+        // Region filter
+        if (lat < bbox.latMin || lat > bbox.latMax || lon < bbox.lonMin || lon > bbox.lonMax) return null;
 
         const brightness = parseFloat(cols[brightIdx]);
         const frp = parseFloat(cols[frpIdx]);

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { fetchWithTimeout } from '@/lib/fetcher';
+import { getConflictFromRequest } from '@/lib/conflicts';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +9,9 @@ export const dynamic = 'force-dynamic';
 // Has a military database (dbFlags bit 1) that properly identifies military aircraft
 // Much better than OpenSky for mil tracking
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { server } = getConflictFromRequest(req);
+  const { flightsCenter: center, flightsBBox: bbox } = server;
   try {
     // Fetch all sources in parallel with short timeouts
     const [milResult, regionResult] = await Promise.allSettled([
@@ -16,7 +19,7 @@ export async function GET() {
         timeout: 8000,
         headers: { 'Accept': 'application/json' },
       }).then(r => r.ok ? r.json() : { ac: [] }),
-      fetchWithTimeout('https://api.adsb.lol/v2/lat/30/lon/48/dist/2500', {
+      fetchWithTimeout(`https://api.adsb.lol/v2/lat/${center.lat}/lon/${center.lon}/dist/${center.dist}`, {
         timeout: 8000,
         headers: { 'Accept': 'application/json' },
       }).then(r => r.ok ? r.json() : { ac: [] }),
@@ -25,9 +28,9 @@ export async function GET() {
     const milData = milResult.status === 'fulfilled' ? milResult.value : { ac: [] };
     const regionData = regionResult.status === 'fulfilled' ? regionResult.value : { ac: [] };
 
-    // Filter mil feed to Middle East region
+    // Filter mil feed to the active conflict's region
     const milAircraft = (milData.ac || []).filter((a: AircraftState) =>
-      a.lat && a.lon && a.lat >= 10 && a.lat <= 45 && a.lon >= 20 && a.lon <= 70
+      a.lat && a.lon && a.lat >= bbox.latMin && a.lat <= bbox.latMax && a.lon >= bbox.lonMin && a.lon <= bbox.lonMax
     );
 
     // From regional feed, get military flagged + interesting aircraft
@@ -257,6 +260,9 @@ function getOriginFromHex(hex: string): string {
   if (n >= 0x740000 && n <= 0x741FFF) return 'Turkey';
   if (n >= 0x710000 && n <= 0x71FFFF) return 'Saudi Arabia';
   if (n >= 0x896000 && n <= 0x896FFF) return 'UAE';
+  if (n >= 0x140000 && n <= 0x1FFFFF) return 'Russia';
+  if (n >= 0x508000 && n <= 0x50FFFF) return 'Ukraine';
+  if (n >= 0x510000 && n <= 0x5103FF) return 'Belarus';
   if (n >= 0x400000 && n <= 0x43FFFF) return 'NATO/Europe';
   return '';
 }

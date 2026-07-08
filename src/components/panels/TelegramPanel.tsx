@@ -1,6 +1,6 @@
 'use client';
 
-import { useDataFeed, timeAgo } from '@/lib/hooks';
+import { useConflictFeed, timeAgo } from '@/lib/hooks';
 
 interface TelegramPost {
   channel: string;
@@ -19,7 +19,7 @@ interface TelegramData {
 }
 
 export default function TelegramPanel() {
-  const { data, loading, lastUpdated } = useDataFeed<TelegramData>('/api/telegram', 60000);
+  const { data, loading, lastUpdated } = useConflictFeed<TelegramData>('/api/telegram', 60000);
 
   return (
     <div className="panel h-full flex flex-col">

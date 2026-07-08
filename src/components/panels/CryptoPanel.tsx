@@ -1,6 +1,6 @@
 'use client';
 
-import { useDataFeed } from '@/lib/hooks';
+import { useConflictFeed } from '@/lib/hooks';
 
 interface CryptoData {
   name: string;
@@ -18,7 +18,7 @@ const SYMBOL_COLORS: Record<string, string> = {
 };
 
 export default function CryptoPanel() {
-  const { data: prices, loading } = useDataFeed<CryptoData[]>('/api/crypto', 600000);
+  const { data: prices, loading } = useConflictFeed<CryptoData[]>('/api/crypto', 600000);
 
   return (
     <div className="panel h-full flex flex-col">

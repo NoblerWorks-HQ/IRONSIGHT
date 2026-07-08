@@ -1,6 +1,8 @@
 'use client';
 
-import { useDataFeed } from '@/lib/hooks';
+import { useConflictFeed } from '@/lib/hooks';
+import { useConflict } from '@/lib/conflicts/context';
+import type { RegionBox } from '@/lib/conflicts';
 
 interface FireEvent {
   lat: number;
@@ -30,26 +32,18 @@ const INTENSITY_COLORS: Record<string, string> = {
   extreme: 'var(--red)',
 };
 
-// Rough reverse geocoding for Middle East
-function getRegion(lat: number, lon: number): string {
-  if (lat > 36 && lon > 36 && lon < 45) return 'Turkey';
-  if (lat > 29 && lat < 34 && lon > 34 && lon < 36) return 'Israel';
-  if (lat > 24 && lat < 38 && lon > 44 && lon < 64) return 'Iran';
-  if (lat > 29 && lat < 38 && lon > 38 && lon < 49) return 'Iraq';
-  if (lat > 32 && lat < 38 && lon > 35 && lon < 43) return 'Syria';
-  if (lat > 33 && lat < 35 && lon > 35 && lon < 37) return 'Lebanon';
-  if (lat > 12 && lat < 19 && lon > 42 && lon < 55) return 'Yemen';
-  if (lat > 16 && lat < 33 && lon > 34 && lon < 56) return 'Saudi Arabia';
-  if (lat > 22 && lat < 27 && lon > 51 && lon < 57) return 'UAE';
-  if (lat > 25 && lat < 31 && lon > 25 && lon < 35) return 'Egypt';
-  if (lat > 30 && lat < 34 && lon > 35 && lon < 40) return 'Jordan';
-  if (lat > 23 && lat < 27 && lon > 45 && lon < 51) return 'Qatar/Bahrain';
-  if (lat > 21 && lat < 27 && lon > 55 && lon < 60) return 'Oman';
-  return 'Middle East';
+// Rough reverse geocoding — boxes come from the active conflict config.
+function getRegion(lat: number, lon: number, boxes: RegionBox[], fallback: string): string {
+  for (const b of boxes) {
+    if (lat >= b.latMin && lat <= b.latMax && lon >= b.lonMin && lon <= b.lonMax) return b.name;
+  }
+  return fallback;
 }
 
 export default function SatellitePanel() {
-  const { data, loading } = useDataFeed<FIRMSData>('/api/fires', 600000); // 10 min refresh
+  const { config } = useConflict();
+  const { regionBoxes, defaultRegion } = config.client;
+  const { data, loading } = useConflictFeed<FIRMSData>('/api/fires', 600000); // 10 min refresh
 
   return (
     <div className="panel h-full flex flex-col">
@@ -90,7 +84,7 @@ export default function SatellitePanel() {
           </div>
         ) : (
           data?.events.slice(0, 30).map((event, i) => {
-            const region = getRegion(event.lat, event.lon);
+            const region = getRegion(event.lat, event.lon, regionBoxes, defaultRegion);
             return (
               <div
                 key={i}

@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server';
 import { fetchWithTimeout, parseXML, getTextContent } from '@/lib/fetcher';
+import { getConflictFromRequest } from '@/lib/conflicts';
 
 export const dynamic = 'force-dynamic';
 
 // Strike tracker using Google News RSS
-export async function GET() {
+export async function GET(req: Request) {
+  const { server } = getConflictFromRequest(req);
   const strikes: StrikeEvent[] = [];
 
-  const queries = [
-    'Iran+OR+Israel+missile+strike+OR+airstrike+OR+intercept',
-    'Iran+OR+Israel+drone+attack+OR+rocket+launch',
-  ];
+  const queries = server.strikeQueries;
 
   for (const q of queries) {
     try {
@@ -50,12 +49,10 @@ export async function GET() {
           category = 'STRIKE'; severity = 'medium';
         }
 
-        let country = 'Middle East';
-        if (t.includes('iran') || t.includes('tehran')) country = 'Iran';
-        else if (t.includes('israel')) country = 'Israel';
-        else if (t.includes('lebanon')) country = 'Lebanon';
-        else if (t.includes('syria')) country = 'Syria';
-        else if (t.includes('yemen') || t.includes('houthi')) country = 'Yemen';
+        let country = server.defaultCountry;
+        for (const rule of server.countryAttribution) {
+          if (rule.match.some(m => t.includes(m))) { country = rule.country; break; }
+        }
 
         strikes.push({
           id: `strike-${strikes.length}-${Date.now()}`,

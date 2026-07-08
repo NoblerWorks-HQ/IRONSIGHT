@@ -1,6 +1,6 @@
 'use client';
 
-import { useDataFeed, formatPrice, formatChange } from '@/lib/hooks';
+import { useConflictFeed, formatPrice, formatChange } from '@/lib/hooks';
 
 interface OilData {
   type: string;
@@ -12,7 +12,7 @@ interface OilData {
 }
 
 export default function OilPanel() {
-  const { data: prices, loading } = useDataFeed<OilData[]>('/api/oil', 600000);
+  const { data: prices, loading } = useConflictFeed<OilData[]>('/api/oil', 600000);
 
   return (
     <div className="panel h-full flex flex-col">

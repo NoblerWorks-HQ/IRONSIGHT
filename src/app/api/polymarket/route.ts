@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server';
+import { getConflictFromRequest } from '@/lib/conflicts';
 
 export const dynamic = 'force-dynamic';
-
-// Match Middle East conflict topics — use word boundaries and specific phrases to avoid false positives
-const KEYWORDS = /\biran\b|israel|middle.?east|ceasefire|military.*iran|military.*israel|\bwar\b.*(?:iran|israel|middle.?east)|strike.*(?:iran|israel)|missile|nuclear.*iran|gaza|hezbollah|houthi|lebanon.*(?:strike|offensive|invasion)|syria.*strike|yemen.*(?:strike|attack)|hormuz|red.?sea.*(?:attack|military)|idf\b|irgc\b|netanyahu|khamenei|trump.*iran|regime.*(?:fall|change)|ground.*offensive|air.*strike|drone.*(?:iran|israel|attack)|ballistic/i;
-
-// Exclude anything not about the Iran-Israel-US Middle East conflict
-const EXCLUDE = /nba|nfl|mlb|nhl|fifa|world.?cup|premier.?league|champions.?league|super.?bowl|oscar|grammy|emmy|election.*governor|mayor|warriors|lakers|celtics|yankees|dodgers|russia|ukraine|china|taiwan|north.?korea|tariff|crypto|bitcoin|ethereum|solana/i;
 
 interface PolymarketMarket {
   id: string;
@@ -24,7 +19,10 @@ interface PolymarketMarket {
   image: string;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { server } = getConflictFromRequest(req);
+  const KEYWORDS = server.polymarketKeywords;
+  const EXCLUDE = server.polymarketExclude;
   try {
     const res = await fetch(
       'https://gamma-api.polymarket.com/markets?limit=500&closed=false&active=true&order=volume24hr&ascending=false',

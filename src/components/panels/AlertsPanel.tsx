@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useDataFeed } from '@/lib/hooks';
+import { useConflictFeed } from '@/lib/hooks';
+import { useConflict } from '@/lib/conflicts/context';
 import { playAlertSound } from '@/lib/generateAlert';
 
 interface AlertData {
@@ -19,6 +20,22 @@ interface AlertData {
   lastChecked: string;
 }
 
+interface DroneTrack {
+  id: string;
+  label: string;
+  color: string;
+  heading: number;
+  count: number;
+  place: string;
+  time: string;
+}
+
+interface DroneData {
+  drones: DroneTrack[];
+  count: number;
+  ballisticThreat: boolean;
+}
+
 const TYPE_ICONS: Record<string, string> = {
   MISSILE: '🚀',
   ROCKET: '🎯',
@@ -29,7 +46,11 @@ const TYPE_ICONS: Record<string, string> = {
 };
 
 export default function AlertsPanel() {
-  const { data, loading } = useDataFeed<AlertData>('/api/alerts', 15000);
+  const { config } = useConflict();
+  const alertSystemName = config.client.alertSystemName;
+  const { data, loading } = useConflictFeed<AlertData>('/api/alerts', 15000);
+  const { data: droneData } = useConflictFeed<DroneData>('/api/drones', 20000);
+  const drones = droneData?.drones || [];
   const prevStatus = useRef<string>('CLEAR');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -78,21 +99,22 @@ export default function AlertsPanel() {
   }, []);
 
   const isActive = data?.status === 'ACTIVE';
+  const hasThreat = isActive || drones.length > 0;
 
   return (
     <div
       className="panel h-full flex flex-col"
-      style={isActive ? { borderColor: 'var(--red)', boxShadow: '0 0 20px rgba(255, 51, 102, 0.3)' } : {}}
+      style={hasThreat ? { borderColor: 'var(--red)', boxShadow: '0 0 20px rgba(255, 51, 102, 0.3)' } : {}}
     >
       <div className="panel-header">
         <span
           className="status-dot"
           style={{
-            background: isActive ? 'var(--red)' : 'var(--green)',
-            animation: isActive ? 'pulse-dot 0.5s ease-in-out infinite' : undefined,
+            background: hasThreat ? 'var(--red)' : 'var(--green)',
+            animation: hasThreat ? 'pulse-dot 0.5s ease-in-out infinite' : undefined,
           }}
         />
-        ISRAEL ALERT STATUS
+        {config.client.alertStatusTitle}
         <div className="ml-auto flex items-center gap-2">
           {/* Sound toggle */}
           <button
@@ -113,14 +135,37 @@ export default function AlertsPanel() {
             {soundEnabled ? '🔔' : '🔕'}
           </button>
           <span className="text-[9px] font-normal normal-case tracking-normal"
-            style={{ color: isActive ? 'var(--red)' : 'var(--green)' }}
+            style={{ color: hasThreat ? 'var(--red)' : 'var(--green)' }}
           >
-            {isActive ? `${data?.activeCount} ACTIVE` : 'ALL CLEAR'}
+            {hasThreat
+              ? `${data?.activeCount || 0} ALERT${drones.length ? ` · ${drones.length} TRK` : ''}`
+              : 'ALL CLEAR'}
           </span>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
+        {drones.length > 0 && (
+          <div className="border-b border-[var(--border-color)]">
+            <div className="px-3 py-1 text-[9px] tracking-widest text-[var(--text-secondary)] bg-[var(--bg-panel-header)]">
+              LIVE TRACKS // {drones.length} INBOUND
+            </div>
+            {drones.slice(0, 12).map(d => (
+              <div key={d.id} className="data-row flex items-center gap-2">
+                <span className="text-sm" style={{ color: d.color, transform: `rotate(${d.heading}deg)` }}>▲</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] font-bold" style={{ color: d.color }}>
+                    {d.label}{d.count > 1 ? ` ×${d.count}` : ''}
+                    {d.place ? <span className="text-[var(--text-primary)] font-normal"> → {d.place}</span> : null}
+                  </div>
+                  <div className="text-[8px] text-[var(--text-secondary)]">
+                    hdg {d.heading}° · {new Date(d.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         {loading ? (
           <div className="p-3">
             <div className="loading-shimmer h-20 rounded" />
@@ -136,7 +181,7 @@ export default function AlertsPanel() {
                     INCOMING THREAT DETECTED
                   </div>
                   <div className="text-[9px] text-[var(--text-secondary)]">
-                    Pikud HaOref sirens activated
+                    {alertSystemName} sirens activated
                   </div>
                 </div>
               </div>
@@ -162,6 +207,11 @@ export default function AlertsPanel() {
               </div>
             ))}
           </>
+        ) : drones.length > 0 ? (
+          // Drones inbound but no oblast siren active — the LIVE TRACKS section above covers it
+          <div className="px-3 py-2 text-[9px] text-[var(--text-secondary)]">
+            No oblast air-raid sirens active · tracking {drones.length} inbound threat{drones.length > 1 ? 's' : ''} above
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full p-4">
             <div className="relative w-16 h-16 mb-3">
@@ -172,7 +222,7 @@ export default function AlertsPanel() {
             </div>
             <div className="text-sm font-bold text-[var(--green)] mb-1">ALL CLEAR</div>
             <div className="text-[9px] text-[var(--text-secondary)] text-center">
-              No active alerts from Pikud HaOref
+              No active alerts from {alertSystemName}
             </div>
             <div className="text-[8px] text-[var(--text-secondary)] mt-2">
               Polling every 5s • Last: {data?.lastChecked ? new Date(data.lastChecked).toLocaleTimeString() : '...'}

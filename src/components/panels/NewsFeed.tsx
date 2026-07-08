@@ -1,33 +1,13 @@
 'use client';
 
-import { useDataFeed, timeAgo, useTick } from '@/lib/hooks';
+import { useConflictFeed, timeAgo, useTick } from '@/lib/hooks';
+import { useConflict } from '@/lib/conflicts/context';
 import type { NewsItem } from '@/types';
 
-const SOURCE_COLORS: Record<string, string> = {
-  BBC: '#bb1919',
-  NYT: '#333',
-  'Al Jazeera': '#d4a843',
-  Reuters: '#ff6600',
-  'Times of Israel': '#0066cc',
-  'JPost': '#003366',
-  'Google News': '#4285f4',
-  'Breaking Def': '#cc0000',
-  'Long War Jrnl': '#556b2f',
-  'DoD': '#003366',
-  'PressTV': '#00a650',
-  'The National': '#1a6b3c',
-  'CNN': '#cc0000',
-  'Fox News': '#003366',
-  'WSJ': '#0274b6',
-  'Mil Times': '#8b0000',
-  'War on Rocks': '#2e4057',
-  'CENTCOM': '#4b5320',
-  'Haaretz': '#2a7fff',
-  'Drop Site': '#e63946',
-};
-
 export default function NewsFeed() {
-  const { data: news, loading, lastUpdated } = useDataFeed<NewsItem[]>('/api/news', 90000);
+  const { config } = useConflict();
+  const SOURCE_COLORS = config.client.sourceColors;
+  const { data: news, loading, lastUpdated } = useConflictFeed<NewsItem[]>('/api/news', 90000);
   useTick(15000);
 
   return (

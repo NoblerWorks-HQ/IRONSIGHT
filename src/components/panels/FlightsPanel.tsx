@@ -1,6 +1,6 @@
 'use client';
 
-import { useDataFeed } from '@/lib/hooks';
+import { useConflictFeed } from '@/lib/hooks';
 
 interface MilFlight {
   icao24: string;
@@ -62,7 +62,7 @@ function focusOnMapTarget(id: string, lat: number, lon: number, type: 'aircraft'
 }
 
 export default function FlightsPanel() {
-  const { data, loading } = useDataFeed<FlightDataResponse>('/api/flights', 180000);
+  const { data, loading } = useConflictFeed<FlightDataResponse>('/api/flights', 180000);
 
   // Group by type
   const byType: Record<string, number> = {};

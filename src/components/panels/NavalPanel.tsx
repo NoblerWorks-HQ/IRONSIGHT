@@ -1,6 +1,7 @@
 'use client';
 
-import { useDataFeed } from '@/lib/hooks';
+import { useConflictFeed } from '@/lib/hooks';
+import { useConflict } from '@/lib/conflicts/context';
 
 interface NavalVessel {
   name: string;
@@ -23,17 +24,6 @@ interface NavalData {
   note: string;
 }
 
-const NAVY_COLORS: Record<string, string> = {
-  'US Navy': 'var(--blue)',
-  'Royal Navy': '#4488cc',
-  'French Navy': '#6666cc',
-  'Israeli Navy': 'var(--cyan)',
-  'Iran Navy': 'var(--red)',
-  'IRGC Navy': 'var(--red)',
-  'Saudi Navy': 'var(--green)',
-  'German Navy': '#888',
-};
-
 const TYPE_ICONS: Record<string, string> = {
   'Aircraft Carrier': '⛴',
   'Destroyer': '🛥',
@@ -48,7 +38,9 @@ const TYPE_ICONS: Record<string, string> = {
 };
 
 export default function NavalPanel() {
-  const { data, loading } = useDataFeed<NavalData>('/api/ships', 300000);
+  const { config } = useConflict();
+  const NAVY_COLORS = config.client.navyColors;
+  const { data, loading } = useConflictFeed<NavalData>('/api/ships', 300000);
 
   // Group by navy
   const byNavy: Record<string, NavalVessel[]> = {};
@@ -57,8 +49,8 @@ export default function NavalPanel() {
     byNavy[ship.navy].push(ship);
   });
 
-  // Sort navies: US first, then allies, then adversaries
-  const navyOrder = ['US Navy', 'Royal Navy', 'French Navy', 'Israeli Navy', 'Saudi Navy', 'Iran Navy', 'IRGC Navy'];
+  // Sort navies: allies first, then adversaries (per conflict config)
+  const navyOrder = config.client.navyOrder;
   const sortedNavies = Object.keys(byNavy).sort((a, b) => {
     const aIdx = navyOrder.indexOf(a);
     const bIdx = navyOrder.indexOf(b);
@@ -77,7 +69,7 @@ export default function NavalPanel() {
 
       {/* Region summary */}
       <div className="flex items-center gap-3 px-3 py-1.5 border-b border-[var(--border-color)] bg-[var(--bg-panel-header)]">
-        {['Persian Gulf', 'Red Sea', 'Eastern Med', 'Strait of Hormuz'].map(region => {
+        {config.client.maritimeRegions.map(region => {
           const count = data?.ships.filter(s => s.region === region).length || 0;
           return count > 0 ? (
             <div key={region} className="text-[8px] text-[var(--text-secondary)]">

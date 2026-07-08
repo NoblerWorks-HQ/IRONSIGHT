@@ -1,63 +1,10 @@
 import { NextResponse } from 'next/server';
 import { fetchWithTimeout, parseXML, getTextContent } from '@/lib/fetcher';
+import { getConflictFromRequest } from '@/lib/conflicts';
 
 export const dynamic = 'force-dynamic';
 
 export const revalidate = 0;
-
-// Per-country Google News queries for conflict/security events
-const COUNTRY_QUERIES = [
-  {
-    name: 'Lebanon',
-    flag: '🇱🇧',
-    query: 'Lebanon+strike+OR+airstrike+OR+attack+OR+missile+OR+bomb+OR+Hezbollah+OR+Beirut+attack',
-  },
-  {
-    name: 'Iran',
-    flag: '🇮🇷',
-    query: 'Iran+strike+OR+attack+OR+missile+OR+bomb+OR+Tehran+strike+OR+IRGC+attack',
-  },
-  {
-    name: 'Iraq',
-    flag: '🇮🇶',
-    query: 'Iraq+strike+OR+attack+OR+missile+OR+Baghdad+strike+OR+militia+attack',
-  },
-  {
-    name: 'Syria',
-    flag: '🇸🇾',
-    query: 'Syria+strike+OR+airstrike+OR+attack+OR+Damascus+strike',
-  },
-  {
-    name: 'Yemen',
-    flag: '🇾🇪',
-    query: 'Yemen+Houthi+strike+OR+attack+OR+missile+OR+drone+OR+"Red+Sea"+attack',
-  },
-  {
-    name: 'Kuwait',
-    flag: '🇰🇼',
-    query: 'Kuwait+siren+OR+missile+OR+attack+OR+"air+defense"+OR+intercept',
-  },
-  {
-    name: 'Bahrain',
-    flag: '🇧🇭',
-    query: 'Bahrain+attack+OR+missile+OR+military+OR+threat+OR+"5th+Fleet"',
-  },
-  {
-    name: 'UAE',
-    flag: '🇦🇪',
-    query: 'UAE+OR+Dubai+OR+"Abu+Dhabi"+attack+OR+missile+OR+drone+OR+intercept',
-  },
-  {
-    name: 'Saudi Arabia',
-    flag: '🇸🇦',
-    query: 'Saudi+Arabia+attack+OR+missile+OR+drone+OR+intercept+OR+Houthi',
-  },
-  {
-    name: 'Jordan',
-    flag: '🇯🇴',
-    query: 'Jordan+attack+OR+missile+OR+intercept+OR+airspace+OR+military',
-  },
-];
 
 // Severity scoring based on title content
 const CRITICAL_TERMS = [
@@ -112,13 +59,16 @@ interface CountryEvent {
   hoursAgo: number;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { server } = getConflictFromRequest(req);
+  const countryQueries = server.countryQueries.map(c => ({ name: c.country, flag: c.flag, query: c.query }));
+
   // Fetch 3 countries at a time to avoid rate limiting Google
   const results: { name: string; flag: string; events: CountryEvent[]; level: string }[] = [];
 
   // Process in batches of 3
-  for (let i = 0; i < COUNTRY_QUERIES.length; i += 3) {
-    const batch = COUNTRY_QUERIES.slice(i, i + 3);
+  for (let i = 0; i < countryQueries.length; i += 3) {
+    const batch = countryQueries.slice(i, i + 3);
     const batchResults = await Promise.allSettled(
       batch.map(async (country) => {
         const url = `https://news.google.com/rss/search?q=${country.query}&hl=en-US&gl=US&ceid=US:en`;
