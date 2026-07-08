@@ -19,7 +19,7 @@ If you want something like IRONSIGHT built for your domain, [get in touch](https
 
 # IRONSIGHT
 
-![IRONSIGHT Dashboard](https://raw.githubusercontent.com/NoblerWorks-HQ/IRONSIGHT/main/Ironsight.png?v=3)
+![IRONSIGHT Dashboard](https://raw.githubusercontent.com/NoblerWorks-HQ/IRONSIGHT/main/ironsight2.png)
 
 Real-time OSINT command center for monitoring active conflicts. A single dashboard that aggregates open-source intelligence from news, Telegram, military tracking, financial markets, satellite thermal data, and live air-threat feeds.
 
