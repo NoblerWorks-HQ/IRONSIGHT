@@ -5,7 +5,21 @@ import { ConflictProvider } from "@/lib/conflicts/context";
 
 export const metadata: Metadata = {
   title: "IRONSIGHT // OSINT Command Center",
-  description: "Real-time geopolitical intelligence monitoring dashboard",
+  description:
+    "Real-time OSINT dashboard aggregating free, public open-source intelligence across two conflict theaters (Iran/Israel and Russia/Ukraine): news, Telegram, air-raid alerts, live drone/missile tracking, military aircraft, naval, markets, and satellite thermal detection. All data belongs to its respective providers.",
+  applicationName: "IRONSIGHT",
+  keywords: [
+    "OSINT",
+    "dashboard",
+    "Iran",
+    "Israel",
+    "Russia",
+    "Ukraine",
+    "conflict monitor",
+    "air raid alerts",
+    "drone tracker",
+  ],
+  authors: [{ name: "Nobler Works", url: "https://noblerworks.com/" }],
 };
 
 export default function RootLayout({
