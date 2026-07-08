@@ -138,12 +138,21 @@ IDF Official, Rocket Alert, Alert Israel, Times of Israel, Abu Ali Express, OSIN
 
 ## Getting Started
 
+**Prerequisite:** Node.js 22 (see [`.nvmrc`](.nvmrc); run `nvm use` if you use nvm). No API keys or environment variables required.
+
 ```bash
-npm install
+npm install   # or: npm ci
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) and use the **THEATER** toggle in the header to switch conflicts.
+
+To build for production:
+
+```bash
+npm run build
+npm start
+```
 
 ## Tech Stack
 
