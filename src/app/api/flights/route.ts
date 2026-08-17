@@ -54,8 +54,6 @@ export async function GET(req: Request) {
       if (isMilitaryType(a.t || '')) return true;
       // US military ICAO hex range (AE/AF block) with no callsign — likely mil with transponder on
       if (!cs && hexNum >= 0xAE0000 && hexNum <= 0xAFFFFF) return true;
-      // Any US hex range aircraft with a military-associated type
-      if (hexNum >= 0xA00000 && hexNum <= 0xAFFFFF && isMilitaryType(a.t || '')) return true;
 
       return false;
     });
@@ -152,74 +150,93 @@ const MILITARY_CALLSIGN_PREFIXES = [
   'UNITY', 'VALOR', 'WITCH', 'ZERO',
 ];
 
-const MILITARY_AIRCRAFT_TYPES = [
-  'C17', 'C5', 'C130', 'C2', 'C40', 'KC135', 'KC46', 'KC10', 'KC30',
-  'E3', 'E6', 'E8', 'RC135', 'EC130', 'EP3', 'P8', 'P3',
-  'RQ4', 'MQ9', 'MQ1', 'RQ170',
-  'F15', 'F16', 'F18', 'F22', 'F35', 'F14',
-  'A10', 'B52', 'B1', 'B2', 'B21',
-  'V22', 'H60', 'CH47', 'AH64', 'MH53', 'UH1',
-  'A400', 'C295', 'CN35',
-  'E2C', 'E2D',
-  'EUFI', // Eurofighter
-  'F2KA', // Rafale
-  'TOR', // Tornado
-  'HAWK',
-  'GLF5', 'GLF6', // Military Gulfstreams (C-37)
-  'B737', // Some military 737s (P-8 base, govt)
-  'B738', 'B739',
-  'A332', // MRTT tankers
-  'A310', // Military tankers
-  'A124', // Antonov (interesting)
-  'IL76', 'IL78', // Russian military
-  'AN12', 'AN22', 'AN26', 'AN32', 'AN72',
-];
+// Exact ICAO type designators (Doc 8643) that are unambiguously military.
+// Matched EXACTLY, never as substrings — a substring match turns a Cessna 172
+// into a C-17 Globemaster, a Citation Excel (C56X) into a C-5 Galaxy, an
+// Embraer Legacy (E35L) into an E-3 AWACS and a King Air (B200) into a B-2.
+//
+// Dual-use designators are deliberately excluded: B737/B738/B739 (the 737 is
+// the most common airliner in the theater), A332/A310 (the MRTT tanker shares
+// the civil A330/A310 code), GLF5/GLF6 (Gulfstream), A124 and C40. Genuine
+// military examples of those airframes already carry adsb.lol's dbFlags
+// military bit and are captured by the flag check, so no real signal is lost.
+const MILITARY_AIRCRAFT_TYPES = new Set([
+  // Airlift / tanker
+  'C17', 'C5', 'C5M', 'C130', 'C30J', 'C160', 'C2', 'A400', 'C295', 'CN35',
+  'K35R', 'K35E', 'K35T', 'K46',
+  // ISR / AEW / airborne C2
+  'E2', 'E3TF', 'E3CF', 'E6', 'E8', 'R135', 'P8', 'P3', 'Q4', 'Q9', 'Q1',
+  // Fighters / attack
+  'F14', 'F15', 'F16', 'F18', 'F22', 'F35', 'A10',
+  'EUFI', 'RFAL', 'MIR2', 'TOR', 'HAWK',
+  'MG29', 'SU25', 'SU27', 'SU30', 'SU34',
+  // Bombers
+  'B1', 'B2', 'B21', 'B52', 'TU95', 'TU22', 'TU16',
+  // Rotary / tiltrotor
+  'V22', 'H60', 'H47', 'H64', 'H53', 'UH1',
+  // Russian / Soviet transports
+  'IL76', 'IL78', 'AN12', 'AN22', 'AN26', 'AN32', 'AN70', 'AN72',
+]);
 
 function isMilitaryCallsign(callsign: string): boolean {
   if (!callsign) return false;
-  for (const prefix of MILITARY_CALLSIGN_PREFIXES) {
-    if (callsign.startsWith(prefix)) return true;
-  }
-  if (/^\d{5,6}$/.test(callsign)) return true;
-  return false;
+  // A military callsign is a known prefix followed by a numeric mission number
+  // (RCH471, PLF110). Requiring that digit boundary stops civil callsigns that
+  // merely begin with the same letters — e.g. SAMU42 and SAMU06, French air
+  // ambulances, matching the US "SAM" (Special Air Mission) prefix.
+  return MILITARY_CALLSIGN_PREFIXES.some(
+    prefix => callsign.startsWith(prefix) && /\d/.test(callsign.charAt(prefix.length))
+  );
 }
 
 function isMilitaryType(type: string): boolean {
   if (!type) return false;
-  const upper = type.toUpperCase();
-  return MILITARY_AIRCRAFT_TYPES.some(mt => upper.includes(mt));
+  return MILITARY_AIRCRAFT_TYPES.has(type.trim().toUpperCase());
 }
+
+// Exact ICAO designator -> mission role. Keys must appear in
+// MILITARY_AIRCRAFT_TYPES or arrive via the dbFlags military bit.
+const TYPE_ROLES: Record<string, string> = {
+  Q4: 'ISR Drone (UAV)', Q9: 'ISR Drone (UAV)', Q1: 'ISR Drone (UAV)',
+  R135: 'SIGINT/ELINT',
+  E3TF: 'AWACS', E3CF: 'AWACS',
+  E8: 'JSTARS',
+  E6: 'TACAMO (Nuclear C2)',
+  E2: 'Hawkeye (AEW)',
+  P8: 'Maritime Patrol', P3: 'Maritime Patrol',
+  K35R: 'Aerial Tanker', K35E: 'Aerial Tanker', K35T: 'Aerial Tanker',
+  K46: 'Aerial Tanker', IL78: 'Aerial Tanker',
+  C17: 'Strategic Airlift (C-17)',
+  C5: 'Strategic Airlift (C-5)', C5M: 'Strategic Airlift (C-5)',
+  C130: 'Tactical Transport', C30J: 'Tactical Transport', C160: 'Tactical Transport',
+  C295: 'Tactical Transport', CN35: 'Tactical Transport', A400: 'Tactical Transport',
+  C2: 'Navy Transport (C-2)',
+  V22: 'Tiltrotor (V-22)',
+  H60: 'Helicopter', H47: 'Helicopter', H64: 'Helicopter',
+  H53: 'Helicopter', UH1: 'Helicopter',
+  F35: 'Fighter (F-35)', F22: 'Fighter (F-22)', F16: 'Fighter (F-16)',
+  F15: 'Fighter (F-15)', F18: 'Fighter (F/A-18)', F14: 'Fighter (F-14)',
+  EUFI: 'Fighter (NATO)', RFAL: 'Fighter (NATO)', TOR: 'Fighter (NATO)',
+  MIR2: 'Fighter (NATO)', HAWK: 'Trainer / Light Attack',
+  MG29: 'Fighter', SU27: 'Fighter', SU30: 'Fighter',
+  SU25: 'Attack', SU34: 'Strike',
+  A10: 'Attack (A-10)',
+  B52: 'Bomber', B1: 'Bomber', B2: 'Bomber', B21: 'Bomber',
+  TU95: 'Bomber', TU22: 'Bomber', TU16: 'Bomber',
+  IL76: 'Heavy Transport', AN12: 'Heavy Transport', AN22: 'Heavy Transport',
+  AN26: 'Heavy Transport', AN32: 'Heavy Transport', AN70: 'Heavy Transport',
+  AN72: 'Heavy Transport',
+};
 
 function classifyAircraft(callsign: string, acType: string, desc: string, altitude: number, speed: number): string {
   const cs = callsign.toUpperCase();
   const t = acType.toUpperCase();
   const d = desc.toLowerCase();
 
-  // By aircraft type first (most reliable)
-  if (t.includes('RQ4') || t.includes('MQ9') || t.includes('MQ1')) return 'ISR Drone (UAV)';
-  if (t.includes('RC135') || t.includes('EP3') || t.includes('EC130')) return 'SIGINT/ELINT';
-  if (t.includes('E3') || t.includes('E767')) return 'AWACS';
-  if (t.includes('E8')) return 'JSTARS';
-  if (t.includes('E6')) return 'TACAMO (Nuclear C2)';
-  if (t.includes('E2')) return 'Hawkeye (AEW)';
-  if (t.includes('P8') || t.includes('P3')) return 'Maritime Patrol';
-  if (t.includes('KC135') || t.includes('KC46') || t.includes('KC10') || t.includes('KC30') || t.includes('A332') || t.includes('A310')) return 'Aerial Tanker';
-  if (t.includes('C17')) return 'Strategic Airlift (C-17)';
-  if (t.includes('C5')) return 'Strategic Airlift (C-5)';
-  if (t.includes('C130') || t.includes('C295') || t.includes('CN35') || t.includes('A400')) return 'Tactical Transport';
-  if (t.includes('C40') || (t.includes('B737') && cs.startsWith('NAVY'))) return 'Navy Transport (C-40)';
-  if (t.includes('V22')) return 'Tiltrotor (V-22)';
-  if (t.includes('H60') || t.includes('MH53') || t.includes('CH47') || t.includes('AH64')) return 'Helicopter';
-  if (t.includes('F35')) return 'Fighter (F-35)';
-  if (t.includes('F22')) return 'Fighter (F-22)';
-  if (t.includes('F16')) return 'Fighter (F-16)';
-  if (t.includes('F15')) return 'Fighter (F-15)';
-  if (t.includes('F18')) return 'Fighter (F/A-18)';
-  if (t.includes('EUFI') || t.includes('F2KA') || t.includes('TOR')) return 'Fighter (NATO)';
-  if (t.includes('A10')) return 'Attack (A-10)';
-  if (t.includes('B52') || t.includes('B1') || t.includes('B2') || t.includes('B21')) return 'Bomber';
-  if (t.includes('A124') || t.includes('IL76') || t.includes('AN')) return 'Heavy Transport';
-  if (t.includes('GLF')) return 'VIP/C2 Transport';
+  // By aircraft type first (most reliable) — exact designator lookup, not
+  // substring, for the same reason as MILITARY_AIRCRAFT_TYPES above.
+  const role = TYPE_ROLES[t];
+  if (role) return role;
 
   // By callsign
   if (cs.startsWith('FORTE')) return 'RQ-4 Global Hawk (ISR)';
