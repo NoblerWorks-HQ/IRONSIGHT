@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useConflictFeed } from '@/lib/hooks';
 import { useConflict } from '@/lib/conflicts/context';
 import type { ColorMatchRule } from '@/lib/conflicts';
+import { addStrikeMarker, geocodeStrike } from './strike-position';
 
 let L: typeof import('leaflet') | null = null;
 
@@ -205,33 +206,6 @@ function drawMissileArc(map: L.Map, from: [number, number], to: [number, number]
       layerGroup.removeLayer(warhead);
     } catch {}
   };
-}
-
-// Geocode a strike — ONLY match specific locations, not generic country names.
-// This prevents "Iran war: day 22" from placing a random pin on the map.
-// targets/strikeLocations come from the active conflict config.
-function geocodeStrike(
-  description: string,
-  location: string,
-  targets: [string, string][],
-  strikeLocations: Record<string, [number, number]>,
-): { coords: [number, number]; place: string } | null {
-  const text = `${description} ${location}`.toLowerCase();
-
-  // Also require a strike-indicating word to avoid matching city mentions in non-strike articles
-  const strikeWords = ['strike', 'struck', 'hit', 'attack', 'bomb', 'missile', 'rocket',
-    'drone', 'target', 'destroy', 'intercept', 'fire', 'launch', 'blast', 'explosion',
-    'damage', 'killed', 'wounded', 'casualties', 'impact'];
-  const hasStrikeWord = strikeWords.some(w => text.includes(w));
-  if (!hasStrikeWord) return null;
-
-  for (const [key, place] of targets) {
-    if (text.includes(key) && strikeLocations[key]) {
-      return { coords: strikeLocations[key], place };
-    }
-  }
-
-  return null;
 }
 
 export default function ConflictMap({ className }: MapProps) {
@@ -910,24 +884,23 @@ export default function ConflictMap({ className }: MapProps) {
       plotted.add(key);
       plottedLocations.add(geo.place.toLowerCase());
 
-      const pos: [number, number] = [
-        geo.coords[0] + (Math.random() - 0.5) * 0.15,
-        geo.coords[1] + (Math.random() - 0.5) * 0.15,
-      ];
-
       const timeStr = new Date(event.date).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
       const typeColor = event.type === 'MISSILE' ? '#ff0044' : event.type === 'DRONE' ? '#ff6600' : '#ff3300';
       const sourceTag = event.fromTelegram ? '📡 ' : '';
       const popupHtml = `
         <div style="font-family:monospace;font-size:11px;color:#000;min-width:220px;max-width:300px;">
           <strong style="color:${typeColor};font-size:12px;">${event.type} — ${geo.place}</strong><br/>
+          <span style="color:#666;font-size:9px;">Approximate place reference — not the exact incident location</span><br/>
           <div style="margin:4px 0;line-height:1.4;">${event.title}</div>
           <em style="color:#666;font-size:9px;">${sourceTag}${event.source} • ${timeStr}</em>
         </div>
       `;
 
-      const marker = L!.marker(pos, {
-        icon: L!.divIcon({
+      addStrikeMarker(
+        L!,
+        strikeLayerRef.current!,
+        geo,
+        L!.divIcon({
           className: 'strike-marker',
           html: `<div style="width:22px;height:22px;position:relative;cursor:pointer;">
             <div style="position:absolute;inset:0;background:radial-gradient(circle,${typeColor} 25%,${typeColor}44 55%,transparent 70%);border-radius:50%;animation:alert-flash 1.5s ease-in-out infinite;"></div>
@@ -935,8 +908,8 @@ export default function ConflictMap({ className }: MapProps) {
           </div>`,
           iconSize: [22, 22], iconAnchor: [11, 11],
         }),
-      }).addTo(strikeLayerRef.current!);
-      marker.bindPopup(popupHtml);
+        popupHtml,
+      );
     });
 
     console.log(`[MAP] Plotted ${plotted.size} strike markers`);
@@ -1006,6 +979,11 @@ export default function ConflictMap({ className }: MapProps) {
       </div>
       <div className="relative flex-1 min-h-0">
         {!mounted ? <div className="loading-shimmer w-full h-full" /> : <div id="conflict-map" className="w-full h-full" />}
+        {showStrikes && (
+          <div className="absolute bottom-2 left-2 z-[1000] text-[9px] px-2 py-1 rounded" style={{ background: 'rgba(10,14,23,0.9)', color: '#ff9955' }}>
+            💥 Strike pins show approximate places, not exact incident sites.
+          </div>
+        )}
         {measureMode && (
           <div className="absolute top-2 left-2 z-[1000] text-[9px] px-2 py-1 rounded" style={{ background: 'rgba(10,14,23,0.9)', border: '1px solid #ffaa00', color: '#ffaa00' }}>
             MEASURE MODE — Click two points to measure distance. Click DIST again to exit.
