@@ -17,7 +17,7 @@ export const DEFAULT_CONFLICT: ConflictKey = 'iran-israel';
 export const CONFLICT_KEYS = Object.keys(CONFLICTS) as ConflictKey[];
 
 export function isConflictKey(v: unknown): v is ConflictKey {
-  return typeof v === 'string' && v in CONFLICTS;
+  return typeof v === 'string' && Object.hasOwn(CONFLICTS, v);
 }
 
 // Resolve a (possibly untrusted) key to a config, falling back to the default.

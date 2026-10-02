@@ -42,10 +42,13 @@ function threatMeta(type: string, text: string): { label: string; color: string 
 }
 
 // Translation cache — Ukrainian place/text strings repeat across polls.
-const trCache: Record<string, string> = {};
+// Bounded (oldest evicted first) so a long-running container does not leak.
+const TR_CACHE_MAX = 2000;
+const trCache = new Map<string, string>();
 async function tr(text: string): Promise<string> {
   if (!text) return '';
-  if (trCache[text]) return trCache[text];
+  const hit = trCache.get(text);
+  if (hit) return hit;
   // Only hit the translator for Cyrillic text
   if (!/[Ѐ-ӿ]/.test(text)) return text;
   try {
@@ -53,7 +56,11 @@ async function tr(text: string): Promise<string> {
     // Only cache genuine translations — never cache a failure (returns input),
     // so a cold-start timeout retries on the next poll instead of sticking.
     if (out && out !== text) {
-      trCache[text] = out;
+      trCache.set(text, out);
+      if (trCache.size > TR_CACHE_MAX) {
+        const oldest = trCache.keys().next().value;
+        if (oldest !== undefined) trCache.delete(oldest);
+      }
       return out;
     }
     return text;
