@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { translateFreeText } from '@/lib/hebrew';
 import { getConflictFromRequest } from '@/lib/conflicts';
+import { extractTelegramText } from '@/lib/telegramText';
 
 // Detect non-Latin scripts (Hebrew, Arabic, Farsi, Cyrillic, etc.)
 function hasNonLatinText(text: string): boolean {
@@ -25,12 +26,16 @@ interface TelegramPost {
 
 // Persist latest known post IDs across requests (in-memory cache)
 const latestKnownIds: Record<string, number> = {};
-// Cache of fetched posts so we don't re-fetch
-const postCache: Record<string, { text: string; date: string }> = {};
+// Cache of fetched posts so we don't re-fetch. Bounded: oldest entries are
+// evicted first (Map keeps insertion order) so a long-running container
+// does not grow without limit.
+const POST_CACHE_MAX = 5000;
+const postCache = new Map<string, { text: string; date: string }>();
 
 async function fetchPost(channel: string, postId: number): Promise<{ text: string; date: string } | null> {
   const cacheKey = `${channel}/${postId}`;
-  if (postCache[cacheKey]) return postCache[cacheKey];
+  const cached = postCache.get(cacheKey);
+  if (cached) return cached;
 
   try {
     const res = await fetch(`https://t.me/${channel}/${postId}?embed=1&mode=tme`, {
@@ -41,25 +46,12 @@ async function fetchPost(channel: string, postId: number): Promise<{ text: strin
     if (!res.ok) return null;
     const html = await res.text();
 
-    const textMatch = html.match(/<div class="tgme_widget_message_text js-message_text"[^>]*>(.*?)<\/div>/s);
-    if (!textMatch) return null;
-
-    let text = textMatch[1]
-      .replace(/<br\s*\/?>/gi, ' ')
-      .replace(/<[^>]+>/g, '')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/&#036;/g, '$')
-      .replace(/\s+/g, ' ')
-      .trim();
+    const extracted = extractTelegramText(html);
+    if (!extracted) return null;
+    let text = extracted;
 
     const dateMatch = html.match(/<time[^>]*datetime="([^"]+)"/);
     const date = dateMatch ? dateMatch[1] : new Date().toISOString();
-
-    if (!text) return null;
 
     // Auto-translate non-Latin text (Hebrew, Farsi, Arabic, etc.)
     if (hasNonLatinText(text)) {
@@ -67,7 +59,11 @@ async function fetchPost(channel: string, postId: number): Promise<{ text: strin
     }
 
     const result = { text, date };
-    postCache[cacheKey] = result;
+    postCache.set(cacheKey, result);
+    if (postCache.size > POST_CACHE_MAX) {
+      const oldest = postCache.keys().next().value;
+      if (oldest !== undefined) postCache.delete(oldest);
+    }
     return result;
   } catch {
     return null;

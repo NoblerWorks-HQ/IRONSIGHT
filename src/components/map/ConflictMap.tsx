@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useConflictFeed } from '@/lib/hooks';
 import { useConflict } from '@/lib/conflicts/context';
 import type { ColorMatchRule } from '@/lib/conflicts';
+import { esc } from '@/lib/escapeHtml';
 
 let L: typeof import('leaflet') | null = null;
 
@@ -461,7 +462,7 @@ export default function ConflictMap({ className }: MapProps) {
       const size = city.capital ? 5 : 3;
       const color = cfg.cityColors[city.country] || cfg.cityColors.default || '#999999';
       const marker = L!.circleMarker([city.lat, city.lon], { radius: size, color, fillColor: color, fillOpacity: 0.6, weight: 1 });
-      marker.bindTooltip(city.name, { permanent: city.capital, direction: 'right', offset: [8, 0], className: 'city-label' });
+      marker.bindTooltip(esc(city.name), { permanent: city.capital, direction: 'right', offset: [8, 0], className: 'city-label' });
       marker.bindPopup(''); // Will be set dynamically on click
       cityLayerRef.current!.addLayer(marker);
       cityMarkersRef.current.set(city.name, marker);
@@ -493,7 +494,7 @@ export default function ConflictMap({ className }: MapProps) {
         alerts.alerts.forEach(a => {
           a.locations.forEach(loc => {
             if (loc.toLowerCase().trim() === cityKey) {
-              activeAlerts.push(`${a.type}: ${a.threat}`);
+              activeAlerts.push(`${esc(a.type)}: ${esc(a.threat)}`);
             }
           });
         });
@@ -501,8 +502,8 @@ export default function ConflictMap({ className }: MapProps) {
 
       // Build popup HTML
       let html = `<div style="font-family:monospace;font-size:11px;color:#000;min-width:220px;max-width:300px;max-height:250px;overflow-y:auto;">`;
-      html += `<strong style="font-size:13px;">${city.name}</strong><br/>`;
-      html += `<span style="color:#666;">${city.country}${city.capital ? ' (Capital)' : ''}</span>`;
+      html += `<strong style="font-size:13px;">${esc(city.name)}</strong><br/>`;
+      html += `<span style="color:#666;">${esc(city.country)}${city.capital ? ' (Capital)' : ''}</span>`;
 
       if (activeAlerts.length > 0) {
         html += `<div style="margin-top:6px;padding:4px 6px;background:#fff0f0;border:1px solid #ff3366;border-radius:3px;">`;
@@ -517,9 +518,9 @@ export default function ConflictMap({ className }: MapProps) {
         recentStrikes.forEach(s => {
           const timeStr = new Date(s.date).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
           html += `<div style="margin:2px 0;font-size:10px;">`;
-          html += `<span style="color:${s.type === 'STRIKE' ? '#ff3300' : s.type === 'DRONE' ? '#ff6600' : '#666'};font-weight:bold;">${s.type}</span> `;
-          html += `${s.description.substring(0, 80)}${s.description.length > 80 ? '...' : ''}`;
-          html += `<br/><span style="color:#999;font-size:9px;">${s.source} • ${timeStr}</span>`;
+          html += `<span style="color:${s.type === 'STRIKE' ? '#ff3300' : s.type === 'DRONE' ? '#ff6600' : '#666'};font-weight:bold;">${esc(s.type)}</span> `;
+          html += `${esc(s.description.substring(0, 80))}${s.description.length > 80 ? '...' : ''}`;
+          html += `<br/><span style="color:#999;font-size:9px;">${esc(s.source)} • ${timeStr}</span>`;
           html += `</div>`;
         });
         html += `</div>`;
@@ -595,13 +596,13 @@ export default function ConflictMap({ className }: MapProps) {
       const existing = airMarkersRef.current.get(id);
       const popupContent = `
         <div style="font-family:monospace;font-size:11px;color:#000;min-width:180px;">
-          <strong style="color:${color}">${f.callsign || f.icao24}</strong><br/>
-          <strong>${f.type}</strong><br/>
-          ${f.aircraftType ? `Platform: ${f.aircraftType}${f.registration ? ` (${f.registration})` : ''}<br/>` : ''}
-          Origin: ${f.origin}<br/>
-          Alt: ${f.altitude.toLocaleString()} ft<br/>
-          Speed: ${f.speed} kts | Hdg: ${f.heading}°
-          ${f.squawk ? `<br/>Squawk: ${f.squawk}` : ''}
+          <strong style="color:${esc(color)}">${esc(f.callsign || f.icao24)}</strong><br/>
+          <strong>${esc(f.type)}</strong><br/>
+          ${f.aircraftType ? `Platform: ${esc(f.aircraftType)}${f.registration ? ` (${esc(f.registration)})` : ''}<br/>` : ''}
+          Origin: ${esc(f.origin)}<br/>
+          Alt: ${esc(f.altitude?.toLocaleString())} ft<br/>
+          Speed: ${esc(f.speed)} kts | Hdg: ${esc(f.heading)}°
+          ${f.squawk ? `<br/>Squawk: ${esc(f.squawk)}` : ''}
           <br/><em style="color:#666;font-size:9px;">Click to show flight trail</em>
         </div>
       `;
@@ -610,7 +611,7 @@ export default function ConflictMap({ className }: MapProps) {
         animateMarker(existing, f.lat, f.lon, 2000);
         existing.setIcon(L!.divIcon({
           className: 'mil-aircraft-marker',
-          html: `<div style="font-size:14px;transform:rotate(${f.heading}deg);filter:drop-shadow(0 0 4px ${color});color:${color};line-height:1;transition:transform 2s ease-out;">✈</div>`,
+          html: `<div style="font-size:14px;transform:rotate(${Number(f.heading) || 0}deg);filter:drop-shadow(0 0 4px ${esc(color)});color:${esc(color)};line-height:1;transition:transform 2s ease-out;">✈</div>`,
           iconSize: [18, 18], iconAnchor: [9, 9],
         }));
         existing.setPopupContent(popupContent);
@@ -618,12 +619,12 @@ export default function ConflictMap({ className }: MapProps) {
         const marker = L!.marker([f.lat, f.lon], {
           icon: L!.divIcon({
             className: 'mil-aircraft-marker',
-            html: `<div style="font-size:14px;transform:rotate(${f.heading}deg);filter:drop-shadow(0 0 4px ${color});color:${color};line-height:1;transition:transform 2s ease-out;">✈</div>`,
+            html: `<div style="font-size:14px;transform:rotate(${Number(f.heading) || 0}deg);filter:drop-shadow(0 0 4px ${esc(color)});color:${esc(color)};line-height:1;transition:transform 2s ease-out;">✈</div>`,
             iconSize: [18, 18], iconAnchor: [9, 9],
           }),
         });
         marker.bindPopup(popupContent);
-        marker.bindTooltip(f.callsign || f.icao24, { direction: 'top', offset: [0, -10], className: 'aircraft-label' });
+        marker.bindTooltip(esc(f.callsign || f.icao24), { direction: 'top', offset: [0, -10], className: 'aircraft-label' });
 
         // Click to show trail, close to hide
         marker.on('click', () => showTrailForAircraft(id));
@@ -661,18 +662,18 @@ export default function ConflictMap({ className }: MapProps) {
         const marker = L!.marker([ship.lat, ship.lon], {
           icon: L!.divIcon({
             className: 'naval-marker',
-            html: `<div style="font-size:${isSub ? '10px' : '13px'};filter:drop-shadow(0 0 4px ${color});color:${color};line-height:1;">${isSub ? '▼' : '⛴'}</div>`,
+            html: `<div style="font-size:${isSub ? '10px' : '13px'};filter:drop-shadow(0 0 4px ${esc(color)});color:${esc(color)};line-height:1;">${isSub ? '▼' : '⛴'}</div>`,
             iconSize: [16, 16], iconAnchor: [8, 8],
           }),
         });
         marker.bindPopup(`
           <div style="font-family:monospace;font-size:11px;color:#000;min-width:180px;">
-            <strong style="color:${color}">${ship.name}</strong><br/>
-            ${ship.hull} &bull; ${ship.class}<br/>Type: ${ship.type}<br/>Navy: ${ship.navy}<br/>
-            Status: ${ship.status}<br/>Region: ${ship.region}${ship.group ? `<br/>Group: ${ship.group}` : ''}
+            <strong style="color:${esc(color)}">${esc(ship.name)}</strong><br/>
+            ${esc(ship.hull)} &bull; ${esc(ship.class)}<br/>Type: ${esc(ship.type)}<br/>Navy: ${esc(ship.navy)}<br/>
+            Status: ${esc(ship.status)}<br/>Region: ${esc(ship.region)}${ship.group ? `<br/>Group: ${esc(ship.group)}` : ''}
           </div>
         `);
-        marker.bindTooltip(ship.name, { direction: 'top', offset: [0, -8], className: 'naval-label' });
+        marker.bindTooltip(esc(ship.name), { direction: 'top', offset: [0, -8], className: 'naval-label' });
         navalLayerRef.current!.addLayer(marker);
         navalMarkersRef.current.set(id, marker);
       }
@@ -694,14 +695,14 @@ export default function ConflictMap({ className }: MapProps) {
       const timeStr = new Date(d.time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
       const popupHtml = `
         <div style="font-family:monospace;font-size:11px;color:#000;min-width:200px;max-width:280px;">
-          <strong style="color:${d.color};font-size:12px;">${d.label}${d.count > 1 ? ` ×${d.count}` : ''}</strong><br/>
-          ${d.place ? `<span style="color:#333;">→ ${d.place}</span><br/>` : ''}
-          <span style="color:#555;">Heading ${d.heading}° • Confidence ${d.confidence}%</span>
-          ${d.text ? `<div style="margin:4px 0;line-height:1.35;">${d.text}</div>` : ''}
+          <strong style="color:${esc(d.color)};font-size:12px;">${esc(d.label)}${d.count > 1 ? ` ×${esc(d.count)}` : ''}</strong><br/>
+          ${d.place ? `<span style="color:#333;">→ ${esc(d.place)}</span><br/>` : ''}
+          <span style="color:#555;">Heading ${esc(d.heading)}° • Confidence ${esc(d.confidence)}%</span>
+          ${d.text ? `<div style="margin:4px 0;line-height:1.35;">${esc(d.text)}</div>` : ''}
           <em style="color:#888;font-size:9px;">Neptun • ${timeStr}</em>
         </div>`;
       const iconHtml = `<div style="width:20px;height:20px;position:relative;">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:rotate(${d.heading}deg);color:${d.color};font-size:15px;line-height:1;filter:drop-shadow(0 0 5px ${d.color});">▲</div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:rotate(${Number(d.heading) || 0}deg);color:${esc(d.color)};font-size:15px;line-height:1;filter:drop-shadow(0 0 5px ${esc(d.color)});">▲</div>
       </div>`;
 
       // Movement trail
@@ -725,7 +726,7 @@ export default function ConflictMap({ className }: MapProps) {
           icon: L!.divIcon({ className: 'drone-marker', html: iconHtml, iconSize: [20, 20], iconAnchor: [10, 10] }),
         });
         marker.bindPopup(popupHtml);
-        marker.bindTooltip(`${d.label}${d.place ? ` → ${d.place}` : ''}`, { direction: 'top', offset: [0, -8], className: 'drone-label' });
+        marker.bindTooltip(`${esc(d.label)}${d.place ? ` → ${esc(d.place)}` : ''}`, { direction: 'top', offset: [0, -8], className: 'drone-label' });
         droneLayerRef.current!.addLayer(marker);
         droneMarkersRef.current.set(d.id, marker);
       }
@@ -774,7 +775,7 @@ export default function ConflictMap({ className }: MapProps) {
       alertCircle.bindPopup(`
         <div style="font-family:monospace;font-size:11px;color:#000;">
           <strong style="color:red">ACTIVE ALERTS</strong><br/>
-          ${alerts.alerts.map(a => `${a.type}: ${a.threat}`).join('<br/>')}
+          ${alerts.alerts.map(a => `${esc(a.type)}: ${esc(a.threat)}`).join('<br/>')}
         </div>
       `);
       alertLayerRef.current.addLayer(alertCircle);
@@ -787,7 +788,7 @@ export default function ConflictMap({ className }: MapProps) {
             const sirens = L!.circleMarker(coords, {
               radius: 12, color: '#ff3366', fillColor: '#ff3366', fillOpacity: 0.4, weight: 2, className: 'alert-flash',
             });
-            sirens.bindPopup(`<div style="font-family:monospace;font-size:11px;color:#000;"><strong style="color:red">${alert.type}</strong><br/>${loc}<br/>${alert.threat}</div>`);
+            sirens.bindPopup(`<div style="font-family:monospace;font-size:11px;color:#000;"><strong style="color:red">${esc(alert.type)}</strong><br/>${esc(loc)}<br/>${esc(alert.threat)}</div>`);
             alertLayerRef.current!.addLayer(sirens);
           }
         });
@@ -920,9 +921,9 @@ export default function ConflictMap({ className }: MapProps) {
       const sourceTag = event.fromTelegram ? '📡 ' : '';
       const popupHtml = `
         <div style="font-family:monospace;font-size:11px;color:#000;min-width:220px;max-width:300px;">
-          <strong style="color:${typeColor};font-size:12px;">${event.type} — ${geo.place}</strong><br/>
-          <div style="margin:4px 0;line-height:1.4;">${event.title}</div>
-          <em style="color:#666;font-size:9px;">${sourceTag}${event.source} • ${timeStr}</em>
+          <strong style="color:${typeColor};font-size:12px;">${esc(event.type)} — ${esc(geo.place)}</strong><br/>
+          <div style="margin:4px 0;line-height:1.4;">${esc(event.title)}</div>
+          <em style="color:#666;font-size:9px;">${sourceTag}${esc(event.source)} • ${timeStr}</em>
         </div>
       `;
 
@@ -959,14 +960,14 @@ export default function ConflictMap({ className }: MapProps) {
         weight: 1,
         dashArray: '10, 8',
       });
-      circle.bindTooltip(`${site.name}<br/>${site.range}km range`, { className: 'city-label' });
+      circle.bindTooltip(`${esc(site.name)}<br/>${esc(site.range)}km range`, { className: 'city-label' });
       rangeLayerRef.current!.addLayer(circle);
 
       // Launch site marker
       const marker = L!.circleMarker([site.lat, site.lon], {
         radius: 4, color: '#ff3366', fillColor: '#ff3366', fillOpacity: 0.8, weight: 1,
       });
-      marker.bindTooltip(site.name, { className: 'city-label', direction: 'right', offset: [6, 0] });
+      marker.bindTooltip(esc(site.name), { className: 'city-label', direction: 'right', offset: [6, 0] });
       rangeLayerRef.current!.addLayer(marker);
     });
   }, [showRangeRings]);
