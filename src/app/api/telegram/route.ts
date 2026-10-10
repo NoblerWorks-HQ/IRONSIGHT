@@ -69,12 +69,59 @@ async function fetchPost(channel: string, postId: number): Promise<{ text: strin
     return null;
   }
 }
+import fs from 'fs';
+import path from 'path';
+
+const STATE_FILE_PATH = path.join(process.cwd(), 'data', 'telegram_state.json');
+
+function loadTelegramState(): Record<string, number> {
+  try {
+    if (fs.existsSync(STATE_FILE_PATH)) {
+      return JSON.parse(fs.readFileSync(STATE_FILE_PATH, 'utf-8'));
+    }
+  } catch (e) {
+    console.error("[Telegram API] Failed to read state:", e);
+  }
+  return {};
+}
+
+function saveTelegramState(state: Record<string, number>) {
+  try {
+    const dir = path.dirname(STATE_FILE_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(STATE_FILE_PATH, JSON.stringify(state, null, 2), 'utf-8');
+    } catch (e) {
+    console.error("[Telegram API] Failed to write state:", e);
+  }
+}
+
+// Initialize global request counter and load persisted state from disk
+let totalRequestsMade = 0;
+const persistedState = loadTelegramState();
+
 
 // On first call, find latest post via binary search. After that, just check ahead.
 async function findLatestPostId(channel: string): Promise<number> {
+  // Enforce a strict request budget
+  const MAX_REQUESTS = Number(process.env.MAX_TELEGRAM_REQUESTS_PER_CALL) || 200;
+
+  // Use persisted disk state if process memory is blank (cold start)
+  if (!latestKnownIds[channel] && persistedState[channel]) {
+    latestKnownIds[channel] = persistedState[channel];
+  }
+
   const known = latestKnownIds[channel];
 
   if (known) {
+    // Gracefully stop dispatching network calls if budget is exhausted
+    if (totalRequestsMade >= MAX_REQUESTS) {
+      console.warn(`[Telegram API] Request budget limit of ${MAX_REQUESTS} reached. Skipping channel: ${channel}`);
+      return known;
+    }
+
+    // Track scheduled network requests against safety budget ceiling
+    totalRequestsMade += 20;
+
     // Check up to 20 ahead in parallel for new posts
     const checks = Array.from({ length: 20 }, (_, i) => known + 20 - i);
     const results = await Promise.allSettled(
@@ -87,7 +134,13 @@ async function findLatestPostId(channel: string): Promise<number> {
         highest = r.value;
       }
     }
+
     latestKnownIds[channel] = highest;
+
+    // Persist the newly discovered high-water mark to disk immediately
+    persistedState[channel] = highest;
+    saveTelegramState(persistedState);
+
     return highest;
   }
 
@@ -96,8 +149,12 @@ async function findLatestPostId(channel: string): Promise<number> {
   let high = 200000;
 
   // Quick probe to find rough range
-  for (const probe of [500, 5000, 15000, 30000, 50000, 80000, 120000, 180000]) {
+  for (const probe of) {
     if (probe >= high) break;
+    
+    if (totalRequestsMade >= MAX_REQUESTS) break;
+    totalRequestsMade++;
+
     const result = await fetchPost(channel, probe);
     if (result) {
       low = probe;
@@ -109,6 +166,9 @@ async function findLatestPostId(channel: string): Promise<number> {
 
   // Binary search
   while (high - low > 10) {
+    if (totalRequestsMade >= MAX_REQUESTS) break;
+    totalRequestsMade++;
+
     const mid = Math.floor((low + high) / 2);
     const result = await fetchPost(channel, mid);
     if (result) {
@@ -120,66 +180,26 @@ async function findLatestPostId(channel: string): Promise<number> {
 
   // Fine scan the last few
   for (let i = high; i >= low; i--) {
+    if (totalRequestsMade >= MAX_REQUESTS) break;
+    totalRequestsMade++;
+
     const result = await fetchPost(channel, i);
     if (result) {
       latestKnownIds[channel] = i;
+
+      // Persist the newly discovered high-water mark to disk immediately
+      persistedState[channel] = i;
+      saveTelegramState(persistedState);
+
       return i;
     }
   }
 
   latestKnownIds[channel] = low;
+
+  // Persist the newly discovered high-water mark to disk immediately
+  persistedState[channel] = low;
+  saveTelegramState(persistedState);
+
   return low;
-}
-
-export async function GET(req: Request) {
-  const { server } = getConflictFromRequest(req);
-  const channels = server.telegramChannels;
-
-  // Process ALL channels in parallel — each finds latest + fetches 3 posts
-  const channelResults = await Promise.allSettled(
-    channels.map(async (channel) => {
-      const latestId = await findLatestPostId(channel.name);
-      const posts: TelegramPost[] = [];
-
-      // Fetch only latest 3 posts in parallel
-      const ids = [latestId, latestId - 1, latestId - 2].filter(id => id > 0);
-      const results = await Promise.allSettled(
-        ids.map(id => fetchPost(channel.name, id))
-      );
-
-      results.forEach((r, i) => {
-        if (r.status === 'fulfilled' && r.value) {
-          posts.push({
-            channel: channel.name,
-            channelLabel: channel.label,
-            color: channel.color,
-            postId: ids[i],
-            text: r.value.text,
-            date: r.value.date,
-            url: `https://t.me/${channel.name}/${ids[i]}`,
-          });
-        }
-      });
-
-      return posts;
-    })
-  );
-
-  const allPosts: TelegramPost[] = [];
-  for (const result of channelResults) {
-    if (result.status === 'fulfilled') {
-      allPosts.push(...result.value);
-    }
-  }
-
-  // Sort newest first
-  allPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-  return NextResponse.json({
-    posts: allPosts,
-    channels: channels.map(c => c.label),
-    updated: new Date().toISOString(),
-  }, {
-    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-  });
 }
