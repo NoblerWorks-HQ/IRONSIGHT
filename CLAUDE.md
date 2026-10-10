@@ -35,3 +35,6 @@ src/
 - No API keys required - all free data sources
 - Open source under MIT license
 - Features, data sources and polling intervals: `README.md`
+
+## Docs stay current
+- Update README, `docs/`, this CLAUDE.md and TODO.md **in the same commit** as the change that makes them wrong, never in a later cleanup. A stale doc is a bug.
