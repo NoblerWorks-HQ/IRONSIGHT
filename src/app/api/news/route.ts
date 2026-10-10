@@ -38,7 +38,7 @@ async function fetchRSS(feedUrl: string, source: string): Promise<NewsItem[]> {
 
       let title = getTextContent(item, 'title');
       let link = getTextContent(item, 'link');
-      let pubDate = getTextContent(item, 'pubDate') || getTextContent(item, 'published') || getTextContent(item, 'updated');
+      const pubDate = getTextContent(item, 'pubDate') || getTextContent(item, 'published') || getTextContent(item, 'updated');
 
       // For Atom feeds, link is in href attribute
       if (!link) {

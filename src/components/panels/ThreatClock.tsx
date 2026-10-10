@@ -8,10 +8,16 @@ export default function ThreatClock() {
   const TIME_ZONES = config.client.timeZones;
   const [time, setTime] = useState<Date | null>(null);
 
+  // Starts null so the server render and first client render match; the first
+  // tick is deferred (not a synchronous setState in the effect body).
   useEffect(() => {
-    setTime(new Date());
-    const id = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(id);
+    const tick = () => setTime(new Date());
+    const first = setTimeout(tick, 0);
+    const id = setInterval(tick, 1000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(id);
+    };
   }, []);
 
   if (!time) {

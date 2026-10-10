@@ -32,4 +32,4 @@ Read-only fleet audit (9 agents, nothing changed). Each line: effort S (<half da
 _None tracked yet - add items as `- [ ] task`, grouped by priority or theme. Mark done inline: `- [x] ~~task~~ ✅ done YYYY-MM-DD`._
 
 - [ ] Remove the leftover graphify tooling: `.claude/skills/graphify/` (10 files) + the two graphify PreToolUse hooks in `.claude/settings.json` (fleet rule: engineering-standards/repo-and-project-structure.md, "No knowledge-graph tooling"). The CLAUDE.md stub went 2026-09-30.
-- [ ] `npm run lint` is `next lint`, which Next 16 removed - switch to `eslint .` with a flat config.
+- [x] ✅ 2026-10-10 `eslint .` + `eslint.config.mjs` (flat, eslint-config-next presets); lint now runs: 0 errors, 18 warnings (react-hooks, unused vars) left. Was: `npm run lint` is `next lint`, which Next 16 removed - switch to `eslint .` with a flat config.
