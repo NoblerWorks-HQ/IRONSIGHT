@@ -16,6 +16,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
+# Ensure a public/ dir exists so the runtime COPY below never fails,
+# even when the repo ships without static assets.
+RUN mkdir -p public
 
 # 3) Minimal runtime image — only the standalone output + static assets
 FROM node:22-alpine AS runner
