@@ -1,32 +1,7 @@
 'use client';
 
 import { useConflictFeed } from '@/lib/hooks';
-
-interface MilFlight {
-  icao24: string;
-  callsign: string;
-  origin: string;
-  lat: number;
-  lon: number;
-  altitude: number;
-  heading: number;
-  speed: number;
-  type: string;
-  aircraftType: string;
-  registration: string;
-  description: string;
-  squawk: string;
-  isMilitary: boolean;
-  isInteresting: boolean;
-}
-
-interface FlightDataResponse {
-  total: number;
-  military: number;
-  flights: MilFlight[];
-  source: string;
-  updated: string;
-}
+import type { FlightData as FlightDataResponse } from '@/lib/types/api';
 
 const TYPE_COLORS: Record<string, string> = {
   'RQ-4 Global Hawk (ISR)': 'var(--red)',

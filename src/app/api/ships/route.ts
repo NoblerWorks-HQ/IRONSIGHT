@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { getConflictFromRequest } from '@/lib/conflicts';
+import type { NavalVessel } from '@/lib/types/api';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,16 +30,3 @@ export async function GET(req: Request) {
   }
 }
 
-interface NavalVessel {
-  name: string;
-  hull: string;
-  type: string;
-  class: string;
-  navy: string;
-  lat: number;
-  lon: number;
-  status: string;
-  region: string;
-  lastReported: string;
-  group?: string;
-}

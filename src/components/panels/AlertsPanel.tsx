@@ -4,37 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useConflictFeed } from '@/lib/hooks';
 import { useConflict } from '@/lib/conflicts/context';
 import { playAlertSound } from '@/lib/generateAlert';
-
-interface AlertData {
-  status: 'ACTIVE' | 'CLEAR';
-  activeCount: number;
-  alerts: {
-    id: string;
-    time: string;
-    type: string;
-    threat: string;
-    locations: string[];
-    source: string;
-    active: boolean;
-  }[];
-  lastChecked: string;
-}
-
-interface DroneTrack {
-  id: string;
-  label: string;
-  color: string;
-  heading: number;
-  count: number;
-  place: string;
-  time: string;
-}
-
-interface DroneData {
-  drones: DroneTrack[];
-  count: number;
-  ballisticThreat: boolean;
-}
+import type { AlertData, DroneData } from '@/lib/types/api';
 
 const TYPE_ICONS: Record<string, string> = {
   MISSILE: '🚀',

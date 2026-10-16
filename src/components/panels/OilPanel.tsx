@@ -1,15 +1,7 @@
 'use client';
 
 import { useConflictFeed, formatPrice, formatChange } from '@/lib/hooks';
-
-interface OilData {
-  type: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-  error?: boolean;
-}
+import type { OilData } from '@/lib/types/api';
 
 export default function OilPanel() {
   const { data: prices, loading } = useConflictFeed<OilData[]>('/api/oil', 600000);

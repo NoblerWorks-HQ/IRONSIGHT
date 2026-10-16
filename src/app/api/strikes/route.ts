@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { fetchWithTimeout, parseXML, getTextContent } from '@/lib/fetcher';
 import { getConflictFromRequest } from '@/lib/conflicts';
+import type { StrikeEvent } from '@/lib/types/api';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,13 +80,3 @@ export async function GET(req: Request) {
   });
 }
 
-interface StrikeEvent {
-  id: string;
-  date: string;
-  category: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  title: string;
-  source: string;
-  url: string;
-  country: string;
-}

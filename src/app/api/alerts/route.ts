@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { fetchWithTimeout } from '@/lib/fetcher';
 import { translateHebrew, translateCities, isHebrew, translateFreeText, CITY_TRANSLATIONS } from '@/lib/hebrew';
 import { getConflictFromRequest } from '@/lib/conflicts';
+import type { AlertEvent } from '@/lib/types/api';
 
 export const dynamic = 'force-dynamic';
 
@@ -164,18 +165,6 @@ interface TzevaAdomAlert {
   data?: string;
   threat?: string;
   cities?: string[];
-}
-
-interface AlertEvent {
-  id: string;
-  time: string;
-  type: string;
-  threat: string;
-  threatOriginal: string;
-  locations: string[];
-  locationsOriginal: string[];
-  source: string;
-  active: boolean;
 }
 
 function categorizeAlert(threat: string): string {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { translateFreeText } from '@/lib/hebrew';
 import { getConflictFromRequest } from '@/lib/conflicts';
 import { extractTelegramText } from '@/lib/telegramText';
+import type { TelegramPost } from '@/lib/types/api';
 
 // Detect non-Latin scripts (Hebrew, Arabic, Farsi, Cyrillic, etc.)
 function hasNonLatinText(text: string): boolean {
@@ -13,16 +14,6 @@ export const dynamic = 'force-dynamic';
 // Scrape public Telegram channels via embed endpoint
 // Completely free, no API key, no bot needed
 // Channel list is per-conflict (see src/lib/conflicts/*).
-
-interface TelegramPost {
-  channel: string;
-  channelLabel: string;
-  color: string;
-  postId: number;
-  text: string;
-  date: string;
-  url: string;
-}
 
 // Persist latest known post IDs across requests (in-memory cache)
 const latestKnownIds: Record<string, number> = {};

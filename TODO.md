@@ -26,7 +26,8 @@ Fleet audit follow-up. Fixed items landed on main 2026-10-02 (local only - this 
 
 Read-only fleet audit (9 agents, nothing changed). Each line: effort S (<half day) / M (1-3 days) / L, and the risk of making the fix. 🔴 = a live bug or safety hole.
 
-- [ ] 🟡 API response types defined twice (routes + panels) -> `src/lib/types/`; split `src/components/map/ConflictMap.tsx` (1,038, 18 `useEffect`) into one hook per feed layer. M, low-med.
+- [x] 2026-10-16 API response types defined once in `src/lib/types/api.ts` (type-only; routes, panels and the map import it; `tsc`, lint (18 warnings, unchanged) and `npm test` clean).
+- [ ] Split `src/components/map/ConflictMap.tsx` (~900 lines, 18 `useEffect`) into one hook per feed layer. Deliberately NOT done 2026-10-16: no browser/map test exists, so identical behaviour cannot be proven. Needs a Leaflet smoke test (Playwright: markers per layer render from mocked `/api/*`) first. M, low-med.
 
 ## Open
 

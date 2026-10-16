@@ -1,22 +1,7 @@
 'use client';
 
 import { useConflictFeed, timeAgo } from '@/lib/hooks';
-
-interface TelegramPost {
-  channel: string;
-  channelLabel: string;
-  color: string;
-  postId: number;
-  text: string;
-  date: string;
-  url: string;
-}
-
-interface TelegramData {
-  posts: TelegramPost[];
-  channels: string[];
-  updated: string;
-}
+import type { TelegramData } from '@/lib/types/api';
 
 export default function TelegramPanel() {
   const { data, loading, lastUpdated } = useConflictFeed<TelegramData>('/api/telegram', 60000);

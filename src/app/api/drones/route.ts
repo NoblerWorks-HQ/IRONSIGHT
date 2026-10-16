@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { fetchWithTimeout } from '@/lib/fetcher';
 import { translateFreeText } from '@/lib/hebrew';
 import { getConflictFromRequest } from '@/lib/conflicts';
+import type { Drone } from '@/lib/types/api';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,22 +11,6 @@ export const dynamic = 'force-dynamic';
 // Each track carries a threat_type (shahed, recon, missile...), live position,
 // heading, a movement trail, and a confidence score. Ukrainian text is
 // translated to English (cached).
-
-interface Drone {
-  id: string;
-  type: string;      // raw threat_type
-  label: string;     // display label, e.g. "Shahed Drone"
-  color: string;
-  lat: number;
-  lng: number;
-  heading: number;   // degrees
-  count: number;
-  place: string;     // translated destination/place
-  text: string;      // translated description
-  time: string;
-  confidence: number; // 0-100
-  trail: [number, number][];
-}
 
 // Classify a track into a display label + color. Neptun's threat_type is coarse
 // (only "shahed" / "raketa"), so we also inspect the original Ukrainian text

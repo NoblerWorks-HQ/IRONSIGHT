@@ -1,17 +1,7 @@
 'use client';
 
 import { useConflictFeed, timeAgo, useTick } from '@/lib/hooks';
-
-interface StrikeEvent {
-  id: string;
-  date: string;
-  category: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  title: string;
-  source: string;
-  url: string;
-  country: string;
-}
+import type { StrikeEvent } from '@/lib/types/api';
 
 const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
   MISSILE: { icon: '🚀', color: 'var(--red)' },

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { fetchWithTimeout, parseXML, getTextContent } from '@/lib/fetcher';
 import { getConflictFromRequest } from '@/lib/conflicts';
+import type { CountryEvent } from '@/lib/types/api';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,15 +49,6 @@ function getAlertLevel(events: { severity: string; hoursAgo: number }[]): 'CLEAR
   // If we have events but they're older, still show monitoring
   if (events.length > 0) return 'MONITORING';
   return 'CLEAR';
-}
-
-interface CountryEvent {
-  title: string;
-  source: string;
-  time: string;
-  url: string;
-  severity: 'critical' | 'high' | 'medium' | 'low';
-  hoursAgo: number;
 }
 
 export async function GET(req: Request) {

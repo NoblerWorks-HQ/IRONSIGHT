@@ -3,27 +3,7 @@
 import { useState } from 'react';
 import { useConflictFeed, timeAgo, useTick } from '@/lib/hooks';
 import { useConflict } from '@/lib/conflicts/context';
-
-interface CountryEvent {
-  title: string;
-  source: string;
-  time: string;
-  url: string;
-  severity: 'critical' | 'high' | 'medium' | 'low';
-  hoursAgo: number;
-}
-
-interface CountryAlert {
-  name: string;
-  flag: string;
-  events: CountryEvent[];
-  level: string;
-}
-
-interface RegionalData {
-  alerts: CountryAlert[];
-  updated: string;
-}
+import type { RegionalData } from '@/lib/types/api';
 
 const LEVEL_CONFIG: Record<string, { color: string; label: string }> = {
   CLEAR: { color: 'var(--green)', label: 'CLEAR' },

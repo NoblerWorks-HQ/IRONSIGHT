@@ -2,27 +2,7 @@
 
 import { useConflictFeed } from '@/lib/hooks';
 import { useConflict } from '@/lib/conflicts/context';
-
-interface NavalVessel {
-  name: string;
-  hull: string;
-  type: string;
-  class: string;
-  navy: string;
-  lat: number;
-  lon: number;
-  status: string;
-  region: string;
-  lastReported: string;
-  group?: string;
-}
-
-interface NavalData {
-  totalTracked: number;
-  ships: NavalVessel[];
-  updated: string;
-  note: string;
-}
+import type { NavalData, NavalVessel } from '@/lib/types/api';
 
 const TYPE_ICONS: Record<string, string> = {
   'Aircraft Carrier': '⛴',
