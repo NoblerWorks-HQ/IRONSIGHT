@@ -18,7 +18,7 @@ Fleet audit follow-up. Fixed items landed on main 2026-10-02 (local only - this 
 ## Dependencies (2026-10-04)
 
 - [x] 2026-10-04 Dependabot alerts 3 critical / 29 high / 14 medium / 2 low -> 0 open (`npm audit fix`, non-force, lockfile only: next 16.2.9 -> 16.3.8, sharp 0.35.5, postcss 8.5.23, xmldom, js-yaml, nanoid, ...). Build, tsc, `npm test`, `docker build` all pass. Pushed c22cbd4.
-- [ ] 2026-10-11 check that Dependabot auto-closed its superseded PRs (#28, #30, #34-#40); close any that remain only if their bump is already in the lockfile.
+- [x] 2026-10-11 check that Dependabot auto-closed its superseded PRs (#28, #30, #34-#40); close any that remain only if their bump is already in the lockfile. ✅ 2026-10-15: none had auto-closed; all 9 closed by hand after checking main's `package-lock.json` holds each target or newer (next 16.3.8, postcss 8.5.23, sharp 0.35.5, nanoid 3.3.19, browserslist 4.29.3, baseline-browser-mapping 2.11.27, js-yaml 4.3.2, xmldom 0.8.15, humanfs 0.16.8, postcss-selector-parser 6.1.4). Non-Dependabot PRs #1, #2, #20, #32, #41, #42 untouched.
 - [ ] low - `npm audit` still shows 7 high, all build-time: braces <=3.0.3 (GHSA-vfj7-8cjw-p6xm, no patched release) via tailwindcss 3 + eslint-config-next. GitHub auto-dismissed it as dev-only. Only fix is tailwindcss 4 (major, styling pipeline change) - do it with the lint/flat-config work below.
 
 ## Refactor audit (2026-10-01) - found, not started
