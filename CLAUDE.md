@@ -26,7 +26,7 @@ npm start        # start production
 src/
 ├── app/           # Next.js app router; api/ = one route per upstream feed
 ├── components/    # React components (map/, panels/)
-├── lib/           # data fetching utilities; conflicts/ = one config per theater
+├── lib/           # data fetching utilities; conflicts/ = one config per theater; types/api.ts = /api/* response shapes (defined once)
 ├── data/          # static data (city-data.json)
 └── types/
 ```
