@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRONSIGHT</title>
+<meta name="description" content="Real-time OSINT command center for the Iran/Israel and Russia/Ukraine theaters. 50+ live open-source intelligence feeds in one dashboard. No API keys. Free.">
+<link rel="canonical" href="https://noblerworks-hq.github.io/IRONSIGHT/">
+<meta property="og:title" content="IRONSIGHT">
+<meta property="og:description" content="Real-time OSINT command center: news, Telegram, military aircraft, naval tracking, missile alerts and markets in one dashboard.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://noblerworks-hq.github.io/IRONSIGHT/">
+<meta property="og:image" content="https://noblerworks-hq.github.io/IRONSIGHT/img/social.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{--bg:#07090c;--panel:#0e1217;--line:#1f2730;--text:#e8edf2;--muted:#8b97a4;--accent:#ff4d3d;--ok:#35c27a}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+header.top{border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;height:56px}
+.brand{font:700 15px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;text-decoration:none}
+nav a{margin-left:20px;color:var(--muted);text-decoration:none;font-size:14px}
+nav a:hover{color:var(--text)}
+.hero{padding:72px 0 40px;text-align:center}
+.hero h1{font:800 clamp(40px,9vw,80px)/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;margin:0 0 20px}
+.hero h1 span{color:var(--accent)}
+.hero p.lead{max-width:660px;margin:0 auto 28px;color:var(--muted);font-size:18px}
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;padding:11px 20px;border:1px solid var(--line);border-radius:6px;text-decoration:none;font-weight:600;font-size:15px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:hover{border-color:var(--text)}
+.shot{margin:40px auto 0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.shot img{display:block;width:100%;height:auto}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;padding:32px 0}
+.stat{text-align:center}
+.stat b{display:block;font:700 28px/1.2 ui-monospace,Menlo,monospace;color:var(--ok)}
+.stat span{color:var(--muted);font-size:14px}
+section{padding:56px 0;border-top:1px solid var(--line)}
+h2{font:700 13px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:0 0 24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 18px}
+.card h3{margin:0 0 4px;font-size:16px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.theaters{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.theaters .card{border-top:3px solid var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.tablewrap{overflow-x:auto}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;overflow-x:auto;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;margin:0 0 16px}
+p.note{color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:32px 0;color:var(--muted);font-size:14px;text-align:center}
+footer a{color:var(--text)}
+footer p{margin:6px auto;max-width:720px}
+@media (max-width:560px){nav a{margin-left:12px}.hero{padding-top:48px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="#">IRONSIGHT</a>
+  <nav><a href="#features">Features</a><a href="#sources">Sources</a><a href="#run">Run it</a><a href="https://github.com/NoblerWorks-HQ/IRONSIGHT">GitHub</a></nav>
+</div></header>
+
+<main>
+<div class="wrap">
+  <div class="hero">
+    <h1>IRON<span>SIGHT</span></h1>
+    <p class="lead">A real-time OSINT command center for active conflicts. News, Telegram, military aircraft and naval tracking, missile alerts, satellite thermal data and markets, on one dashboard. No API keys. Free.</p>
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/NoblerWorks-HQ/IRONSIGHT">View on GitHub</a>
+      <a class="btn" href="#run">Run it with Docker</a>
+    </div>
+    <div class="shot"><img src="img/dashboard.png" alt="IRONSIGHT dashboard showing the theater map, intel feed and market panels" width="1903" height="898"></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b>50+</b><span>live sources</span></div>
+    <div class="stat"><b>2</b><span>theaters, one toggle</span></div>
+    <div class="stat"><b>0</b><span>API keys needed</span></div>
+    <div class="stat"><b>MIT</b><span>licensed</span></div>
+  </div>
+</div>
+
+<section><div class="wrap">
+  <h2>Two theaters, one dashboard</h2>
+  <div class="theaters">
+    <div class="card"><h3>Iran / Israel</h3><p>The Middle East theater, and the default. Pikud HaOref sirens, Persian Gulf, Red Sea and Eastern Med naval tracking, and Hebrew, Arabic and Farsi sources auto-translated.</p></div>
+    <div class="card"><h3>Russia / Ukraine</h3><p>The Eastern Europe theater. Live Shahed drone, cruise and ballistic missile and glide-bomb tracks, oblast air-raid alerts, and Ukrainian and Russian sources auto-translated.</p></div>
+  </div>
+  <p class="note">A toggle in the header re-points every panel, map layer and feed to the selected conflict, and remembers your choice.</p>
+</div></section>
+
+<section id="features"><div class="wrap">
+  <h2>What's on the screen</h2>
+  <div class="grid">
+    <div class="card"><h3>Live intel feed</h3><p>Per-theater RSS aggregation with relevance filtering and sports and entertainment noise removed.</p></div>
+    <div class="card"><h3>Telegram OSINT</h3><p>Public channels scraped in real time, with auto-translation.</p></div>
+    <div class="card"><h3>Theater map</h3><p>Military aircraft, naval vessels, strike markers, missile arcs, range rings, borders and a distance tool.</p></div>
+    <div class="card"><h3>Air-raid alerts</h3><p>Siren and oblast alert status with audio notifications and on-map markers.</p></div>
+    <div class="card"><h3>Conflict monitor</h3><p>Categorized events (strikes, defense, diplomatic, nuclear) with per-theater geocoding and severity scoring.</p></div>
+    <div class="card"><h3>Regional threat monitor</h3><p>Per-country threat levels across the theater's neighbors.</p></div>
+    <div class="card"><h3>Military airspace</h3><p>Live ADS-B military aircraft, region-filtered per theater.</p></div>
+    <div class="card"><h3>Satellite thermal</h3><p>NASA FIRMS fire and explosion detection.</p></div>
+    <div class="card"><h3>Markets</h3><p>Defense stocks, indices, VIX, gold, USD, oil and gas, crypto, and Polymarket odds for the selected conflict.</p></div>
+  </div>
+</div></section>
+
+<section id="sources"><div class="wrap">
+  <h2>Data sources</h2>
+  <p>Everything comes from free, public endpoints. IRONSIGHT doesn't own or generate any of the underlying data. It is a viewer, and every feed is credited to its provider.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Service</th><th>Data</th></tr>
+    <tr><td>Yahoo Finance</td><td>Stocks, indices, commodities, oil futures</td></tr>
+    <tr><td>CoinGecko</td><td>Crypto prices</td></tr>
+    <tr><td>Polymarket</td><td>Prediction-market odds</td></tr>
+    <tr><td>NASA FIRMS</td><td>Thermal-anomaly satellite data</td></tr>
+    <tr><td>adsb.lol</td><td>Military aircraft ADS-B tracking</td></tr>
+    <tr><td>Tzeva Adom</td><td>Israeli missile, rocket and drone alerts</td></tr>
+    <tr><td>alerts.com.ua, Neptun</td><td>Ukrainian air-raid alerts and drone and missile tracks</td></tr>
+    <tr><td>Google News RSS, Telegram</td><td>News and public channel posts</td></tr>
+  </table></div>
+  <p class="note">See the <a href="https://github.com/NoblerWorks-HQ/IRONSIGHT#data-sources">full source list</a>, the credits, and the legal disclaimer in the README.</p>
+</div></section>
+
+<section id="run"><div class="wrap">
+  <h2>Run it yourself</h2>
+  <p>IRONSIGHT needs a server to proxy its feeds, so it can't run on this page. The easiest way to run it is Docker.</p>
+<pre>git clone https://github.com/NoblerWorks-HQ/IRONSIGHT.git
+cd IRONSIGHT
+docker compose up --build</pre>
+  <p class="note">Then open http://localhost:3000. Prefer Node? Run <code>npm install</code> then <code>npm run dev</code>. Built with Next.js, TypeScript, Tailwind CSS and Leaflet.</p>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <p>Built by <a href="https://noblerworks.com/">Nobler Works</a>. Want something like IRONSIGHT for your domain? <a href="https://noblerworks.com/">Get in touch</a>.</p>
+  <p><a href="https://github.com/NoblerWorks-HQ/IRONSIGHT">Source on GitHub</a></p>
+</div></footer>
+</body>
+</html>
