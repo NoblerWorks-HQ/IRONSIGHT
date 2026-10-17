@@ -2,14 +2,27 @@ name: Pages
 
 # Publishes the static landing page in site/ to GitHub Pages.
 #
+# The validate job runs on every pull request and blocks the deploy: it fails on
+# a broken local link or image, a malformed JSON-LD block, a sitemap that does
+# not list the canonical URL, or an IndexNow key that does not match its
+# verification file. Deployment only happens on main.
+#
 # One-time repo setup: Settings > Pages > Build and deployment > Source must be
-# set to "GitHub Actions". Until that is done, the deploy job fails.
+# set to "GitHub Actions".
 
 on:
   push:
     branches: [main]
     paths:
       - 'site/**'
+      - '.github/indexnow-key.txt'
+      - '.github/scripts/check-site.py'
+      - '.github/workflows/pages.yml'
+  pull_request:
+    paths:
+      - 'site/**'
+      - '.github/indexnow-key.txt'
+      - '.github/scripts/check-site.py'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -22,7 +35,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate:
+    name: Validate site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check site
+        run: python3 .github/scripts/check-site.py
+
   deploy:
+    name: Deploy to Pages
+    if: github.event_name != 'pull_request'
+    needs: validate
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -38,3 +62,15 @@ jobs:
           path: site
       - id: deployment
         uses: actions/deploy-pages@v5
+
+      # Search engines hear about the change on deploy instead of waiting for a
+      # crawl. A failed ping warns but never fails the deploy.
+      - name: Notify IndexNow
+        continue-on-error: true
+        run: |
+          key="$(tr -d '[:space:]' < .github/indexnow-key.txt)"
+          url="${{ steps.deployment.outputs.page_url }}"
+          host="$(echo "$url" | sed -E 's#https?://([^/]+)/.*#\1#')"
+          curl -fsS -X POST https://api.indexnow.org/indexnow \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            -d "{\"host\":\"$host\",\"key\":\"$key\",\"keyLocation\":\"${url}${key}.txt\",\"urlList\":[\"${url}\"]}"

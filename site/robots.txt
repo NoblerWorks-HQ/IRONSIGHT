@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://noblerworks-hq.github.io/IRONSIGHT/sitemap.xml

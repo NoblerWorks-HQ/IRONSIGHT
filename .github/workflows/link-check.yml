@@ -1,0 +1,54 @@
+name: Link check
+
+# Advisory: external URLs rot for reasons outside a contributor's control, so a
+# broken link opens (or updates) one rolling issue rather than failing a PR.
+# lychee failing to run at all is different and fails the job.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  external:
+    name: External URLs (advisory)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Run lychee
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --max-concurrency 8
+            --timeout 30
+            --retry-wait-time 10
+            --max-retries 2
+            --accept 200,206,403,429,999
+            --exclude-loopback
+            --scheme https
+            './site/*.html'
+            './README.md'
+          fail: false
+          output: ./lychee-report.md
+
+      # Exit 0 = clean, 2 = ran and found broken links, anything else = lychee
+      # itself failed and checked nothing. Only 2 is advisory.
+      - name: Fail if lychee did not actually run
+        if: always() && steps.lychee.outputs.exit_code != '0' && steps.lychee.outputs.exit_code != '2'
+        run: |
+          echo "::error::lychee exited with '${{ steps.lychee.outputs.exit_code }}': it did not check any URLs."
+          exit 1
+
+      - name: Open or update the link-rot issue
+        if: steps.lychee.outputs.exit_code == '2'
+        uses: peter-evans/create-issue-from-file@v6
+        with:
+          title: Broken links found by the weekly check
+          content-filepath: ./lychee-report.md

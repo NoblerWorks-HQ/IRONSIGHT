@@ -1,0 +1,20 @@
+name: Feature request
+description: A new panel, data source, or conflict theater
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to see
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Data source
+      description: For a new feed, give the provider and a link. It must be free, public and keyless.
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: What question does it help answer faster?

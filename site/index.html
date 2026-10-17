@@ -12,6 +12,16 @@
 <meta property="og:url" content="https://noblerworks-hq.github.io/IRONSIGHT/">
 <meta property="og:image" content="https://noblerworks-hq.github.io/IRONSIGHT/img/social.png">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#07090c">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:site_name" content="IRONSIGHT">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta name="twitter:title" content="IRONSIGHT">
+<meta name="twitter:description" content="Real-time OSINT command center for the Iran/Israel and Russia/Ukraine theaters. 50+ live open-source intelligence feeds in one dashboard. No API keys. Free.">
+<meta name="twitter:image" content="https://noblerworks-hq.github.io/IRONSIGHT/img/social.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "IRONSIGHT", "description": "Real-time OSINT command center for the Iran/Israel and Russia/Ukraine theaters. 50+ live open-source intelligence feeds in one dashboard. No API keys. Free.", "url": "https://noblerworks-hq.github.io/IRONSIGHT/", "image": "https://noblerworks-hq.github.io/IRONSIGHT/img/social.png", "codeRepository": "https://github.com/NoblerWorks-HQ/IRONSIGHT", "license": "https://opensource.org/licenses/MIT", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@type": "Organization", "name": "Nobler Works", "url": "https://noblerworks.com/"}, "applicationCategory": "SecurityApplication", "operatingSystem": "Any (Node.js 22 or Docker)"}</script>
 <style>
 :root{--bg:#07090c;--panel:#0e1217;--line:#1f2730;--text:#e8edf2;--muted:#8b97a4;--accent:#ff4d3d;--ok:#35c27a}
 *{box-sizing:border-box}
@@ -56,15 +66,25 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--muted);font-s
 footer a{color:var(--text)}
 footer p{margin:6px auto;max-width:720px}
 @media (max-width:560px){nav a{margin-left:12px}.hero{padding-top:48px}}
+@media (prefers-color-scheme:light){:root{--bg:#f7f9fb;--panel:#fff;--line:#d9e0e7;--text:#10161d;--muted:#566370;--accent:#d3281a;--ok:#1b8a52}}
+.skip{position:absolute;left:-9999px;top:8px;background:var(--accent);color:#fff;padding:8px 14px;border-radius:6px;z-index:10}
+.skip:focus{left:8px}
+a:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+section[id]{scroll-margin-top:16px}
+.social{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.social a{text-decoration:none}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{header.top,.btns,.skip{display:none}body{background:#fff;color:#000}}
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
   <a class="brand" href="#">IRONSIGHT</a>
   <nav><a href="#features">Features</a><a href="#sources">Sources</a><a href="#run">Run it</a><a href="https://github.com/NoblerWorks-HQ/IRONSIGHT">GitHub</a></nav>
 </div></header>
 
-<main>
+<main id="main">
 <div class="wrap">
   <div class="hero">
     <h1>IRON<span>SIGHT</span></h1>
@@ -134,7 +154,7 @@ docker compose up --build</pre>
 </div></section>
 </main>
 
-<footer><div class="wrap">
+<footer><div class="wrap"><div class="social"><a href="https://noblerworks.com/">Website</a><a href="https://x.com/Nobler_Works">X</a><a href="https://www.youtube.com/@NoblerWorks">YouTube</a><a href="https://www.tiktok.com/@noblerworks">TikTok</a><a href="https://www.threads.com/@noblerworks">Threads</a></div>
   <p>Built by <a href="https://noblerworks.com/">Nobler Works</a>. Want something like IRONSIGHT for your domain? <a href="https://noblerworks.com/">Get in touch</a>.</p>
   <p><a href="https://github.com/NoblerWorks-HQ/IRONSIGHT">Source on GitHub</a></p>
 </div></footer>

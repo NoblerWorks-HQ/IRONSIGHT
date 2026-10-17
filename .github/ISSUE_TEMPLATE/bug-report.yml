@@ -1,0 +1,44 @@
+name: Bug report
+description: A panel, map layer or feed behaves incorrectly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Most bugs here are an upstream feed that changed shape, went down, or started rate-limiting. The fields below tell those apart from a real bug in the app.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you see, and what did you expect instead?
+    validations:
+      required: true
+  - type: dropdown
+    id: theater
+    attributes:
+      label: Theater
+      options: [Iran / Israel, Russia / Ukraine, Both]
+    validations:
+      required: true
+  - type: input
+    id: panel
+    attributes:
+      label: Panel or map layer
+      placeholder: "Telegram OSINT, Military Airspace, Air-raid alerts..."
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. npm run dev
+        2. Switch theater to Russia / Ukraine
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: How you run it
+      placeholder: "npm run dev / docker compose, Node 22, macOS, Chrome"

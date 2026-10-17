@@ -1,0 +1,31 @@
+# Dependency updates for the two surfaces that go stale: the GitHub Actions in
+# .github/workflows/ and the npm dependencies. Monthly, grouped, so the routine
+# bumps arrive as one PR each rather than a stream.
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    rebase-strategy: disabled  # auto-rebases re-run full PR CI on metered Actions minutes
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    rebase-strategy: disabled
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps
+    groups:
+      minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]

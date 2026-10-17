@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/NoblerWorks-HQ/.github/blob/main/SECURITY.md
+    about: Please report security issues privately, not as a public issue.
+  - name: Built by Nobler Works
+    url: https://noblerworks.com/
+    about: We build OSINT tools, real-time dashboards and custom software. Get in touch.
