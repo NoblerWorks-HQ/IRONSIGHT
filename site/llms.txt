@@ -1,7 +1,20 @@
 # IRONSIGHT
 
-> Real-time OSINT command center for the Iran/Israel and Russia/Ukraine theaters. 50+ live open-source intelligence feeds in one dashboard. No API keys. Free.
+> Free open-source OSINT dashboard for Iran/Israel and Russia/Ukraine: live news, Telegram, aircraft, naval tracking, missile alerts and markets. No API keys.
+
+## Pages
+
+- [Home](https://noblerworks-hq.github.io/IRONSIGHT/): overview, FAQ
+- [IRONSIGHT data sources](https://noblerworks-hq.github.io/IRONSIGHT/data-sources/): Every free OSINT source IRONSIGHT uses: alert APIs, ADS-B aircraft, NASA FIRMS, Polymarket, news RSS and Telegram, with the polling interval of each feed.
+- [Iran / Israel theater](https://noblerworks-hq.github.io/IRONSIGHT/iran-israel/): The IRONSIGHT Iran/Israel theater: live Pikud HaOref siren alerts, military aircraft, Gulf and Red Sea naval tracking, translated Telegram OSINT and markets.
+- [Russia / Ukraine theater](https://noblerworks-hq.github.io/IRONSIGHT/russia-ukraine/): The IRONSIGHT Russia/Ukraine theater: live Shahed drone, cruise missile and glide-bomb tracks, oblast air-raid alerts, Black Sea naval tracking and Telegram.
+- [Run IRONSIGHT yourself](https://noblerworks-hq.github.io/IRONSIGHT/self-hosting/): Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 22. No API keys or environment variables needed.
+
+## Links
 
 - [Source code and README](https://github.com/NoblerWorks-HQ/IRONSIGHT)
-- [Landing page](https://noblerworks-hq.github.io/IRONSIGHT/)
 - [Nobler Works](https://noblerworks.com/)
+- [X](https://x.com/Nobler_Works)
+- [YouTube](https://www.youtube.com/@NoblerWorks)
+- [TikTok](https://www.tiktok.com/@noblerworks)
+- [Threads](https://www.threads.com/@noblerworks)

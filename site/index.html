@@ -3,87 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IRONSIGHT</title>
-<meta name="description" content="Real-time OSINT command center for the Iran/Israel and Russia/Ukraine theaters. 50+ live open-source intelligence feeds in one dashboard. No API keys. Free.">
+<title>IRONSIGHT: Free Real-Time OSINT Conflict Dashboard</title>
+<meta name="description" content="Free open-source OSINT dashboard for Iran/Israel and Russia/Ukraine: live news, Telegram, aircraft, naval tracking, missile alerts and markets. No API keys.">
 <link rel="canonical" href="https://noblerworks-hq.github.io/IRONSIGHT/">
-<meta property="og:title" content="IRONSIGHT">
-<meta property="og:description" content="Real-time OSINT command center: news, Telegram, military aircraft, naval tracking, missile alerts and markets in one dashboard.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="keywords" content="OSINT dashboard, conflict monitor, real-time OSINT, Iran Israel live map, Russia Ukraine live map, missile alert tracker, drone tracker, open-source intelligence, Telegram OSINT, military aircraft tracker">
+<meta name="author" content="Nobler Works">
+<meta property="og:title" content="IRONSIGHT: Free Real-Time OSINT Conflict Dashboard">
+<meta property="og:description" content="Free open-source OSINT dashboard for Iran/Israel and Russia/Ukraine: live news, Telegram, aircraft, naval tracking, missile alerts and markets. No API keys.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://noblerworks-hq.github.io/IRONSIGHT/">
+<meta property="og:site_name" content="IRONSIGHT">
+<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://noblerworks-hq.github.io/IRONSIGHT/img/social.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="IRONSIGHT: Free open-source OSINT dashboard for Iran/Israel and Russia/Ukraine: live news, Telegram, aircraft, naval tracking, missile alerts and markets">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@Nobler_Works">
+<meta name="twitter:title" content="IRONSIGHT: Free Real-Time OSINT Conflict Dashboard">
+<meta name="twitter:description" content="Free open-source OSINT dashboard for Iran/Israel and Russia/Ukraine: live news, Telegram, aircraft, naval tracking, missile alerts and markets. No API keys.">
+<meta name="twitter:image" content="https://noblerworks-hq.github.io/IRONSIGHT/img/social.png">
 <meta name="theme-color" content="#07090c">
 <meta name="color-scheme" content="dark light">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<meta property="og:site_name" content="IRONSIGHT">
-<meta property="og:image:width" content="1280">
-<meta property="og:image:height" content="640">
-<meta name="twitter:title" content="IRONSIGHT">
-<meta name="twitter:description" content="Real-time OSINT command center for the Iran/Israel and Russia/Ukraine theaters. 50+ live open-source intelligence feeds in one dashboard. No API keys. Free.">
-<meta name="twitter:image" content="https://noblerworks-hq.github.io/IRONSIGHT/img/social.png">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "IRONSIGHT", "description": "Real-time OSINT command center for the Iran/Israel and Russia/Ukraine theaters. 50+ live open-source intelligence feeds in one dashboard. No API keys. Free.", "url": "https://noblerworks-hq.github.io/IRONSIGHT/", "image": "https://noblerworks-hq.github.io/IRONSIGHT/img/social.png", "codeRepository": "https://github.com/NoblerWorks-HQ/IRONSIGHT", "license": "https://opensource.org/licenses/MIT", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@type": "Organization", "name": "Nobler Works", "url": "https://noblerworks.com/"}, "applicationCategory": "SecurityApplication", "operatingSystem": "Any (Node.js 22 or Docker)"}</script>
-<style>
-:root{--bg:#07090c;--panel:#0e1217;--line:#1f2730;--text:#e8edf2;--muted:#8b97a4;--accent:#ff4d3d;--ok:#35c27a}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-a{color:inherit}
-.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
-header.top{border-bottom:1px solid var(--line)}
-header.top .wrap{display:flex;justify-content:space-between;align-items:center;height:56px}
-.brand{font:700 15px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;text-decoration:none}
-nav a{margin-left:20px;color:var(--muted);text-decoration:none;font-size:14px}
-nav a:hover{color:var(--text)}
-.hero{padding:72px 0 40px;text-align:center}
-.hero h1{font:800 clamp(40px,9vw,80px)/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;margin:0 0 20px}
-.hero h1 span{color:var(--accent)}
-.hero p.lead{max-width:660px;margin:0 auto 28px;color:var(--muted);font-size:18px}
-.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.btn{display:inline-block;padding:11px 20px;border:1px solid var(--line);border-radius:6px;text-decoration:none;font-weight:600;font-size:15px}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn:hover{border-color:var(--text)}
-.shot{margin:40px auto 0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.shot img{display:block;width:100%;height:auto}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;padding:32px 0}
-.stat{text-align:center}
-.stat b{display:block;font:700 28px/1.2 ui-monospace,Menlo,monospace;color:var(--ok)}
-.stat span{color:var(--muted);font-size:14px}
-section{padding:56px 0;border-top:1px solid var(--line)}
-h2{font:700 13px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:0 0 24px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 18px}
-.card h3{margin:0 0 4px;font-size:16px}
-.card p{margin:0;color:var(--muted);font-size:15px}
-.theaters{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-.theaters .card{border-top:3px solid var(--accent)}
-table{width:100%;border-collapse:collapse;font-size:15px}
-th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-th{color:var(--muted);font-weight:600}
-.tablewrap{overflow-x:auto}
-pre{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;overflow-x:auto;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;margin:0 0 16px}
-p.note{color:var(--muted)}
-footer{border-top:1px solid var(--line);padding:32px 0;color:var(--muted);font-size:14px;text-align:center}
-footer a{color:var(--text)}
-footer p{margin:6px auto;max-width:720px}
-@media (max-width:560px){nav a{margin-left:12px}.hero{padding-top:48px}}
-@media (prefers-color-scheme:light){:root{--bg:#f7f9fb;--panel:#fff;--line:#d9e0e7;--text:#10161d;--muted:#566370;--accent:#d3281a;--ok:#1b8a52}}
-.skip{position:absolute;left:-9999px;top:8px;background:var(--accent);color:#fff;padding:8px 14px;border-radius:6px;z-index:10}
-.skip:focus{left:8px}
-a:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-section[id]{scroll-margin-top:16px}
-.social{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
-.social a{text-decoration:none}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-@media print{header.top,.btns,.skip{display:none}body{background:#fff;color:#000}}
-</style>
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://noblerworks.com/#org", "name": "Nobler Works", "url": "https://noblerworks.com/", "sameAs": ["https://x.com/Nobler_Works", "https://www.youtube.com/@NoblerWorks", "https://www.tiktok.com/@noblerworks", "https://www.threads.com/@noblerworks", "https://github.com/NoblerWorks-HQ"], "founder": [{"@type": "Person", "name": "Patrick Wilson"}, {"@type": "Person", "name": "Daniel Casale"}]}, {"@type": "WebSite", "@id": "https://noblerworks-hq.github.io/IRONSIGHT/#site", "url": "https://noblerworks-hq.github.io/IRONSIGHT/", "name": "IRONSIGHT", "publisher": {"@id": "https://noblerworks.com/#org"}, "inLanguage": "en"}, {"@type": "WebPage", "@id": "https://noblerworks-hq.github.io/IRONSIGHT/#page", "url": "https://noblerworks-hq.github.io/IRONSIGHT/", "name": "IRONSIGHT: Free Real-Time OSINT Conflict Dashboard", "description": "Free open-source OSINT dashboard for Iran/Israel and Russia/Ukraine: live news, Telegram, aircraft, naval tracking, missile alerts and markets. No API keys.", "isPartOf": {"@id": "https://noblerworks-hq.github.io/IRONSIGHT/#site"}, "inLanguage": "en", "datePublished": "2026-10-17", "dateModified": "2026-10-18", "author": {"@id": "https://noblerworks.com/#org"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "IRONSIGHT", "item": "https://noblerworks-hq.github.io/IRONSIGHT/"}]}, {"@type": "SoftwareApplication", "applicationCategory": "SecurityApplication", "operatingSystem": "Any (Node.js 22 or Docker)", "name": "IRONSIGHT", "description": "Free open-source OSINT dashboard for Iran/Israel and Russia/Ukraine: live news, Telegram, aircraft, naval tracking, missile alerts and markets. No API keys.", "url": "https://noblerworks-hq.github.io/IRONSIGHT/", "image": "https://noblerworks-hq.github.io/IRONSIGHT/img/social.png", "codeRepository": "https://github.com/NoblerWorks-HQ/IRONSIGHT", "license": "https://opensource.org/licenses/MIT", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@id": "https://noblerworks.com/#org"}, "keywords": "OSINT dashboard, conflict monitor, real-time OSINT, Iran Israel live map, Russia Ukraine live map, missile alert tracker, drone tracker, open-source intelligence, Telegram OSINT, military aircraft tracker"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is IRONSIGHT?", "acceptedAnswer": {"@type": "Answer", "text": "IRONSIGHT is a free, open-source, real-time OSINT command center. It aggregates more than 50 public sources (news, Telegram, military aircraft, naval tracking, air-raid alerts, satellite thermal data and markets) into one dashboard for the Iran/Israel and Russia/Ukraine theaters."}}, {"@type": "Question", "name": "Does it need API keys?", "acceptedAnswer": {"@type": "Answer", "text": "No. Every source is a free, public, keyless endpoint, so there is nothing to sign up for."}}, {"@type": "Question", "name": "Is there a hosted version?", "acceptedAnswer": {"@type": "Answer", "text": "No. IRONSIGHT needs a server to proxy its feeds, so you run it yourself with Docker or Node.js 22. It takes one command with Docker."}}, {"@type": "Question", "name": "How fresh is the data?", "acceptedAnswer": {"@type": "Answer", "text": "Air-raid alerts poll every 15 seconds, the Ukraine drone and missile tracker every 20 seconds, Telegram and the regional threat monitor every 60 seconds, and news every 90 seconds. Markets and satellite fire data refresh every 10 minutes."}}, {"@type": "Question", "name": "Who owns the data?", "acceptedAnswer": {"@type": "Answer", "text": "The providers do. IRONSIGHT is a viewer that points back to the original sources, and it claims no ownership of any third-party data. Credits and a legal disclaimer are in the README."}}, {"@type": "Question", "name": "Can I add another conflict?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Each theater is one config object under src/lib/conflicts/, so adding a conflict is mostly a new config file plus registering it."}}]}]}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
-  <a class="brand" href="#">IRONSIGHT</a>
-  <nav><a href="#features">Features</a><a href="#sources">Sources</a><a href="#run">Run it</a><a href="https://github.com/NoblerWorks-HQ/IRONSIGHT">GitHub</a></nav>
+  <a class="brand" href="./">IRONSIGHT</a>
+  <nav><a href="#faq">FAQ</a><a href="data-sources/">Data sources</a><a href="iran-israel/">Iran / Israel</a><a href="https://github.com/NoblerWorks-HQ/IRONSIGHT">GitHub</a></nav>
 </div></header>
-
 <main id="main">
 <div class="wrap">
   <div class="hero">
@@ -93,7 +45,7 @@ section[id]{scroll-margin-top:16px}
       <a class="btn primary" href="https://github.com/NoblerWorks-HQ/IRONSIGHT">View on GitHub</a>
       <a class="btn" href="#run">Run it with Docker</a>
     </div>
-    <div class="shot"><img src="img/dashboard.png" alt="IRONSIGHT dashboard showing the theater map, intel feed and market panels" width="1903" height="898"></div>
+    <div class="shot"><img fetchpriority="high" decoding="async" fetchpriority="high" decoding="async" fetchpriority="high" decoding="async" fetchpriority="high" decoding="async" src="img/dashboard.jpg" alt="IRONSIGHT dashboard showing the theater map, intel feed and market panels" width="1903" height="898"></div>
   </div>
   <div class="stats">
     <div class="stat"><b>50+</b><span>live sources</span></div>
@@ -152,11 +104,21 @@ cd IRONSIGHT
 docker compose up --build</pre>
   <p class="note">Then open http://localhost:3000. Prefer Node? Run <code>npm install</code> then <code>npm run dev</code>. Built with Next.js, TypeScript, Tailwind CSS and Leaflet.</p>
 </div></section>
-</main>
-
-<footer><div class="wrap"><div class="social"><a href="https://noblerworks.com/">Website</a><a href="https://x.com/Nobler_Works">X</a><a href="https://www.youtube.com/@NoblerWorks">YouTube</a><a href="https://www.tiktok.com/@noblerworks">TikTok</a><a href="https://www.threads.com/@noblerworks">Threads</a></div>
-  <p>Built by <a href="https://noblerworks.com/">Nobler Works</a>. Want something like IRONSIGHT for your domain? <a href="https://noblerworks.com/">Get in touch</a>.</p>
-  <p><a href="https://github.com/NoblerWorks-HQ/IRONSIGHT">Source on GitHub</a></p>
+<section><div class="wrap"><h2>Explore</h2><div class="grid cards"><a class="card" href="data-sources/"><h3>IRONSIGHT data sources</h3><p>Every free OSINT source IRONSIGHT uses: alert APIs, ADS-B aircraft, NASA FIRMS, Polymarket, news RSS and Telegram, with the polling interval of each feed.</p></a><a class="card" href="iran-israel/"><h3>Iran / Israel theater</h3><p>The IRONSIGHT Iran/Israel theater: live Pikud HaOref siren alerts, military aircraft, Gulf and Red Sea naval tracking, translated Telegram OSINT and markets.</p></a><a class="card" href="russia-ukraine/"><h3>Russia / Ukraine theater</h3><p>The IRONSIGHT Russia/Ukraine theater: live Shahed drone, cruise missile and glide-bomb tracks, oblast air-raid alerts, Black Sea naval tracking and Telegram.</p></a><a class="card" href="self-hosting/"><h3>Run IRONSIGHT yourself</h3><p>Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 22. No API keys or environment variables needed.</p></a></div></div></section>
+<section id="faq"><div class="wrap"><h2>Frequently asked questions</h2><div class="faq"><details><summary>What is IRONSIGHT?</summary><p>IRONSIGHT is a free, open-source, real-time OSINT command center. It aggregates more than 50 public sources (news, Telegram, military aircraft, naval tracking, air-raid alerts, satellite thermal data and markets) into one dashboard for the Iran/Israel and Russia/Ukraine theaters.</p></details><details><summary>Does it need API keys?</summary><p>No. Every source is a free, public, keyless endpoint, so there is nothing to sign up for.</p></details><details><summary>Is there a hosted version?</summary><p>No. IRONSIGHT needs a server to proxy its feeds, so you run it yourself with Docker or Node.js 22. It takes one command with Docker.</p></details><details><summary>How fresh is the data?</summary><p>Air-raid alerts poll every 15 seconds, the Ukraine drone and missile tracker every 20 seconds, Telegram and the regional threat monitor every 60 seconds, and news every 90 seconds. Markets and satellite fire data refresh every 10 minutes.</p></details><details><summary>Who owns the data?</summary><p>The providers do. IRONSIGHT is a viewer that points back to the original sources, and it claims no ownership of any third-party data. Credits and a legal disclaimer are in the README.</p></details><details><summary>Can I add another conflict?</summary><p>Yes. Each theater is one config object under src/lib/conflicts/, so adding a conflict is mostly a new config file plus registering it.</p></details></div></div></section>
+<section id="nobler-works"><div class="wrap">
+  <h2>Built by Nobler Works</h2>
+  <div class="nw"><img src="img/nobler-works-banner.jpg" alt="Nobler Works" width="480" height="204" loading="lazy">
+  <div><p>Nobler Works builds OSINT tools, real-time dashboards and custom software. If you want something like IRONSIGHT built for your domain, get in touch.</p>
+  <p><a class="btn primary" href="https://noblerworks.com/">Work with Nobler Works</a></p>
+  <p class="note">AI agents and multi-agent systems, OSINT and real-time dashboards, cybersecurity software, multi-cloud architecture on AWS, Google Cloud and Azure, and custom software.</p></div></div>
+  <h2 style="margin-top:40px">More from Nobler Works</h2>
+  <div class="grid cards"><a class="card" href="https://noblerworks-hq.github.io/WarGames/"><h3>War Games</h3><p>AI strategy simulation where Claude, Gemini and GPT command NATO, Russia and China.</p></a><a class="card" href="https://github.com/NoblerWorks-HQ/minecraft-agentic"><h3>Minecraft Agentic Builder</h3><p>A crew of four AI bots builds Minecraft worlds from one line of text, live in your browser.</p></a><a class="card" href="https://gitgood.dev"><h3>gitGood.dev</h3><p>Practice questions, coding challenges, system design and cloud certification practice exams.</p></a><a class="card" href="https://patrickwiloak.github.io/cloud-data-ai-security-zero-to-hero/"><h3>Cloud, Data, AI and Security: Zero to Hero</h3><p>Free study guides for 149 certifications across 27 providers, plus hands-on builds.</p></a></div>
+  <h2 style="margin-top:40px">Follow along</h2>
+  <div class="social"><a href="https://noblerworks.com/" rel="noopener">Website</a><a href="https://x.com/Nobler_Works" rel="noopener">X</a><a href="https://www.youtube.com/@NoblerWorks" rel="noopener">YouTube</a><a href="https://www.tiktok.com/@noblerworks" rel="noopener">TikTok</a><a href="https://www.threads.com/@noblerworks" rel="noopener">Threads</a><a href="https://github.com/NoblerWorks-HQ" rel="noopener">GitHub</a></div>
+</div></section>
+</main><footer><div class="wrap">
+<div class="more"><a href="data-sources/">IRONSIGHT data sources</a><a href="iran-israel/">Iran / Israel theater</a><a href="russia-ukraine/">Russia / Ukraine theater</a><a href="self-hosting/">Run IRONSIGHT yourself</a><a href="https://github.com/NoblerWorks-HQ/IRONSIGHT">Source on GitHub</a><a href="https://noblerworks.com/">noblerworks.com</a></div>
+<p>IRONSIGHT is open source (MIT), built by <a href="https://noblerworks.com/">Nobler Works</a>.</p>
 </div></footer>
-</body>
-</html>
+</body></html>
