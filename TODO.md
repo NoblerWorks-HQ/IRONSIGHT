@@ -36,3 +36,8 @@ _None tracked yet - add items as `- [ ] task`, grouped by priority or theme. Mar
 - [x] ✅ 2026-10-16 removed the leftover graphify tooling (`.claude/skills/graphify/`, the two PreToolUse hooks; `.claude/settings.json` held nothing else). `graphify-out/` stays in .gitignore as harmless.
 - [x] ✅ 2026-10-14 removed unused devDependencies `@tailwindcss/postcss` (v4 plugin; `postcss.config.mjs` uses the v3 `tailwindcss` one) and `@tailwindcss/forms` (`tailwind.config.ts` has `plugins: []`); `next build` green.
 - [x] ✅ 2026-10-10 `eslint .` + `eslint.config.mjs` (flat, eslint-config-next presets); lint now runs: 0 errors, 18 warnings (react-hooks, unused vars) left. Was: `npm run lint` is `next lint`, which Next 16 removed - switch to `eslint .` with a flat config.
+
+## Relock loop (Dependabot alerts the loop cannot relock)
+
+- [ ] 2026-10-20 relock (loop): source-map-js 1.2.1 -> 1.2.2 is IN RANGE but not relocked - no scripts/check-ci-local.mjs to verify it; by hand: cd . && npm update source-map-js --package-lock-only (Dependabot #64, high, runtime). <!-- relock:#64 -->
+- [ ] 2026-10-20 relock (loop): postcss-selector-parser 6.1.4 -> 7.1.6 needs a RANGE CHANGE in ./package.json - postcss-nested wants ^6.1.1; tailwindcss wants ^6.1.2 (Dependabot #63, medium, development). <!-- relock:#63 -->
