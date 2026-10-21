@@ -4,11 +4,11 @@
 
 ## Pages
 
-- [Home](https://noblerworks-hq.github.io/IRONSIGHT/): overview, FAQ
-- [IRONSIGHT data sources](https://noblerworks-hq.github.io/IRONSIGHT/data-sources/): Every free OSINT source IRONSIGHT uses: alert APIs, ADS-B aircraft, NASA FIRMS, Polymarket, news RSS and Telegram, with the polling interval of each feed.
-- [Iran / Israel theater](https://noblerworks-hq.github.io/IRONSIGHT/iran-israel/): The IRONSIGHT Iran/Israel theater: live Pikud HaOref siren alerts, military aircraft, Gulf and Red Sea naval tracking, translated Telegram OSINT and markets.
-- [Russia / Ukraine theater](https://noblerworks-hq.github.io/IRONSIGHT/russia-ukraine/): The IRONSIGHT Russia/Ukraine theater: live Shahed drone, cruise missile and glide-bomb tracks, oblast air-raid alerts, Black Sea naval tracking and Telegram.
-- [Run IRONSIGHT yourself](https://noblerworks-hq.github.io/IRONSIGHT/self-hosting/): Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 22. No API keys or environment variables needed.
+- [Home](https://ironsight.noblerworks.com/): overview, FAQ
+- [IRONSIGHT data sources](https://ironsight.noblerworks.com/data-sources/): Every free OSINT source IRONSIGHT uses: alert APIs, ADS-B aircraft, NASA FIRMS, Polymarket, news RSS and Telegram, with the polling interval of each feed.
+- [Iran / Israel theater](https://ironsight.noblerworks.com/iran-israel/): The IRONSIGHT Iran/Israel theater: live Pikud HaOref siren alerts, military aircraft, Gulf and Red Sea naval tracking, translated Telegram OSINT and markets.
+- [Russia / Ukraine theater](https://ironsight.noblerworks.com/russia-ukraine/): The IRONSIGHT Russia/Ukraine theater: live Shahed drone, cruise missile and glide-bomb tracks, oblast air-raid alerts, Black Sea naval tracking and Telegram.
+- [Run IRONSIGHT yourself](https://ironsight.noblerworks.com/self-hosting/): Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 22. No API keys or environment variables needed.
 
 ## Links
 

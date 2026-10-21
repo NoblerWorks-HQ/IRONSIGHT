@@ -4,6 +4,11 @@ Working task list for **IRONSIGHT**. Read this at the start of a work session an
 
 ---
 
+## Domain (2026-10-21)
+
+- [x] 2026-10-21 Site moved to `ironsight.noblerworks.com` (Route 53 CNAME, NW); `/IRONSIGHT/` base paths removed from `site/`.
+- [ ] 2026-10-28 Patrick: Search Console `sc-domain:noblerworks.com` -> submit `https://ironsight.noblerworks.com/sitemap.xml`.
+
 ## Audit findings (2026-10-02)
 
 Fleet audit follow-up. Fixed items landed on main 2026-10-02 (local only - this repo has no hosted deploy; push to publish).

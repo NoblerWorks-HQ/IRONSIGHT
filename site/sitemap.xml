@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://noblerworks-hq.github.io/IRONSIGHT/</loc><lastmod>2026-10-18</lastmod><priority>1.0</priority></url>
-  <url><loc>https://noblerworks-hq.github.io/IRONSIGHT/data-sources/</loc><lastmod>2026-10-18</lastmod><priority>0.8</priority></url>
-  <url><loc>https://noblerworks-hq.github.io/IRONSIGHT/iran-israel/</loc><lastmod>2026-10-18</lastmod><priority>0.8</priority></url>
-  <url><loc>https://noblerworks-hq.github.io/IRONSIGHT/russia-ukraine/</loc><lastmod>2026-10-18</lastmod><priority>0.8</priority></url>
-  <url><loc>https://noblerworks-hq.github.io/IRONSIGHT/self-hosting/</loc><lastmod>2026-10-18</lastmod><priority>0.8</priority></url>
+  <url><loc>https://ironsight.noblerworks.com/</loc><lastmod>2026-10-18</lastmod><priority>1.0</priority></url>
+  <url><loc>https://ironsight.noblerworks.com/data-sources/</loc><lastmod>2026-10-18</lastmod><priority>0.8</priority></url>
+  <url><loc>https://ironsight.noblerworks.com/iran-israel/</loc><lastmod>2026-10-18</lastmod><priority>0.8</priority></url>
+  <url><loc>https://ironsight.noblerworks.com/russia-ukraine/</loc><lastmod>2026-10-18</lastmod><priority>0.8</priority></url>
+  <url><loc>https://ironsight.noblerworks.com/self-hosting/</loc><lastmod>2026-10-18</lastmod><priority>0.8</priority></url>
 </urlset>

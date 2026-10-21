@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://noblerworks-hq.github.io/IRONSIGHT/sitemap.xml
+Sitemap: https://ironsight.noblerworks.com/sitemap.xml
