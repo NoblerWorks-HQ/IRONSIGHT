@@ -274,7 +274,9 @@ Free, open-source projects from the [Nobler Works](https://noblerworks.com/) tea
 | 🌍 **[War Games](https://github.com/NoblerWorks-HQ/WarGames)** | NATO, Russia, and China on one map, each commanded by an LLM | **[Website →](https://wargames.noblerworks.com/)** |
 | ⛏️ **[Minecraft Agentic Builder](https://github.com/NoblerWorks-HQ/minecraft-agentic)** | A crew of AI agents builds Minecraft worlds live in your browser | [Repo →](https://github.com/NoblerWorks-HQ/minecraft-agentic) |
 | 📚 **[AI Zero to Hero](https://github.com/PatrickWiloak/ai-zero-to-hero)** | Everything AI in one place: learn, use at work, build, govern, get hired - plus 156 landmark papers in plain language | **[Website →](https://ai.noblerworks.com/)** |
-| ☁️ **[Cloud, Data, AI & Security: Zero to Hero](https://github.com/PatrickWiloak/cloud-data-ai-security-zero-to-hero)** | 149 cert study guides across 27 providers, plus hands-on builds | **[Website →](https://cloud.noblerworks.com/)** |
+| ☁️ **[Cloud Zero to Hero](https://github.com/PatrickWiloak/cloud-zero-to-hero)** | AWS, Azure, GCP, Kubernetes, DevOps and FinOps: 72 cert guides, concepts and labs | **[Website →](https://cloud.noblerworks.com/)** |
+| 🗄️ **[Data Zero to Hero](https://github.com/PatrickWiloak/data-zero-to-hero)** | Data engineering, databases, Snowflake, Databricks, Kafka: cert guides and paths | **[Website →](https://data.noblerworks.com/)** |
+| 🔐 **[Security Zero to Hero](https://github.com/PatrickWiloak/security-zero-to-hero)** | CISSP, Security+, cloud security, compliance and zero trust | **[Website →](https://security.noblerworks.com/)** |
 | 🧠 **[Bedrock RAG with S3 Vectors](https://github.com/PatrickWiloak/bedrock-rag-s3-vectors-tutorial)** | Deploy document Q&A on AWS Bedrock in under 10 minutes (CDK or Terraform) | [Repo →](https://github.com/PatrickWiloak/bedrock-rag-s3-vectors-tutorial) |
 | 🏃 **[Proper Training for Distance Running](https://github.com/PatrickWiloak/proper-distance-running-training-guidance)** | Evidence-based running guide with twelve 5K-to-marathon plans | **[Read online →](https://achilles.fit/guides)** |
 
