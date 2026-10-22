@@ -44,5 +44,5 @@ _None tracked yet - add items as `- [ ] task`, grouped by priority or theme. Mar
 
 ## Relock loop (Dependabot alerts the loop cannot relock)
 
-- [ ] 2026-10-20 relock (loop): source-map-js 1.2.1 -> 1.2.2 is IN RANGE but not relocked - no scripts/check-ci-local.mjs to verify it; by hand: cd . && npm update source-map-js --package-lock-only (Dependabot #64, high, runtime). <!-- relock:#64 -->
+- [x] ~~2026-10-20 relock: source-map-js 1.2.1 -> 1.2.2 (Dependabot #64)~~ ✅ 2026-10-22 relocked; test + lint (0 errors) + build pass <!-- relock:#64 -->
 - [ ] 2026-10-20 relock (loop): postcss-selector-parser 6.1.4 -> 7.1.6 needs a RANGE CHANGE in ./package.json - postcss-nested wants ^6.1.1; tailwindcss wants ^6.1.2 (Dependabot #63, medium, development). <!-- relock:#63 -->
