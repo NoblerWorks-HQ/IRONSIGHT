@@ -17,7 +17,7 @@ export async function GET() {
     const prices = await Promise.all(
       COMMODITIES.map(async (c) => {
         try {
-          const url = `https://query1.finance.yahoo.com/v8/finance/chart/${c.symbol}?interval=1d&range=5d`;
+          const url = `https://query1.finance.yahoo.com/v8/finance/chart/${c.symbol}?interval=1d&range=1d`;
           const res = await fetchWithTimeout(url, {
             timeout: 8000,
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
