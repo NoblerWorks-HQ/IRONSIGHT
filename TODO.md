@@ -6,6 +6,8 @@ Working task list for **IRONSIGHT**. Read this at the start of a work session an
 
 ## Community backlog (2026-10-27)
 
+- [ ] 2026-10-28 Patrick + Dan agree how to handle this backlog; nothing below is actioned until then.
+
 - [ ] 2026-10-27 Reply to outside PRs #1 #2 #20 #32 #41 #42 #43 - none answered yet, oldest 2026-03-30.
 - [ ] 2026-10-27 Close #7 (fixed 5e35011) and PR #20 (fixed 54b2b4d) with thanks; triage #5 #6 #8 #9 #23-#26 (#25/#26 = PR #43, #24 = PR #42).
 - [ ] Dependabot: majors #48-#51 (TypeScript 7, ESLint 10, Tailwind 4, @types/node 26) and #44-#47 open since 2026-10-17 - land or close.
