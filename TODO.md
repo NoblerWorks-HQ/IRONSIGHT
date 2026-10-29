@@ -6,7 +6,7 @@ Working task list for **IRONSIGHT**. Read this at the start of a work session an
 
 ## Community backlog (2026-10-27)
 
-- [ ] 2026-10-28 Patrick + Dan agree how to handle this backlog; nothing below is actioned until then.
+- [ ] 2026-10-29 (Pat + Dan meeting moved from 10-28) Patrick + Dan agree how to handle this backlog; nothing below is actioned until then.
 
 - [ ] 2026-10-28 needs Patrick: post drafted replies in `/home/plw/.cache/ironsight-community-replies-2026-10-28.md` (PRs #1 #2 #20 #32 #41 #42 #43; #1/#2 superseded, #32/#41/#43 wanted, #42 trim).
 - [ ] 2026-10-28 needs Patrick: post drafted close notes for #7 + PR #20 and triage replies (#5 #6 #8 #9 #23-#26) in the same file.
