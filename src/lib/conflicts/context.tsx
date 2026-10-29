@@ -25,6 +25,8 @@ export function ConflictProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
+      // Post-hydration restore of the persisted choice: setState here is intended.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (isConflictKey(stored) && stored !== key) setKey(stored);
     } catch {
       // localStorage unavailable — stay on default

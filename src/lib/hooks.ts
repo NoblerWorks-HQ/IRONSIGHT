@@ -30,6 +30,8 @@ export function useDataFeed<T>(url: string, interval: number = 60000, initialDat
   }, [url]);
 
   useEffect(() => {
+    // Fetch on mount, then poll: fetchData sets state after an await, by design.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
     const id = setInterval(fetchData, interval);
     return () => clearInterval(id);
