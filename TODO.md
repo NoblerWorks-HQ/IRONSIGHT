@@ -6,10 +6,10 @@ Working task list for **IRONSIGHT**. Read this at the start of a work session an
 
 ## Community backlog (2026-10-27)
 
-- [ ] 2026-10-29 (Pat + Dan meeting moved from 10-28) Patrick + Dan agree how to handle this backlog; nothing below is actioned until then.
+- [ ] 2026-10-30 (Pat + Dan meeting moved from 10-29, then 10-28) Patrick + Dan agree how to handle this backlog; nothing below is actioned until then.
 
-- [ ] 2026-10-29 (after the Pat + Dan meeting) needs Patrick: post drafted replies in `/home/plw/.cache/ironsight-community-replies-2026-10-28.md` (PRs #1 #2 #20 #32 #41 #42 #43; #1/#2 superseded, #32/#41/#43 wanted, #42 trim).
-- [ ] 2026-10-29 (after the Pat + Dan meeting) needs Patrick: post drafted close notes for #7 + PR #20 and triage replies (#5 #6 #8 #9 #23-#26) in the same file.
+- [ ] 2026-10-30 (after the Pat + Dan meeting) needs Patrick: post drafted replies in `/home/plw/.cache/ironsight-community-replies-2026-10-28.md` (PRs #1 #2 #20 #32 #41 #42 #43; #1/#2 superseded, #32/#41/#43 wanted, #42 trim).
+- [ ] 2026-10-30 (after the Pat + Dan meeting) needs Patrick: post drafted close notes for #7 + PR #20 and triage replies (#5 #6 #8 #9 #23-#26) in the same file.
 - [ ] Dependabot: majors #48-#51 (TypeScript 7, ESLint 10, Tailwind 4, @types/node 26) and #44-#47 open since 2026-10-17 - land or close.
 - [ ] Link check #53: README alerts.com.ua is 404; `site/404.html` root-relative links are a lychee false positive (needs a root dir). Close #52 as superseded.
 
