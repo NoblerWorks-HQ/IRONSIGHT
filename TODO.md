@@ -56,3 +56,8 @@ _None tracked yet - add items as `- [ ] task`, grouped by priority or theme. Mar
 
 - [x] ~~2026-10-20 relock: source-map-js 1.2.1 -> 1.2.2 (Dependabot #64)~~ ✅ 2026-10-22 relocked; test + lint (0 errors) + build pass <!-- relock:#64 -->
 - [x] 2026-10-20 relock (loop): postcss-selector-parser 6.1.4 -> 7.1.6 (#63) ✅ 2026-10-28 held, no override: tailwind 3 + postcss-nested need ^6; advisory withdrawn (410). <!-- relock:#63 -->
+
+## Code mismatches found by the docs pass (2026-10-30) - [FEATURES.md](docs/FEATURES.md)
+- [ ] `src/app/page.tsx` footer names GDELT/OPENSKY/OCHA feeds no route uses, and shows polling "5s / 2m / 5m" (real: 15 s / 90 s / 10 min)
+- [ ] Iran/Israel clock labelled "MSK" uses `Asia/Shanghai` with a China flag
+- [ ] Header THREAT LEVEL is hard-coded "ELEVATED"
