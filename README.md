@@ -50,16 +50,25 @@ Built with Next.js, TypeScript, Tailwind CSS, and Leaflet. **No API keys require
 - **Theater Map** — Interactive Leaflet map with military aircraft, naval vessels, strike markers from news and Telegram, missile trajectory arcs, range rings, country-border overlay, and a distance-measurement tool
 - **Live Drone / Missile Tracker** *(Russia/Ukraine)* — Real-time Shahed drone, cruise/ballistic missile, and glide-bomb (KAB) tracks with heading, movement trails, and confidence, rendered on the map and listed in the alert panel
 - **Air-Raid Alert Status** — Israeli Home Front Command (Pikud HaOref) sirens for the Middle East, and Ukrainian oblast air-raid alerts for Eastern Europe, with audio notifications and on-map sirens/arcs
-- **Conflict Monitor** — Categorized events (strikes, defense, diplomatic, nuclear) with per-theater geocoding
+- **Conflict Monitor** - Categorized events (strike, defense, military, diplomatic, nuclear, drone, report) with per-theater location tagging
 - **Missile / Strike Tracker** — Weapon-type classification and severity scoring
 - **Regional Threat Monitor** — Per-country threat levels across the theater's neighbors
 - **Military Airspace** — Live military aircraft tracking via adsb.lol, region-filtered per theater
-- **Naval Tracker** — Known vessel positions (Persian Gulf / Red Sea / Eastern Med, or Black Sea / Sea of Azov)
+- **Naval Tracker** - Curated list of known vessel positions from public reports, not a live AIS feed (Persian Gulf / Red Sea / Eastern Med / Arabian Sea, or Black Sea / Sea of Azov / Eastern Med / Kerch Strait)
 - **Defense & Markets** — Defense-contractor stocks, indices, VIX, gold, USD via Yahoo Finance
 - **Crypto Markets** — Bitcoin, Ethereum, Solana, BNB with 24h price changes
 - **Prediction Markets** — Live Polymarket odds relevant to the selected conflict
 - **Energy Markets** — WTI, Brent, natural gas, heating oil, gasoline via Yahoo Finance
 - **Satellite Thermal Detect** — NASA FIRMS fire/explosion detection, region-filtered per theater
+- **Theater Clocks & Metrics Bar** - Zulu time plus per-theater city clocks; header WTI / Brent / natural-gas prices (the THREAT LEVEL tile is a fixed label)
+
+Full feature list and the API route table: [docs/FEATURES.md](docs/FEATURES.md).
+
+## Docs
+
+- [docs/FEATURES.md](docs/FEATURES.md) - feature catalogue and API routes
+- [CONTRIBUTING.md](CONTRIBUTING.md) - how to contribute
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ## Data Sources
 
