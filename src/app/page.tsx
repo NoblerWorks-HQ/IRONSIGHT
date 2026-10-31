@@ -47,36 +47,36 @@ export default function Dashboard() {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Top bar */}
-      <header className="border-b border-[var(--border-color)] bg-[var(--bg-secondary)] shrink-0">
+      <header className="border-b border-(--border-color) bg-(--bg-secondary) shrink-0">
         <div className="flex items-center justify-between px-4 py-1.5">
           <div className="flex items-center gap-3">
             <div className="relative w-8 h-8">
-              <div className="absolute inset-0 rounded-full border border-[var(--cyan)] opacity-30" />
-              <div className="absolute inset-1 rounded-full border border-[var(--cyan)] opacity-20" />
-              <div className="absolute inset-2 rounded-full border border-[var(--cyan)] opacity-10" />
+              <div className="absolute inset-0 rounded-full border border-(--cyan) opacity-30" />
+              <div className="absolute inset-1 rounded-full border border-(--cyan) opacity-20" />
+              <div className="absolute inset-2 rounded-full border border-(--cyan) opacity-10" />
               <div
-                className="absolute bottom-1/2 left-1/2 -ml-px w-0.5 h-4 bg-[var(--cyan)] origin-bottom radar-sweep"
+                className="absolute bottom-1/2 left-1/2 -ml-px w-0.5 h-4 bg-(--cyan) origin-bottom radar-sweep"
               />
-              <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-[var(--cyan)] rounded-full -translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-(--cyan) rounded-full -translate-x-1/2 -translate-y-1/2" />
             </div>
             <div>
-              <h1 className="text-sm font-bold tracking-[3px] text-[var(--cyan)]">IRONSIGHT</h1>
-              <p className="text-[8px] text-[var(--text-secondary)] tracking-[2px]">
+              <h1 className="text-sm font-bold tracking-[3px] text-(--cyan)">IRONSIGHT</h1>
+              <p className="text-[8px] text-(--text-secondary) tracking-[2px]">
                 OSINT COMMAND CENTER // UNCLASSIFIED
               </p>
             </div>
           </div>
           <MetricsBar />
-          <div className="flex items-center gap-4 text-[9px] text-[var(--text-secondary)]">
+          <div className="flex items-center gap-4 text-[9px] text-(--text-secondary)">
             <ConflictToggle />
             <span>SESSION {formatUptime(uptime)}</span>
             <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--green)] animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-(--green) animate-pulse" />
               LIVE
             </span>
           </div>
         </div>
-        <div className="border-t border-[var(--border-color)]">
+        <div className="border-t border-(--border-color)">
           <ThreatClock />
         </div>
       </header>
@@ -137,7 +137,7 @@ export default function Dashboard() {
       </main>
 
       {/* Bottom status bar */}
-      <footer className="border-t border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-1 flex items-center justify-between text-[9px] text-[var(--text-secondary)] shrink-0">
+      <footer className="border-t border-(--border-color) bg-(--bg-secondary) px-4 py-1 flex items-center justify-between text-[9px] text-(--text-secondary) shrink-0">
         <span>FEEDS: NEWS | GDELT | TELEGRAM | OPENSKY | OCHA | YAHOO FIN | {config.client.alertSystemName.toUpperCase()} | NASA FIRMS | ADSB.LOL</span>
         <div className="flex items-center gap-4">
           <span>ALERTS: 5s | NEWS: 2m | MARKETS: 5m</span>

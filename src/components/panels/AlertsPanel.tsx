@@ -94,7 +94,7 @@ export default function AlertsPanel() {
                 playAlertSound('ping'); // Preview sound when enabling
               }
             }}
-            className="text-[9px] px-1.5 py-0.5 rounded border transition-colors"
+            className="text-[9px] px-1.5 py-0.5 rounded-sm border transition-colors"
             style={{
               color: soundEnabled ? 'var(--cyan)' : 'var(--text-secondary)',
               borderColor: soundEnabled ? 'var(--cyan)' : 'var(--border-color)',
@@ -116,8 +116,8 @@ export default function AlertsPanel() {
 
       <div className="flex-1 overflow-y-auto">
         {drones.length > 0 && (
-          <div className="border-b border-[var(--border-color)]">
-            <div className="px-3 py-1 text-[9px] tracking-widest text-[var(--text-secondary)] bg-[var(--bg-panel-header)]">
+          <div className="border-b border-(--border-color)">
+            <div className="px-3 py-1 text-[9px] tracking-widest text-(--text-secondary) bg-(--bg-panel-header)">
               LIVE TRACKS // {drones.length} INBOUND
             </div>
             {drones.slice(0, 12).map(d => (
@@ -126,9 +126,9 @@ export default function AlertsPanel() {
                 <div className="flex-1 min-w-0">
                   <div className="text-[10px] font-bold" style={{ color: d.color }}>
                     {d.label}{d.count > 1 ? ` ×${d.count}` : ''}
-                    {d.place ? <span className="text-[var(--text-primary)] font-normal"> → {d.place}</span> : null}
+                    {d.place ? <span className="text-(--text-primary) font-normal"> → {d.place}</span> : null}
                   </div>
-                  <div className="text-[8px] text-[var(--text-secondary)]">
+                  <div className="text-[8px] text-(--text-secondary)">
                     hdg {d.heading}° · {new Date(d.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -138,7 +138,7 @@ export default function AlertsPanel() {
         )}
         {loading ? (
           <div className="p-3">
-            <div className="loading-shimmer h-20 rounded" />
+            <div className="loading-shimmer h-20 rounded-sm" />
           </div>
         ) : isActive ? (
           <>
@@ -147,10 +147,10 @@ export default function AlertsPanel() {
               <div className="flex items-center gap-2">
                 <span className="text-lg">🚨</span>
                 <div>
-                  <div className="text-xs font-bold text-[var(--red)]">
+                  <div className="text-xs font-bold text-(--red)">
                     INCOMING THREAT DETECTED
                   </div>
-                  <div className="text-[9px] text-[var(--text-secondary)]">
+                  <div className="text-[9px] text-(--text-secondary)">
                     {alertSystemName} sirens activated
                   </div>
                 </div>
@@ -161,17 +161,17 @@ export default function AlertsPanel() {
               <div key={i} className="data-row">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-sm">{TYPE_ICONS[alert.type] || '🔴'}</span>
-                  <span className="text-[10px] font-bold text-[var(--red)]">
+                  <span className="text-[10px] font-bold text-(--red)">
                     {alert.type}
                   </span>
-                  <span className="text-[9px] text-[var(--text-secondary)]">
+                  <span className="text-[9px] text-(--text-secondary)">
                     {new Date(alert.time).toLocaleTimeString()}
                   </span>
                 </div>
-                <div className="text-[11px] text-[var(--text-primary)]">
+                <div className="text-[11px] text-(--text-primary)">
                   {alert.threat}
                 </div>
-                <div className="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                <div className="text-[9px] text-(--text-secondary) mt-0.5">
                   {alert.locations.join(', ')}
                 </div>
               </div>
@@ -179,7 +179,7 @@ export default function AlertsPanel() {
           </>
         ) : drones.length > 0 ? (
           // Drones inbound but no oblast siren active — the LIVE TRACKS section above covers it
-          <div className="px-3 py-2 text-[9px] text-[var(--text-secondary)]">
+          <div className="px-3 py-2 text-[9px] text-(--text-secondary)">
             No oblast air-raid sirens active · tracking {drones.length} inbound threat{drones.length > 1 ? 's' : ''} above
           </div>
         ) : (
@@ -190,11 +190,11 @@ export default function AlertsPanel() {
                 <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <div className="text-sm font-bold text-[var(--green)] mb-1">ALL CLEAR</div>
-            <div className="text-[9px] text-[var(--text-secondary)] text-center">
+            <div className="text-sm font-bold text-(--green) mb-1">ALL CLEAR</div>
+            <div className="text-[9px] text-(--text-secondary) text-center">
               No active alerts from {alertSystemName}
             </div>
-            <div className="text-[8px] text-[var(--text-secondary)] mt-2">
+            <div className="text-[8px] text-(--text-secondary) mt-2">
               Polling every 5s • Last: {data?.lastChecked ? new Date(data.lastChecked).toLocaleTimeString() : '...'}
             </div>
             <div className="text-[8px] mt-1" style={{ color: soundEnabled ? 'var(--cyan)' : 'var(--text-secondary)' }}>

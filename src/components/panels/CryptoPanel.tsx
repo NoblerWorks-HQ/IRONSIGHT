@@ -30,14 +30,14 @@ export default function CryptoPanel() {
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="loading-shimmer h-10 rounded" />
+              <div key={i} className="loading-shimmer h-10 rounded-sm" />
             ))}
           </div>
         ) : (
           prices?.map((item, i) => (
             <div key={i} className="data-row flex items-center justify-between">
               <div>
-                <div className="text-[11px] font-medium text-[var(--text-primary)]">
+                <div className="text-[11px] font-medium text-(--text-primary)">
                   {item.name}
                 </div>
                 <div className="text-[9px] font-bold" style={{ color: SYMBOL_COLORS[item.symbol] || 'var(--text-secondary)' }}>
@@ -45,7 +45,7 @@ export default function CryptoPanel() {
                 </div>
               </div>
               <div className="text-right">
-                <div className={`text-sm font-bold ${item.error ? 'text-[var(--text-secondary)]' : ''}`}>
+                <div className={`text-sm font-bold ${item.error ? 'text-(--text-secondary)' : ''}`}>
                   {item.error ? 'N/A' : `$${item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 </div>
                 {!item.error && (

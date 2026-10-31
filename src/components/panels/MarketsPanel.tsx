@@ -31,13 +31,13 @@ export default function MarketsPanel() {
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="loading-shimmer h-8 rounded" />
+              <div key={i} className="loading-shimmer h-8 rounded-sm" />
             ))}
           </div>
         ) : (
           <>
             <div className="px-3 pt-2 pb-1">
-              <span className="text-[9px] text-[var(--text-accent)] tracking-widest">INDICES</span>
+              <span className="text-[9px] text-(--text-accent) tracking-widest">INDICES</span>
             </div>
             {indices?.map((item, i) => (
               <div key={i} className="data-row flex items-center justify-between">
@@ -58,12 +58,12 @@ export default function MarketsPanel() {
             ))}
 
             <div className="px-3 pt-3 pb-1">
-              <span className="text-[9px] text-[var(--text-accent)] tracking-widest">DEFENSE CONTRACTORS</span>
+              <span className="text-[9px] text-(--text-accent) tracking-widest">DEFENSE CONTRACTORS</span>
             </div>
             {defense?.map((item, i) => (
               <div key={i} className="data-row flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] text-[var(--text-secondary)] font-mono w-8">{item.symbol}</span>
+                  <span className="text-[9px] text-(--text-secondary) font-mono w-8">{item.symbol}</span>
                   <span className="text-[10px] font-medium">{item.name}</span>
                 </div>
                 <div className="text-right flex items-center gap-3">

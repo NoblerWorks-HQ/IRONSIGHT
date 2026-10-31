@@ -35,13 +35,13 @@ export default function StrikesPanel() {
       <div className="panel-header">
         <span className="status-dot" style={{ background: 'var(--red)', animation: 'pulse-dot 1s ease-in-out infinite' }} />
         MISSILE / STRIKE TRACKER
-        <span className="ml-auto text-[9px] text-[var(--text-secondary)] font-normal normal-case tracking-normal">
+        <span className="ml-auto text-[9px] text-(--text-secondary) font-normal normal-case tracking-normal">
           {strikes?.length || 0} events
         </span>
       </div>
 
       {/* Category summary bar */}
-      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-[var(--border-color)] bg-[var(--bg-panel-header)] overflow-x-auto">
+      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-(--border-color) bg-(--bg-panel-header) overflow-x-auto">
         {Object.entries(counts).map(([cat, count]) => {
           const config = CATEGORY_CONFIG[cat] || CATEGORY_CONFIG.REPORT;
           return (
@@ -50,7 +50,7 @@ export default function StrikesPanel() {
               <span className="text-[9px] font-bold" style={{ color: config.color }}>
                 {cat}
               </span>
-              <span className="text-[9px] text-[var(--text-secondary)]">({count})</span>
+              <span className="text-[9px] text-(--text-secondary)">({count})</span>
             </div>
           );
         })}
@@ -60,11 +60,11 @@ export default function StrikesPanel() {
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="loading-shimmer h-12 rounded" />
+              <div key={i} className="loading-shimmer h-12 rounded-sm" />
             ))}
           </div>
         ) : strikes?.length === 0 ? (
-          <div className="p-4 text-center text-[var(--text-secondary)] text-xs">
+          <div className="p-4 text-center text-(--text-secondary) text-xs">
             No strike events detected
           </div>
         ) : (
@@ -81,7 +81,7 @@ export default function StrikesPanel() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs">{config.icon}</span>
                   <span
-                    className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+                    className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm"
                     style={{
                       color: config.color,
                       backgroundColor: `${config.color}15`,
@@ -91,21 +91,21 @@ export default function StrikesPanel() {
                     {strike.category}
                   </span>
                   <span
-                    className="text-[8px] font-bold px-1 py-0.5 rounded"
+                    className="text-[8px] font-bold px-1 py-0.5 rounded-sm"
                     style={{
                       color: SEVERITY_COLORS[strike.severity],
                     }}
                   >
                     {strike.severity.toUpperCase()}
                   </span>
-                  <span className="text-[9px] text-[var(--text-secondary)] ml-auto">
+                  <span className="text-[9px] text-(--text-secondary) ml-auto">
                     {timeAgo(strike.date)}
                   </span>
                 </div>
-                <p className="text-[11px] leading-tight text-[var(--text-primary)]">
+                <p className="text-[11px] leading-tight text-(--text-primary)">
                   {strike.title}
                 </p>
-                <span className="text-[8px] text-[var(--text-secondary)]">
+                <span className="text-[8px] text-(--text-secondary)">
                   {strike.source} • {strike.country}
                 </span>
               </a>

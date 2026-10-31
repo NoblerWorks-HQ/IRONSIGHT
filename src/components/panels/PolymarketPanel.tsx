@@ -41,7 +41,7 @@ export default function PolymarketPanel() {
           PREDICTION MARKETS
         </div>
         {data && (
-          <span className="text-[9px] text-[var(--text-secondary)]">
+          <span className="text-[9px] text-(--text-secondary)">
             {data.count} markets // Polymarket
           </span>
         )}
@@ -50,11 +50,11 @@ export default function PolymarketPanel() {
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="loading-shimmer h-12 rounded" />
+              <div key={i} className="loading-shimmer h-12 rounded-sm" />
             ))}
           </div>
         ) : !data?.markets?.length ? (
-          <div className="p-4 text-center text-[10px] text-[var(--text-secondary)]">
+          <div className="p-4 text-center text-[10px] text-(--text-secondary)">
             No active prediction markets found
           </div>
         ) : (
@@ -68,10 +68,10 @@ export default function PolymarketPanel() {
               <div key={market.id} className="data-row">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="text-[10px] text-[var(--text-primary)] leading-tight">
+                    <div className="text-[10px] text-(--text-primary) leading-tight">
                       {market.question}
                     </div>
-                    <div className="text-[8px] text-[var(--text-secondary)] mt-0.5">
+                    <div className="text-[8px] text-(--text-secondary) mt-0.5">
                       Vol: {formatVolume(market.volume24hr)} 24h
                       {' · '}
                       {formatVolume(market.volumeTotal)} total
@@ -85,7 +85,7 @@ export default function PolymarketPanel() {
                     }}>
                       {yesPrice}%
                     </div>
-                    <div className="text-[8px] text-[var(--text-secondary)]">
+                    <div className="text-[8px] text-(--text-secondary)">
                       {yesOutcome?.label || 'YES'}
                     </div>
                     {changePercent && (
@@ -95,9 +95,9 @@ export default function PolymarketPanel() {
                     )}
                   </div>
                 </div>
-                <div className="mt-1 h-1.5 rounded overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                <div className="mt-1 h-1.5 rounded-sm overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
                   <div
-                    className="h-full rounded transition-all duration-500"
+                    className="h-full rounded-sm transition-all duration-500"
                     style={{
                       width: `${Math.max(yesPrice, 2)}%`,
                       background: yesPrice >= 70 ? 'var(--green)' :

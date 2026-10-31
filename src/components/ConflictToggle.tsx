@@ -9,10 +9,10 @@ export default function ConflictToggle() {
 
   return (
     <div className="flex items-center gap-1">
-      <span className="text-[8px] text-[var(--text-secondary)] tracking-[2px] hidden md:inline">
+      <span className="text-[8px] text-(--text-secondary) tracking-[2px] hidden md:inline">
         THEATER
       </span>
-      <div className="flex items-center rounded border border-[var(--border-color)] overflow-hidden">
+      <div className="flex items-center rounded-sm border border-(--border-color) overflow-hidden">
         {CONFLICT_KEYS.map(k => {
           const active = k === key;
           return (

@@ -15,7 +15,7 @@ export default function NewsFeed() {
       <div className="panel-header">
         <span className="status-dot" />
         LIVE INTEL FEED
-        <span className="ml-auto text-[9px] text-[var(--text-secondary)] font-normal normal-case tracking-normal">
+        <span className="ml-auto text-[9px] text-(--text-secondary) font-normal normal-case tracking-normal">
           {news?.length || 0} items · {lastUpdated ? lastUpdated.toLocaleTimeString() : '—'}
         </span>
       </div>
@@ -23,7 +23,7 @@ export default function NewsFeed() {
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="loading-shimmer h-12 rounded" />
+              <div key={i} className="loading-shimmer h-12 rounded-sm" />
             ))}
           </div>
         ) : (
@@ -36,7 +36,7 @@ export default function NewsFeed() {
               className="data-row flex items-start gap-2 hover:cursor-pointer block"
             >
               <span
-                className="text-[9px] font-bold px-1.5 py-0.5 rounded mt-0.5 shrink-0"
+                className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm mt-0.5 shrink-0"
                 style={{
                   backgroundColor: SOURCE_COLORS[item.source] || '#555',
                   color: '#fff',
@@ -45,10 +45,10 @@ export default function NewsFeed() {
                 {item.source}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] leading-tight text-[var(--text-primary)] truncate">
+                <p className="text-[11px] leading-tight text-(--text-primary) truncate">
                   {item.title}
                 </p>
-                <span className="text-[9px] text-[var(--text-secondary)]">
+                <span className="text-[9px] text-(--text-secondary)">
                   {timeAgo(item.pubDate)}
                 </span>
               </div>

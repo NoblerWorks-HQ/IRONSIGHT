@@ -50,24 +50,24 @@ export default function SatellitePanel() {
       <div className="panel-header">
         <span className="status-dot" style={{ background: '#ff6600' }} />
         SAT THERMAL DETECT
-        <span className="ml-auto text-[9px] text-[var(--text-secondary)] font-normal normal-case tracking-normal">
+        <span className="ml-auto text-[9px] text-(--text-secondary) font-normal normal-case tracking-normal">
           NASA FIRMS
         </span>
       </div>
 
       {/* Summary stats */}
-      <div className="flex items-center gap-3 px-3 py-1.5 border-b border-[var(--border-color)] bg-[var(--bg-panel-header)]">
+      <div className="flex items-center gap-3 px-3 py-1.5 border-b border-(--border-color) bg-(--bg-panel-header)">
         <div className="text-center">
-          <div className="text-sm font-bold text-[var(--text-primary)]">{data?.total || 0}</div>
-          <div className="text-[8px] text-[var(--text-secondary)]">HOTSPOTS</div>
+          <div className="text-sm font-bold text-(--text-primary)">{data?.total || 0}</div>
+          <div className="text-[8px] text-(--text-secondary)">HOTSPOTS</div>
         </div>
         <div className="text-center">
           <div className="text-sm font-bold" style={{ color: '#ff6600' }}>{data?.highIntensity || 0}</div>
-          <div className="text-[8px] text-[var(--text-secondary)]">HIGH INT</div>
+          <div className="text-[8px] text-(--text-secondary)">HIGH INT</div>
         </div>
         <div className="text-center">
-          <div className="text-sm font-bold text-[var(--red)]">{data?.possibleExplosions || 0}</div>
-          <div className="text-[8px] text-[var(--text-secondary)]">FLAGGED</div>
+          <div className="text-sm font-bold text-(--red)">{data?.possibleExplosions || 0}</div>
+          <div className="text-[8px] text-(--text-secondary)">FLAGGED</div>
         </div>
       </div>
 
@@ -75,11 +75,11 @@ export default function SatellitePanel() {
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="loading-shimmer h-10 rounded" />
+              <div key={i} className="loading-shimmer h-10 rounded-sm" />
             ))}
           </div>
         ) : data?.events.length === 0 ? (
-          <div className="p-4 text-center text-[var(--text-secondary)] text-xs">
+          <div className="p-4 text-center text-(--text-secondary) text-xs">
             No thermal anomalies detected in region
           </div>
         ) : (
@@ -98,12 +98,12 @@ export default function SatellitePanel() {
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-medium">{region}</span>
                     {event.possibleExplosion && (
-                      <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-red-900/30 text-[var(--red)]">
+                      <span className="text-[8px] font-bold px-1 py-0.5 rounded-sm bg-red-900/30 text-(--red)">
                         FLAGGED
                       </span>
                     )}
                   </div>
-                  <div className="text-[9px] text-[var(--text-secondary)]">
+                  <div className="text-[9px] text-(--text-secondary)">
                     FRP: {event.frp} MW | {event.brightness}K |{' '}
                     {event.lat.toFixed(2)}, {event.lon.toFixed(2)} |{' '}
                     {new Date(event.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

@@ -50,7 +50,7 @@ export default function FlightsPanel() {
       <div className="panel-header">
         <span className="status-dot" style={{ background: 'var(--cyan)' }} />
         MIL AIRSPACE
-        <span className="ml-auto text-[9px] text-[var(--text-secondary)] font-normal normal-case tracking-normal">
+        <span className="ml-auto text-[9px] text-(--text-secondary) font-normal normal-case tracking-normal">
           {data?.military || 0} mil / {data?.total || 0} total // adsb.lol
         </span>
       </div>
@@ -58,18 +58,18 @@ export default function FlightsPanel() {
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="loading-shimmer h-8 rounded" />
+              <div key={i} className="loading-shimmer h-8 rounded-sm" />
             ))}
           </div>
         ) : data?.flights.length === 0 ? (
-          <div className="p-4 text-center text-[var(--text-secondary)] text-xs">
+          <div className="p-4 text-center text-(--text-secondary) text-xs">
             No military aircraft detected on ADS-B<br />
             <span className="text-[8px]">(many mil flights disable transponders)</span>
           </div>
         ) : (
           <>
             {Object.keys(byType).length > 0 && (
-              <div className="px-3 py-1.5 border-b border-[var(--border-color)] bg-[var(--bg-panel-header)] flex flex-wrap gap-x-3 gap-y-0.5">
+              <div className="px-3 py-1.5 border-b border-(--border-color) bg-(--bg-panel-header) flex flex-wrap gap-x-3 gap-y-0.5">
                 {Object.entries(byType).sort((a, b) => b[1] - a[1]).map(([type, count]) => (
                   <span key={type} className="text-[8px]" style={{ color: TYPE_COLORS[type] || 'var(--text-secondary)' }}>
                     {type}: {count}
@@ -81,7 +81,7 @@ export default function FlightsPanel() {
             {data?.flights.map((f, i) => (
               <div
                 key={i}
-                className="data-row cursor-pointer hover:!bg-[rgba(0,170,255,0.1)]"
+                className="data-row cursor-pointer hover:bg-[rgba(0,170,255,0.1)]!"
                 onClick={() => focusOnMapTarget(f.icao24, f.lat, f.lon, 'aircraft')}
               >
                 <div className="flex items-center justify-between mb-0.5">
@@ -90,21 +90,21 @@ export default function FlightsPanel() {
                       {f.callsign || f.icao24}
                     </span>
                     {f.aircraftType && (
-                      <span className="text-[8px] text-[var(--text-secondary)] font-mono">{f.aircraftType}</span>
+                      <span className="text-[8px] text-(--text-secondary) font-mono">{f.aircraftType}</span>
                     )}
-                    <span className="text-[9px] text-[var(--text-secondary)]">{f.origin}</span>
+                    <span className="text-[9px] text-(--text-secondary)">{f.origin}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     {f.squawk === '7700' && (
-                      <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-red-900/30 text-[var(--red)]">EMERG</span>
+                      <span className="text-[8px] font-bold px-1 py-0.5 rounded-sm bg-red-900/30 text-(--red)">EMERG</span>
                     )}
                     {f.squawk === '7600' && (
-                      <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-amber-900/30 text-[var(--amber)]">NORDO</span>
+                      <span className="text-[8px] font-bold px-1 py-0.5 rounded-sm bg-amber-900/30 text-(--amber)">NORDO</span>
                     )}
                     {f.isInteresting && !f.isMilitary && (
-                      <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-purple-900/30 text-[var(--purple)]">NOTABLE</span>
+                      <span className="text-[8px] font-bold px-1 py-0.5 rounded-sm bg-purple-900/30 text-(--purple)">NOTABLE</span>
                     )}
-                    <span className="text-[8px] text-[var(--text-secondary)]">📍</span>
+                    <span className="text-[8px] text-(--text-secondary)">📍</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -112,7 +112,7 @@ export default function FlightsPanel() {
                     {f.type}
                     {f.registration ? ` (${f.registration})` : ''}
                   </span>
-                  <span className="text-[9px] text-[var(--text-secondary)] font-mono">
+                  <span className="text-[9px] text-(--text-secondary) font-mono">
                     {f.altitude.toLocaleString()}ft {f.speed}kts {f.heading}°
                   </span>
                 </div>

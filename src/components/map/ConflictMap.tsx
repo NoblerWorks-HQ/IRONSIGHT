@@ -850,28 +850,28 @@ export default function ConflictMap({ className }: MapProps) {
         <span className="status-dot" />
         <span className="shrink-0">THEATER MAP</span>
         <div className="ml-auto flex items-center gap-1 flex-wrap justify-end">
-          <button onClick={() => setShowMilAir(!showMilAir)} className="text-[8px] px-1.5 py-0.5 rounded border transition-colors"
+          <button onClick={() => setShowMilAir(!showMilAir)} className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
             style={{ color: showMilAir ? '#00aaff' : 'var(--text-secondary)', borderColor: showMilAir ? '#00aaff' : 'var(--border-color)', background: showMilAir ? 'rgba(0,170,255,0.1)' : 'transparent' }}>
             ✈ AIR {flights?.military || 0}
           </button>
-          <button onClick={() => setShowNaval(!showNaval)} className="text-[8px] px-1.5 py-0.5 rounded border transition-colors"
+          <button onClick={() => setShowNaval(!showNaval)} className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
             style={{ color: showNaval ? '#00d4ff' : 'var(--text-secondary)', borderColor: showNaval ? '#00d4ff' : 'var(--border-color)', background: showNaval ? 'rgba(0,212,255,0.1)' : 'transparent' }}>
             ⛴ NAV {naval?.ships?.length || 0}
           </button>
-          <button onClick={() => setShowStrikes(!showStrikes)} className="text-[8px] px-1.5 py-0.5 rounded border transition-colors"
+          <button onClick={() => setShowStrikes(!showStrikes)} className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
             style={{ color: showStrikes ? '#ff6600' : 'var(--text-secondary)', borderColor: showStrikes ? '#ff6600' : 'var(--border-color)', background: showStrikes ? 'rgba(255,102,0,0.1)' : 'transparent' }}>
             💥 STRIKES
           </button>
-          <button onClick={() => setShowRangeRings(!showRangeRings)} className="text-[8px] px-1.5 py-0.5 rounded border transition-colors"
+          <button onClick={() => setShowRangeRings(!showRangeRings)} className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
             style={{ color: showRangeRings ? '#ff3366' : 'var(--text-secondary)', borderColor: showRangeRings ? '#ff3366' : 'var(--border-color)', background: showRangeRings ? 'rgba(255,51,102,0.1)' : 'transparent' }}>
             ◎ RANGE
           </button>
-          <button onClick={() => setShowCities(!showCities)} className="text-[8px] px-1.5 py-0.5 rounded border transition-colors"
+          <button onClick={() => setShowCities(!showCities)} className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
             style={{ color: showCities ? '#999' : 'var(--text-secondary)', borderColor: showCities ? '#666' : 'var(--border-color)', background: showCities ? 'rgba(150,150,150,0.1)' : 'transparent' }}>
             CITIES
           </button>
           <button onClick={() => { setMeasureMode(!measureMode); if (measureMode && measureLayerRef.current) measureLayerRef.current.clearLayers(); }}
-            className="text-[8px] px-1.5 py-0.5 rounded border transition-colors"
+            className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
             style={{ color: measureMode ? '#ffaa00' : 'var(--text-secondary)', borderColor: measureMode ? '#ffaa00' : 'var(--border-color)', background: measureMode ? 'rgba(255,170,0,0.15)' : 'transparent' }}>
             📏 DIST
           </button>
@@ -880,12 +880,12 @@ export default function ConflictMap({ className }: MapProps) {
       <div className="relative flex-1 min-h-0">
         {!mounted ? <div className="loading-shimmer w-full h-full" /> : <div id="conflict-map" className="w-full h-full" />}
         {showStrikes && (
-          <div className="absolute bottom-2 left-2 z-[1000] text-[9px] px-2 py-1 rounded" style={{ background: 'rgba(10,14,23,0.9)', color: '#ff9955' }}>
+          <div className="absolute bottom-2 left-2 z-1000 text-[9px] px-2 py-1 rounded-sm" style={{ background: 'rgba(10,14,23,0.9)', color: '#ff9955' }}>
             💥 Strike pins show approximate places, not exact incident sites.
           </div>
         )}
         {measureMode && (
-          <div className="absolute top-2 left-2 z-[1000] text-[9px] px-2 py-1 rounded" style={{ background: 'rgba(10,14,23,0.9)', border: '1px solid #ffaa00', color: '#ffaa00' }}>
+          <div className="absolute top-2 left-2 z-1000 text-[9px] px-2 py-1 rounded-sm" style={{ background: 'rgba(10,14,23,0.9)', border: '1px solid #ffaa00', color: '#ffaa00' }}>
             MEASURE MODE — Click two points to measure distance. Click DIST again to exit.
           </div>
         )}

@@ -16,22 +16,22 @@ export default function OilPanel() {
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="loading-shimmer h-10 rounded" />
+              <div key={i} className="loading-shimmer h-10 rounded-sm" />
             ))}
           </div>
         ) : (
           prices?.map((item, i) => (
             <div key={i} className="data-row flex items-center justify-between">
               <div>
-                <div className="text-[11px] font-medium text-[var(--text-primary)]">
+                <div className="text-[11px] font-medium text-(--text-primary)">
                   {item.name}
                 </div>
-                <div className="text-[9px] text-[var(--text-secondary)] uppercase">
+                <div className="text-[9px] text-(--text-secondary) uppercase">
                   {item.type.replace('_', ' ')}
                 </div>
               </div>
               <div className="text-right">
-                <div className={`text-sm font-bold ${item.error ? 'text-[var(--text-secondary)]' : ''}`}>
+                <div className={`text-sm font-bold ${item.error ? 'text-(--text-secondary)' : ''}`}>
                   {item.error ? 'N/A' : `$${formatPrice(item.price)}`}
                 </div>
                 {!item.error && (

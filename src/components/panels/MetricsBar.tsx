@@ -40,9 +40,9 @@ export default function MetricsBar() {
       {metrics.map((m, i) => (
         <div
           key={i}
-          className="flex items-center gap-3 px-4 py-2 border-r border-[var(--border-color)] last:border-r-0 whitespace-nowrap"
+          className="flex items-center gap-3 px-4 py-2 border-r border-(--border-color) last:border-r-0 whitespace-nowrap"
         >
-          <span className="text-[10px] text-[var(--text-secondary)] tracking-wider">
+          <span className="text-[10px] text-(--text-secondary) tracking-wider">
             {m.label}
           </span>
           <span
@@ -53,7 +53,7 @@ export default function MetricsBar() {
                 ? 'value-up'
                 : m.change < 0
                 ? 'value-down'
-                : 'text-[var(--text-primary)]'
+                : 'text-(--text-primary)'
             }`}
           >
             {m.value}

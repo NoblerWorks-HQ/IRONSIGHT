@@ -42,18 +42,18 @@ export default function NavalPanel() {
       <div className="panel-header">
         <span className="status-dot" style={{ background: 'var(--blue)' }} />
         NAVAL TRACKER
-        <span className="ml-auto text-[9px] text-[var(--text-secondary)] font-normal normal-case tracking-normal">
+        <span className="ml-auto text-[9px] text-(--text-secondary) font-normal normal-case tracking-normal">
           {data?.totalTracked || 0} vessels // OSINT
         </span>
       </div>
 
       {/* Region summary */}
-      <div className="flex items-center gap-3 px-3 py-1.5 border-b border-[var(--border-color)] bg-[var(--bg-panel-header)]">
+      <div className="flex items-center gap-3 px-3 py-1.5 border-b border-(--border-color) bg-(--bg-panel-header)">
         {config.client.maritimeRegions.map(region => {
           const count = data?.ships.filter(s => s.region === region).length || 0;
           return count > 0 ? (
-            <div key={region} className="text-[8px] text-[var(--text-secondary)]">
-              <span className="text-[var(--cyan)]">{count}</span> {region}
+            <div key={region} className="text-[8px] text-(--text-secondary)">
+              <span className="text-(--cyan)">{count}</span> {region}
             </div>
           ) : null;
         })}
@@ -63,7 +63,7 @@ export default function NavalPanel() {
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="loading-shimmer h-10 rounded" />
+              <div key={i} className="loading-shimmer h-10 rounded-sm" />
             ))}
           </div>
         ) : (
@@ -77,7 +77,7 @@ export default function NavalPanel() {
               {byNavy[navy].map((ship, i) => (
                 <div
                   key={i}
-                  className="data-row cursor-pointer hover:!bg-[rgba(0,212,255,0.1)]"
+                  className="data-row cursor-pointer hover:bg-[rgba(0,212,255,0.1)]!"
                   onClick={() => {
                     window.dispatchEvent(new CustomEvent('map-focus', {
                       detail: { id: ship.name, lat: ship.lat, lon: ship.lon, type: 'ship' },
@@ -88,11 +88,11 @@ export default function NavalPanel() {
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs">{TYPE_ICONS[ship.type] || '🛥'}</span>
                       <span className="text-[10px] font-medium">{ship.name}</span>
-                      <span className="text-[8px] text-[var(--text-secondary)] font-mono">{ship.hull}</span>
+                      <span className="text-[8px] text-(--text-secondary) font-mono">{ship.hull}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <span
-                        className="text-[8px] px-1.5 py-0.5 rounded"
+                        className="text-[8px] px-1.5 py-0.5 rounded-sm"
                         style={{
                           color: ship.status === 'Active' ? 'var(--green)' : 'var(--cyan)',
                           backgroundColor: ship.status === 'Active' ? 'rgba(0,255,136,0.1)' : 'rgba(0,212,255,0.1)',
@@ -100,10 +100,10 @@ export default function NavalPanel() {
                       >
                         {ship.status}
                       </span>
-                      <span className="text-[8px] text-[var(--text-secondary)]">📍</span>
+                      <span className="text-[8px] text-(--text-secondary)">📍</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-[8px] text-[var(--text-secondary)]">
+                  <div className="flex items-center justify-between text-[8px] text-(--text-secondary)">
                     <span>{ship.class} • {ship.type}</span>
                     <span>{ship.region}{ship.group ? ` • ${ship.group}` : ''}</span>
                   </div>

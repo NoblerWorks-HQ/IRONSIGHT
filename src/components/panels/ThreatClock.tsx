@@ -23,7 +23,7 @@ export default function ThreatClock() {
   if (!time) {
     return (
       <div className="flex items-center gap-4 px-4 py-1.5">
-        <span className="text-[9px] text-[var(--text-secondary)]">Loading clocks...</span>
+        <span className="text-[9px] text-(--text-secondary)">Loading clocks...</span>
       </div>
     );
   }
@@ -33,10 +33,10 @@ export default function ThreatClock() {
   return (
     <div className="flex items-center gap-4 px-4 py-1.5 overflow-x-auto">
       <div className="flex items-center gap-2 shrink-0">
-        <span className="text-[9px] text-[var(--text-secondary)] tracking-widest">ZULU</span>
-        <span className="text-xs font-bold text-[var(--cyan)] glow-text font-mono">{utc}Z</span>
+        <span className="text-[9px] text-(--text-secondary) tracking-widest">ZULU</span>
+        <span className="text-xs font-bold text-(--cyan) glow-text font-mono">{utc}Z</span>
       </div>
-      <div className="h-4 w-px bg-[var(--border-color)]" />
+      <div className="h-4 w-px bg-(--border-color)" />
       {TIME_ZONES.map((tz, i) => {
         const localTime = time.toLocaleTimeString('en-US', {
           timeZone: tz.zone,
@@ -49,8 +49,8 @@ export default function ThreatClock() {
 
         return (
           <div key={i} className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[9px] text-[var(--text-secondary)]">{tz.label}</span>
-            <span className={`text-[11px] font-mono font-bold ${isNight ? 'text-[var(--text-secondary)]' : 'text-[var(--text-primary)]'}`}>
+            <span className="text-[9px] text-(--text-secondary)">{tz.label}</span>
+            <span className={`text-[11px] font-mono font-bold ${isNight ? 'text-(--text-secondary)' : 'text-(--text-primary)'}`}>
               {localTime}
             </span>
           </div>

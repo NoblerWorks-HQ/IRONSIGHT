@@ -58,7 +58,7 @@ export default function RegionalAlertsPanel() {
           }}
         />
         REGIONAL THREAT MONITOR
-        <span className="ml-auto text-[9px] text-[var(--text-secondary)] font-normal normal-case tracking-normal">
+        <span className="ml-auto text-[9px] text-(--text-secondary) font-normal normal-case tracking-normal">
           {sorted.filter(a => a.level !== 'CLEAR').length} active
         </span>
       </div>
@@ -67,7 +67,7 @@ export default function RegionalAlertsPanel() {
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="loading-shimmer h-12 rounded" />
+              <div key={i} className="loading-shimmer h-12 rounded-sm" />
             ))}
           </div>
         ) : (
@@ -80,7 +80,7 @@ export default function RegionalAlertsPanel() {
             return (
               <div
                 key={i}
-                className="border-b border-[var(--border-color)]"
+                className="border-b border-(--border-color)"
               >
                 {/* Country header - clickable to collapse */}
                 <div
@@ -89,7 +89,7 @@ export default function RegionalAlertsPanel() {
                   style={{ borderLeft: `3px solid ${countryColor}` }}
                 >
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] text-[var(--text-secondary)]">
+                    <span className="text-[9px] text-(--text-secondary)">
                       {isCollapsed ? '▸' : '▾'}
                     </span>
                     <span className="text-xs">{country.flag}</span>
@@ -97,7 +97,7 @@ export default function RegionalAlertsPanel() {
                       {country.name}
                     </span>
                     {hasEvents && (
-                      <span className="text-[9px] text-[var(--text-secondary)]">
+                      <span className="text-[9px] text-(--text-secondary)">
                         {country.events[0].hoursAgo < 1
                           ? `${Math.max(1, Math.round(country.events[0].hoursAgo * 60))}m ago`
                           : `${Math.round(country.events[0].hoursAgo)}h ago`
@@ -106,7 +106,7 @@ export default function RegionalAlertsPanel() {
                     )}
                   </div>
                   <span
-                    className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+                    className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm"
                     style={{
                       color: levelConfig.color,
                       border: `1px solid ${levelConfig.color}30`,
@@ -133,10 +133,10 @@ export default function RegionalAlertsPanel() {
                         style={{ background: SEVERITY_COLORS[event.severity] }}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="text-[10px] leading-tight text-[var(--text-primary)] line-clamp-1">
+                        <p className="text-[10px] leading-tight text-(--text-primary) line-clamp-1">
                           {event.title}
                         </p>
-                        <span className="text-[9px] text-[var(--text-secondary)]">
+                        <span className="text-[9px] text-(--text-secondary)">
                           {event.source} • {timeAgo(event.time)}
                         </span>
                       </div>
