@@ -1,4 +1,4 @@
-import { DOMParser } from '@xmldom/xmldom';
+import { DOMParser, type Document as XmlDocument, type Element as XmlElement } from '@xmldom/xmldom';
 
 export async function fetchWithTimeout(
   url: string,
@@ -26,12 +26,13 @@ export async function fetchWithTimeout(
   }
 }
 
-export function parseXML(text: string): Document {
+// xmldom 0.9 throws ParseError on a non-well-formed feed; every caller runs inside try/allSettled.
+export function parseXML(text: string): XmlDocument {
   const parser = new DOMParser();
   return parser.parseFromString(text, 'text/xml');
 }
 
-export function getTextContent(element: Element, tagName: string): string {
+export function getTextContent(element: XmlElement, tagName: string): string {
   const el = element.getElementsByTagName(tagName)[0];
   return el?.textContent || '';
 }
