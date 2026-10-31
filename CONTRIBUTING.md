@@ -14,7 +14,7 @@ No API keys or environment variables are needed. Use the **THEATER** toggle in t
 
 ## Before you open a PR
 
-1. **`npm run lint`, `npm test` and `npm run build` must pass** (CI runs all three).
+1. **`npm run lint`, `npm run typecheck`, `npm test` and `npm run build` must pass** (CI runs all four).
 2. **Check both theaters.** Panels, map layers and feeds are scoped per conflict through the config objects in `src/lib/conflicts/`. A change that works for Iran/Israel can silently break Russia/Ukraine.
 3. **Touched an upstream feed?** Each source lives in one route under `src/app/api/*/route.ts`. Say which provider changed and attach a sample of the response shape. Response types are defined once in `src/lib/types/api.ts`.
 4. **Adding a data source?** It must be free, public and keyless, and it must be credited in the README's Data Sources and Credits sections. IRONSIGHT does not own any of the data it shows.

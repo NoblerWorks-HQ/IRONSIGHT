@@ -18,6 +18,7 @@ Real-time OSINT command center for monitoring active conflicts - two theaters, I
 npm install
 npm run dev      # development
 npm run build    # build
+npm run typecheck # tsc 7 (@typescript/native); `typescript` is aliased to @typescript/typescript6 for the JS API (typescript-eslint, next build)
 npm start        # start production
 ```
 

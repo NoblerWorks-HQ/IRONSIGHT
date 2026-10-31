@@ -1,6 +1,6 @@
 name: CI
 
-# Lint, test and build on every push to main and every pull request.
+# Lint, typecheck, test and build on every push to main and every pull request.
 
 on:
   push:
@@ -34,6 +34,9 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Typecheck (TypeScript 7)
+        run: npm run typecheck
 
       - name: Test
         run: npm test
