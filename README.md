@@ -45,7 +45,7 @@ Built with Next.js, TypeScript, Tailwind CSS, and Leaflet. **No API keys require
 ## Features
 
 - **Conflict Toggle** — Switch the whole dashboard between the Iran/Israel and Russia/Ukraine theaters; selection persists in the browser
-- **Themes** - Six accent presets (Cyan default, Amber, NVG, Red, Violet, Ice) and a light / dark mode, from the header beside the theater toggle; alert red, ok green and warning amber keep their meaning in every theme
+- **Themes** - Seven accent presets (Mono default, Cyan, Amber, NVG, Red, Violet, Ice) and a light / dark mode on neutral black / white surfaces, from the header beside the theater toggle; alert red, ok green and warning amber keep their meaning in every theme
 - **Live Intel Feed** — Per-theater RSS news aggregation with relevance filtering and sports/entertainment noise removal
 - **Telegram OSINT** — Public Telegram channels scraped in real time with auto-translation (Hebrew/Arabic/Farsi and Ukrainian/Russian Cyrillic)
 - **Theater Map** — Interactive Leaflet map with military aircraft, naval vessels, strike markers from news and Telegram, missile trajectory arcs, range rings and a distance-measurement tool, over land and borders drawn from bundled Natural Earth data (no tile server)

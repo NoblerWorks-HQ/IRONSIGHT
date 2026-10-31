@@ -22,7 +22,7 @@ const presets = [...themeTs.matchAll(/\{ id: '(\w+)', label: '(\w+)', swatch: '(
 function vars(id, mode) {
   const v = { ...block(':root') };
   if (mode === 'light') Object.assign(v, block('[data-mode="light"]'));
-  if (id !== 'cyan') {
+  if (id !== 'mono') {
     Object.assign(v, block(`[data-theme="${id}"]`));
     if (mode === 'light') Object.assign(v, block(`[data-mode="light"][data-theme="${id}"]`));
   }
@@ -48,8 +48,8 @@ const SURFACES = ['--bg-primary', '--bg-secondary', '--bg-panel', '--bg-panel-he
 const TEXT = ['--text-primary', '--text-secondary', '--accent', '--red', '--green', '--amber', '--orange', '--blue', '--cyan', '--purple'];
 const SEMANTIC = ['--red', '--green', '--amber', '--orange'];
 
-test('theme.ts lists the six presets, cyan first (the :root default)', () => {
-  assert.deepEqual(presets.map(p => p.id), ['cyan', 'amber', 'nvg', 'red', 'violet', 'ice']);
+test('theme.ts lists the seven presets, mono first (the :root default)', () => {
+  assert.deepEqual(presets.map(p => p.id), ['mono', 'cyan', 'amber', 'nvg', 'red', 'violet', 'ice']);
 });
 
 for (const { id, swatch } of presets) {
@@ -74,16 +74,28 @@ for (const { id, swatch } of presets) {
   }
 }
 
-test('dark cyan is the pre-theme palette, unchanged', () => {
-  const v = vars('cyan', 'dark');
-  assert.deepEqual(
-    ['--bg-primary', '--bg-secondary', '--bg-panel', '--bg-panel-header', '--border-color', '--border-glow', '--text-primary', '--text-secondary', '--text-accent', '--green', '--red', '--amber', '--blue', '--cyan', '--purple'].map(k => v[k]),
-    ['#0a0e17', '#111827', '#1a1f2e', '#141924', '#1e3a5f', '#00d4ff', '#e2e8f0', '#94a3b8', '#00d4ff', '#00ff88', '#ff3366', '#ffaa00', '#00aaff', '#00d4ff', '#aa66ff'],
-  );
+test('default is neutral: black in dark mode, white in light mode, no blue tint', () => {
+  const d = vars('mono', 'dark'), l = vars('mono', 'light');
+  assert.equal(d['--bg-primary'], '#000000');
+  assert.equal(l['--bg-primary'], '#ffffff');
+  assert.equal(l['--bg-panel'], '#ffffff');
+  const grey = h => { const [r, g, b] = rgb(h); return r === g && g === b; };
+  for (const v of [d, l]) for (const k of [...SURFACES, '--border-color', '--text-primary', '--text-secondary', '--accent', '--map-ocean', '--map-land', '--map-coast', '--map-border'])
+    assert.ok(grey(v[k]), `${k} = ${v[k]} is not neutral grey`);
+});
+
+test('borders and map stay neutral grey in every accent preset', () => {
+  for (const { id } of presets) for (const mode of ['dark', 'light']) {
+    const v = vars(id, mode);
+    for (const k of ['--border-color', '--map-border']) {
+      const [r, g, b] = rgb(v[k]);
+      assert.ok(r === g && g === b, `${id}/${mode} ${k} = ${v[k]}`);
+    }
+  }
 });
 
 test('light mode: --red banner text stays AA on the flashing alert banner', () => {
-  const v = vars('cyan', 'light');
+  const v = vars('mono', 'light');
   const m = /rgba\((\d+), (\d+), (\d+), ([\d.]+)\)/.exec(v['--alert-flash-hi']);
   const [r, g, b, a] = m.slice(1).map(Number);
   const bg = rgb(v['--bg-panel']).map((c, i) => Math.round(c * (1 - a) + [r, g, b][i] * a));

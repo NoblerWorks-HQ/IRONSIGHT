@@ -4,6 +4,7 @@
 // tests/theme-contrast.test.mjs checks every preset in both modes for WCAG AA.
 
 export const ACCENT_PRESETS = [
+  { id: 'mono', label: 'MONO', swatch: '#ffffff' },
   { id: 'cyan', label: 'CYAN', swatch: '#00d4ff' },
   { id: 'amber', label: 'AMBER', swatch: '#e6cf7a' },
   { id: 'nvg', label: 'NVG', swatch: '#a6ff4d' },
@@ -15,7 +16,7 @@ export const ACCENT_PRESETS = [
 export type AccentId = (typeof ACCENT_PRESETS)[number]['id'];
 export type ThemeMode = 'dark' | 'light';
 
-export const DEFAULT_ACCENT: AccentId = 'cyan';
+export const DEFAULT_ACCENT: AccentId = 'mono';
 export const DEFAULT_MODE: ThemeMode = 'dark';
 
 export const ACCENT_STORAGE_KEY = 'ironsight-theme';
