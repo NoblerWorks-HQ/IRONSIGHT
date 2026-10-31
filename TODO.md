@@ -6,11 +6,13 @@ Working task list for **IRONSIGHT**. Read this at the start of a work session an
 
 ## Community backlog (2026-10-27)
 
-- [ ] 2026-10-30 (Pat + Dan meeting moved from 10-29, then 10-28) Patrick + Dan agree how to handle this backlog; nothing below is actioned until then.
+- [x] 2026-10-31 Patrick ordered every open PR cleared: #32 #41 #43 landed on main, #1 #2 #20 #42 closed with reasons.
 
-- [ ] 2026-10-30 (after the Pat + Dan meeting) needs Patrick: post drafted replies in `/home/plw/.cache/ironsight-community-replies-2026-10-28.md` (PRs #1 #2 #20 #32 #41 #42 #43; #1/#2 superseded, #32/#41/#43 wanted, #42 trim).
-- [ ] 2026-10-30 (after the Pat + Dan meeting) needs Patrick: post drafted close notes for #7 + PR #20 and triage replies (#5 #6 #8 #9 #23-#26) in the same file.
-- [ ] Dependabot: majors #48-#51 (TypeScript 7, ESLint 10, Tailwind 4, @types/node 26) and #44-#47 open since 2026-10-17 - land or close.
+- [ ] 2026-11-02 needs Patrick: post the issue close note for #7 and triage replies (#5 #6 #9 #23 #24) from `/home/plw/.cache/ironsight-community-replies-2026-10-28.md` (#8 #25 #26 close with the 10-31 fixes).
+- [x] 2026-10-31 Dependabot #44-#51 #54 cleared: in-range + xmldom 0.9, ESLint 10, TS 7 (tsc via @typescript/native), Tailwind 4 landed; @types/node held at 22 to match the Node 22 runtime.
+- [ ] 2026-11-30: re-check typescript-eslint TS 7 support (typescript-eslint#10940); when released, drop the `typescript` -> @typescript/typescript6 alias.
+- [ ] Node 26 LTS: move `.nvmrc`, Dockerfile and `@types/node` to 26 together (Dependabot #50 closed 2026-10-31 for the runtime mismatch).
+- [ ] low - Map basemap: CARTO dark tiles now need an API key and render a KEY REQUIRED watermark (seen 2026-10-31); drop or replace them as WarGames did.
 - [ ] Link check #53: README alerts.com.ua is 404; `site/404.html` root-relative links are a lychee false positive (needs a root dir). Close #52 as superseded.
 
 
@@ -35,7 +37,7 @@ Fleet audit follow-up. Fixed items landed on main 2026-10-02 (local only - this 
 - [x] 2026-10-04 Dependabot alerts 3 critical / 29 high / 14 medium / 2 low -> 0 open (`npm audit fix`, non-force, lockfile only: next 16.2.9 -> 16.3.8, sharp 0.35.5, postcss 8.5.23, xmldom, js-yaml, nanoid, ...). Build, tsc, `npm test`, `docker build` all pass. Pushed c22cbd4.
 - [x] 2026-10-28 triage the 2 Dependabot alerts from the 10-15 push ✅ 2026-10-28 0 open: #64 source-map-js fixed 10-22, #63 postcss-selector-parser withdrawn by GitHub.
 - [x] 2026-10-11 check that Dependabot auto-closed its superseded PRs (#28, #30, #34-#40); close any that remain only if their bump is already in the lockfile. ✅ 2026-10-15: none had auto-closed; all 9 closed by hand after checking main's `package-lock.json` holds each target or newer (next 16.3.8, postcss 8.5.23, sharp 0.35.5, nanoid 3.3.19, browserslist 4.29.3, baseline-browser-mapping 2.11.27, js-yaml 4.3.2, xmldom 0.8.15, humanfs 0.16.8, postcss-selector-parser 6.1.4). Non-Dependabot PRs #1, #2, #20, #32, #41, #42 untouched.
-- [ ] low - `npm audit` still shows 7 high, all build-time: braces <=3.0.3 (GHSA-vfj7-8cjw-p6xm, no patched release) via tailwindcss 3 + eslint-config-next. GitHub auto-dismissed it as dev-only. Only fix is tailwindcss 4 (major, styling pipeline change) - do it with the lint/flat-config work below.
+- [x] 2026-10-31 Tailwind 4 landed; braces gone. Left: minimatch <11.0.1 moderate via eslint-config-next's plugins (upstream). Was: `npm audit` still shows 7 high, all build-time: braces <=3.0.3 (GHSA-vfj7-8cjw-p6xm, no patched release) via tailwindcss 3 + eslint-config-next. GitHub auto-dismissed it as dev-only. Only fix is tailwindcss 4 (major, styling pipeline change) - do it with the lint/flat-config work below.
 
 ## Refactor audit (2026-10-01) - found, not started
 
