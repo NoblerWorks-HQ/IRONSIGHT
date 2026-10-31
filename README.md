@@ -155,7 +155,7 @@ IDF Official, Rocket Alert, Alert Israel, Times of Israel, Abu Ali Express, OSIN
 
 ## Getting Started
 
-**Prerequisite:** Node.js 22 (see [`.nvmrc`](.nvmrc); run `nvm use` if you use nvm). No API keys or environment variables required.
+**Prerequisite:** Node.js 24 (see [`.nvmrc`](.nvmrc); run `nvm use` if you use nvm). No API keys or environment variables required.
 
 ```bash
 npm install   # or: npm ci

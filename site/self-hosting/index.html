@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Run IRONSIGHT Yourself: Docker and Node.js Setup</title>
-<meta name="description" content="Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 22. No API keys or environment variables needed.">
+<meta name="description" content="Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 24. No API keys or environment variables needed.">
 <link rel="canonical" href="https://ironsight.noblerworks.com/self-hosting/">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <meta name="author" content="Nobler Works">
 <meta property="og:title" content="Run IRONSIGHT Yourself: Docker and Node.js Setup">
-<meta property="og:description" content="Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 22. No API keys or environment variables needed.">
+<meta property="og:description" content="Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 24. No API keys or environment variables needed.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://ironsight.noblerworks.com/self-hosting/">
 <meta property="og:site_name" content="IRONSIGHT">
@@ -21,13 +21,13 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@Nobler_Works">
 <meta name="twitter:title" content="Run IRONSIGHT Yourself: Docker and Node.js Setup">
-<meta name="twitter:description" content="Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 22. No API keys or environment variables needed.">
+<meta name="twitter:description" content="Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 24. No API keys or environment variables needed.">
 <meta name="twitter:image" content="https://ironsight.noblerworks.com/img/social.png">
 <meta name="theme-color" content="#07090c">
 <meta name="color-scheme" content="dark light">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="stylesheet" href="../style.css">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://noblerworks.com/#org", "name": "Nobler Works", "url": "https://noblerworks.com/", "sameAs": ["https://x.com/Nobler_Works", "https://www.youtube.com/@NoblerWorks", "https://www.tiktok.com/@noblerworks", "https://www.threads.com/@noblerworks", "https://github.com/NoblerWorks-HQ"], "founder": [{"@type": "Person", "name": "Patrick Wilson"}, {"@type": "Person", "name": "Daniel Casale"}]}, {"@type": "WebSite", "@id": "https://ironsight.noblerworks.com/#site", "url": "https://ironsight.noblerworks.com/", "name": "IRONSIGHT", "publisher": {"@id": "https://noblerworks.com/#org"}, "inLanguage": "en"}, {"@type": "TechArticle", "@id": "https://ironsight.noblerworks.com/self-hosting/#page", "url": "https://ironsight.noblerworks.com/self-hosting/", "name": "Run IRONSIGHT Yourself: Docker and Node.js Setup", "description": "Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 22. No API keys or environment variables needed.", "isPartOf": {"@id": "https://ironsight.noblerworks.com/#site"}, "inLanguage": "en", "datePublished": "2026-10-17", "dateModified": "2026-10-18", "author": {"@id": "https://noblerworks.com/#org"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "IRONSIGHT", "item": "https://ironsight.noblerworks.com/"}, {"@type": "ListItem", "position": 2, "name": "Run IRONSIGHT yourself", "item": "https://ironsight.noblerworks.com/self-hosting/"}]}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://noblerworks.com/#org", "name": "Nobler Works", "url": "https://noblerworks.com/", "sameAs": ["https://x.com/Nobler_Works", "https://www.youtube.com/@NoblerWorks", "https://www.tiktok.com/@noblerworks", "https://www.threads.com/@noblerworks", "https://github.com/NoblerWorks-HQ"], "founder": [{"@type": "Person", "name": "Patrick Wilson"}, {"@type": "Person", "name": "Daniel Casale"}]}, {"@type": "WebSite", "@id": "https://ironsight.noblerworks.com/#site", "url": "https://ironsight.noblerworks.com/", "name": "IRONSIGHT", "publisher": {"@id": "https://noblerworks.com/#org"}, "inLanguage": "en"}, {"@type": "TechArticle", "@id": "https://ironsight.noblerworks.com/self-hosting/#page", "url": "https://ironsight.noblerworks.com/self-hosting/", "name": "Run IRONSIGHT Yourself: Docker and Node.js Setup", "description": "Self-host the IRONSIGHT OSINT dashboard in one command with Docker, or run it with Node.js 24. No API keys or environment variables needed.", "isPartOf": {"@id": "https://ironsight.noblerworks.com/#site"}, "inLanguage": "en", "datePublished": "2026-10-17", "dateModified": "2026-10-18", "author": {"@id": "https://noblerworks.com/#org"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "IRONSIGHT", "item": "https://ironsight.noblerworks.com/"}, {"@type": "ListItem", "position": 2, "name": "Run IRONSIGHT yourself", "item": "https://ironsight.noblerworks.com/self-hosting/"}]}]}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -45,7 +45,7 @@ cd IRONSIGHT
 docker compose up --build</pre>
 <p>The multi-stage image is about 215 MB and runs as a non-root user. Open <code>http://localhost:3000</code>. To use a different host port, change the <code>ports</code> mapping in <code>docker-compose.yml</code>.</p>
 <h2>With Node.js</h2>
-<pre>nvm use          # Node 22
+<pre>nvm use          # Node 24
 npm install
 npm run dev      # http://localhost:3000</pre>
 <p>For production run <code>npm run build</code> then <code>npm start</code>. Use the THEATER toggle in the header to switch between <a href="../iran-israel/">Iran / Israel</a> and <a href="../russia-ukraine/">Russia / Ukraine</a>.</p>

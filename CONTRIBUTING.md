@@ -5,7 +5,7 @@ Thanks for your interest. IRONSIGHT is a viewer over free, public OSINT feeds: a
 ## Getting set up
 
 ```sh
-nvm use          # Node 22, see .nvmrc
+nvm use          # Node 24, see .nvmrc
 npm install
 npm run dev      # http://localhost:3000
 ```

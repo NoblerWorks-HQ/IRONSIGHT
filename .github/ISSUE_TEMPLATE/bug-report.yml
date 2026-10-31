@@ -41,4 +41,4 @@ body:
     id: env
     attributes:
       label: How you run it
-      placeholder: "npm run dev / docker compose, Node 22, macOS, Chrome"
+      placeholder: "npm run dev / docker compose, Node 24, macOS, Chrome"
