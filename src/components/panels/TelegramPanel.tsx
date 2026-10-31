@@ -2,6 +2,7 @@
 
 import { useConflictFeed, timeAgo } from '@/lib/hooks';
 import type { TelegramData } from '@/lib/types/api';
+import { withAlpha } from '@/lib/color';
 
 export default function TelegramPanel() {
   const { data, loading, lastUpdated } = useConflictFeed<TelegramData>('/api/telegram', 60000);
@@ -9,7 +10,7 @@ export default function TelegramPanel() {
   return (
     <div className="panel h-full flex flex-col">
       <div className="panel-header">
-        <span className="status-dot" style={{ background: 'var(--cyan)' }} />
+        <span className="status-dot" style={{ background: 'var(--accent)' }} />
         TELEGRAM OSINT (UNVERIFIED)
         <span className="ml-auto text-[9px] text-(--text-secondary) font-normal normal-case tracking-normal">
           {data?.posts.length || 0} posts // {data?.channels.length || 0} channels{lastUpdated ? ` // ${new Date(lastUpdated).toLocaleTimeString()}` : ''}
@@ -33,15 +34,15 @@ export default function TelegramPanel() {
               href={post.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="block data-row hover:bg-[rgba(0,212,255,0.05)]! cursor-pointer"
+              className="block data-row hover:bg-[rgba(var(--accent-rgb),0.05)]! cursor-pointer"
             >
               <div className="flex items-center gap-2 mb-0.5">
                 <span
                   className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm shrink-0"
                   style={{
                     color: post.color,
-                    backgroundColor: `${post.color}15`,
-                    border: `1px solid ${post.color}30`,
+                    backgroundColor: withAlpha(post.color, '15'),
+                    border: `1px solid ${withAlpha(post.color, '30')}`,
                   }}
                 >
                   {post.channelLabel}

@@ -53,7 +53,7 @@ export default function NavalPanel() {
           const count = data?.ships.filter(s => s.region === region).length || 0;
           return count > 0 ? (
             <div key={region} className="text-[8px] text-(--text-secondary)">
-              <span className="text-(--cyan)">{count}</span> {region}
+              <span className="text-(--accent)">{count}</span> {region}
             </div>
           ) : null;
         })}
@@ -77,7 +77,7 @@ export default function NavalPanel() {
               {byNavy[navy].map((ship, i) => (
                 <div
                   key={i}
-                  className="data-row cursor-pointer hover:bg-[rgba(0,212,255,0.1)]!"
+                  className="data-row cursor-pointer hover:bg-[rgba(var(--accent-rgb),0.1)]!"
                   onClick={() => {
                     window.dispatchEvent(new CustomEvent('map-focus', {
                       detail: { id: ship.name, lat: ship.lat, lon: ship.lon, type: 'ship' },

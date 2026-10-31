@@ -80,7 +80,7 @@ export default function PolymarketPanel() {
                   <div className="text-right shrink-0">
                     <div className="text-sm font-bold" style={{
                       color: yesPrice >= 70 ? 'var(--green)' :
-                             yesPrice >= 40 ? '#ffaa00' :
+                             yesPrice >= 40 ? 'var(--amber)' :
                              'var(--red)'
                     }}>
                       {yesPrice}%
@@ -95,13 +95,13 @@ export default function PolymarketPanel() {
                     )}
                   </div>
                 </div>
-                <div className="mt-1 h-1.5 rounded-sm overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                <div className="mt-1 h-1.5 rounded-sm overflow-hidden" style={{ background: 'rgba(var(--tint-rgb), 0.08)' }}>
                   <div
                     className="h-full rounded-sm transition-all duration-500"
                     style={{
                       width: `${Math.max(yesPrice, 2)}%`,
                       background: yesPrice >= 70 ? 'var(--green)' :
-                                  yesPrice >= 40 ? '#ffaa00' :
+                                  yesPrice >= 40 ? 'var(--amber)' :
                                   'var(--red)',
                       opacity: 0.8,
                     }}

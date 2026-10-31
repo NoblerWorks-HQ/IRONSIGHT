@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useConflictFeed, timeAgo, useTick } from '@/lib/hooks';
 import { useConflict } from '@/lib/conflicts/context';
 import type { RegionalData } from '@/lib/types/api';
+import { withAlpha } from '@/lib/color';
 
 const LEVEL_CONFIG: Record<string, { color: string; label: string }> = {
   CLEAR: { color: 'var(--green)', label: 'CLEAR' },
@@ -14,7 +15,7 @@ const LEVEL_CONFIG: Record<string, { color: string; label: string }> = {
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: 'var(--red)',
-  high: '#ff6600',
+  high: 'var(--orange)',
   medium: 'var(--amber)',
   low: 'var(--blue)',
 };
@@ -84,7 +85,7 @@ export default function RegionalAlertsPanel() {
               >
                 {/* Country header - clickable to collapse */}
                 <div
-                  className="px-3 py-1 flex items-center justify-between cursor-pointer select-none hover:bg-[rgba(255,255,255,0.02)]"
+                  className="px-3 py-1 flex items-center justify-between cursor-pointer select-none hover:bg-[rgba(var(--tint-rgb),0.02)]"
                   onClick={() => toggleCollapse(country.name)}
                   style={{ borderLeft: `3px solid ${countryColor}` }}
                 >
@@ -109,8 +110,8 @@ export default function RegionalAlertsPanel() {
                     className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm"
                     style={{
                       color: levelConfig.color,
-                      border: `1px solid ${levelConfig.color}30`,
-                      backgroundColor: `${levelConfig.color}10`,
+                      border: `1px solid ${withAlpha(levelConfig.color, '30')}`,
+                      backgroundColor: withAlpha(levelConfig.color, '10'),
                     }}
                   >
                     {levelConfig.label}
@@ -124,7 +125,7 @@ export default function RegionalAlertsPanel() {
                     href={event.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block px-3 py-0.5 hover:bg-[rgba(0,212,255,0.05)] cursor-pointer"
+                    className="block px-3 py-0.5 hover:bg-[rgba(var(--accent-rgb),0.05)] cursor-pointer"
                     style={{ paddingLeft: '18px' }}
                   >
                     <div className="flex items-start gap-1.5">

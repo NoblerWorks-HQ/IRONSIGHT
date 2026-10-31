@@ -17,6 +17,7 @@ import RegionalAlertsPanel from '@/components/panels/RegionalAlertsPanel';
 import CryptoPanel from '@/components/panels/CryptoPanel';
 import PolymarketPanel from '@/components/panels/PolymarketPanel';
 import ConflictToggle from '@/components/ConflictToggle';
+import ThemeSwitcher from '@/components/ThemeSwitcher';
 import { useConflict } from '@/lib/conflicts/context';
 import { useState, useEffect } from 'react';
 
@@ -51,16 +52,16 @@ export default function Dashboard() {
         <div className="flex items-center justify-between px-4 py-1.5">
           <div className="flex items-center gap-3">
             <div className="relative w-8 h-8">
-              <div className="absolute inset-0 rounded-full border border-(--cyan) opacity-30" />
-              <div className="absolute inset-1 rounded-full border border-(--cyan) opacity-20" />
-              <div className="absolute inset-2 rounded-full border border-(--cyan) opacity-10" />
+              <div className="absolute inset-0 rounded-full border border-(--accent) opacity-30" />
+              <div className="absolute inset-1 rounded-full border border-(--accent) opacity-20" />
+              <div className="absolute inset-2 rounded-full border border-(--accent) opacity-10" />
               <div
-                className="absolute bottom-1/2 left-1/2 -ml-px w-0.5 h-4 bg-(--cyan) origin-bottom radar-sweep"
+                className="absolute bottom-1/2 left-1/2 -ml-px w-0.5 h-4 bg-(--accent) origin-bottom radar-sweep"
               />
-              <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-(--cyan) rounded-full -translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-(--accent) rounded-full -translate-x-1/2 -translate-y-1/2" />
             </div>
             <div>
-              <h1 className="text-sm font-bold tracking-[3px] text-(--cyan)">IRONSIGHT</h1>
+              <h1 className="text-sm font-bold tracking-[3px] text-(--accent)">IRONSIGHT</h1>
               <p className="text-[8px] text-(--text-secondary) tracking-[2px]">
                 OSINT COMMAND CENTER // UNCLASSIFIED
               </p>
@@ -69,6 +70,7 @@ export default function Dashboard() {
           <MetricsBar />
           <div className="flex items-center gap-4 text-[9px] text-(--text-secondary)">
             <ConflictToggle />
+            <ThemeSwitcher />
             <span>SESSION {formatUptime(uptime)}</span>
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-(--green) animate-pulse" />

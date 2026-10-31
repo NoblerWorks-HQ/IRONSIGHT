@@ -12,7 +12,10 @@ Working task list for **IRONSIGHT**. Read this at the start of a work session an
 - [x] 2026-10-31 Dependabot #44-#51 #54 cleared: in-range + xmldom 0.9, ESLint 10, TS 7 (tsc via @typescript/native), Tailwind 4 landed; @types/node held at 22 to match the Node 22 runtime (moved to 24 with the runtime the same day).
 - [ ] 2026-11-30: re-check typescript-eslint TS 7 support (typescript-eslint#10940); when released, drop the `typescript` -> @typescript/typescript6 alias.
 - [x] 2026-10-31 Node 24: `.nvmrc`, Dockerfile (`node:24-alpine`), CI and `@types/node` ^24 moved together. Node 26 is planned for ~spring 2027, once native modules support it.
-- [ ] low - Map basemap: CARTO dark tiles now need an API key and render a KEY REQUIRED watermark (seen 2026-10-31); drop or replace them as WarGames did.
+- [x] 2026-10-31 Map basemap: CARTO tiles dropped; land/borders drawn from bundled Natural Earth 1:50m (world-atlas), themed via `--map-*`, no third-party map requests.
+- [x] 2026-10-31 App favicon (`src/app/icon.svg`, `apple-icon.png`, `favicon.ico`) and colour themes (6 accents x light/dark) landed; AA pinned by `tests/theme-contrast.test.mjs`.
+- [ ] low - Dark alert banner: `--red` on the flashing `alert-flash` peak is 3.67:1 (below AA, pre-existing; kept for the pixel-identical default). Lighter peak or brighter text.
+- [ ] low - Header overflows below ~1440 px wide (THREAT LEVEL runs into THEATER; pre-existing at 1366, the theme control adds ~60 px): let MetricsBar shrink or drop tiles.
 - [ ] Link check #53: README alerts.com.ua is 404; `site/404.html` root-relative links are a lychee false positive (needs a root dir). Close #52 as superseded.
 
 

@@ -28,7 +28,7 @@ interface FIRMSData {
 const INTENSITY_COLORS: Record<string, string> = {
   low: 'var(--text-secondary)',
   medium: 'var(--amber)',
-  high: '#ff6600',
+  high: 'var(--orange)',
   extreme: 'var(--red)',
 };
 
@@ -48,7 +48,7 @@ export default function SatellitePanel() {
   return (
     <div className="panel h-full flex flex-col">
       <div className="panel-header">
-        <span className="status-dot" style={{ background: '#ff6600' }} />
+        <span className="status-dot" style={{ background: 'var(--orange)' }} />
         SAT THERMAL DETECT
         <span className="ml-auto text-[9px] text-(--text-secondary) font-normal normal-case tracking-normal">
           NASA FIRMS
@@ -62,7 +62,7 @@ export default function SatellitePanel() {
           <div className="text-[8px] text-(--text-secondary)">HOTSPOTS</div>
         </div>
         <div className="text-center">
-          <div className="text-sm font-bold" style={{ color: '#ff6600' }}>{data?.highIntensity || 0}</div>
+          <div className="text-sm font-bold" style={{ color: 'var(--orange)' }}>{data?.highIntensity || 0}</div>
           <div className="text-[8px] text-(--text-secondary)">HIGH INT</div>
         </div>
         <div className="text-center">

@@ -8,6 +8,7 @@ import { esc } from '@/lib/escapeHtml';
 import { addStrikeMarker, geocodeStrike } from './strike-position';
 import type { FlightData, NavalData, AlertData, StrikeEvent as StrikeData, TelegramData, DroneData } from '@/lib/types/api';
 import type { ConflictEvent } from '@/types';
+import type { GeometryCollection, Topology } from 'topojson-specification';
 
 let L: typeof import('leaflet') | null = null;
 
@@ -174,9 +175,17 @@ export default function ConflictMap({ className }: MapProps) {
 
     const map = L.map('conflict-map', {
       center: cfg.mapCenter, zoom: cfg.mapZoom, zoomControl: false, attributionControl: false,
+      // Land is bundled Natural Earth 1:50m geometry (see COUNTRY LAND layer below);
+      // past zoom 8 its coastlines get visibly coarse.
+      maxZoom: 8,
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+    // No basemap tiles: CARTO's free dark tiles now need an API key and watermark
+    // every tile. The land, coastlines and borders are drawn from bundled Natural
+    // Earth data below, and the map container's background is the ocean.
+    L.control.attribution({ position: 'bottomright', prefix: false })
+      .addAttribution('<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener noreferrer">Natural Earth</a>')
+      .addTo(map);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     cityLayerRef.current = L.layerGroup().addTo(map);
@@ -212,27 +221,38 @@ export default function ConflictMap({ className }: MapProps) {
     };
   }, [mounted]);
 
-  // === COUNTRY BORDERS OVERLAY ===
-  // The CartoDB dark basemap draws political borders very faintly; add a crisp
-  // admin-0 boundary-lines overlay (Natural Earth) so country borders stand out.
+  // === COUNTRY LAND, COASTLINES AND BORDERS ===
+  // Natural Earth 1:50m countries (world-atlas TopoJSON), lazy-loaded with the map and
+  // drawn as SVG in their own pane under every overlay. Colours come from CSS
+  // (.map-land / .map-coast / .map-border -> --map-* variables), so light / dark mode
+  // and the accent presets restyle the map without a redraw. No third-party requests.
   useEffect(() => {
     if (!L || !mapRef.current) return;
-    let layer: L.GeoJSON | null = null;
+    const map = mapRef.current;
+    let layers: L.Layer[] = [];
     let cancelled = false;
-    fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_boundary_lines_land.geojson')
-      .then(r => (r.ok ? r.json() : null))
-      .then(geo => {
-        if (cancelled || !geo || !L || !mapRef.current) return;
-        layer = L.geoJSON(geo, {
-          style: { color: '#5578a8', weight: 1, opacity: 0.55, fill: false },
-          interactive: false,
-        });
-        layer.addTo(mapRef.current);
+    if (!map.getPane('land')) {
+      const pane = map.createPane('land');
+      pane.style.zIndex = '200'; // below overlayPane (400), where every marker and line lives
+      pane.style.pointerEvents = 'none';
+    }
+    Promise.all([import('world-atlas/countries-50m.json'), import('topojson-client')])
+      .then(([atlasModule, topo]) => {
+        if (cancelled || !L || !mapRef.current) return;
+        const atlas = (atlasModule.default ?? atlasModule) as unknown as Topology<{ countries: GeometryCollection }>;
+        const countries = atlas.objects.countries;
+        const opts = { pane: 'land', interactive: false } as const;
+        layers = [
+          L.geoJSON(topo.feature(atlas, countries), { ...opts, style: { className: 'map-land', stroke: false } }),
+          L.geoJSON(topo.mesh(atlas, countries, (a, b) => a === b), { ...opts, style: { className: 'map-coast', fill: false } }),
+          L.geoJSON(topo.mesh(atlas, countries, (a, b) => a !== b), { ...opts, style: { className: 'map-border', fill: false } }),
+        ];
+        layers.forEach(l => l.addTo(mapRef.current!));
       })
       .catch(() => {});
     return () => {
       cancelled = true;
-      if (layer && mapRef.current) { try { mapRef.current.removeLayer(layer); } catch {} }
+      layers.forEach(l => { try { map.removeLayer(l); } catch {} });
     };
   }, [mounted]);
 
@@ -278,7 +298,7 @@ export default function ConflictMap({ className }: MapProps) {
         L.marker([midLat, midLng], {
           icon: L.divIcon({
             className: 'measure-label',
-            html: `<div style="background:rgba(10,14,23,0.9);border:1px solid #ffaa00;padding:3px 6px;border-radius:3px;color:#ffaa00;font-family:monospace;font-size:10px;white-space:nowrap;">
+            html: `<div style="background:rgba(var(--bg-primary-rgb), 0.9);border:1px solid var(--amber);padding:3px 6px;border-radius:3px;color:var(--amber);font-family:monospace;font-size:10px;white-space:nowrap;">
               ${distKm} km | ${distMi} mi | ${distNm} nm
             </div>`,
             iconAnchor: [60, 12],
@@ -851,28 +871,28 @@ export default function ConflictMap({ className }: MapProps) {
         <span className="shrink-0">THEATER MAP</span>
         <div className="ml-auto flex items-center gap-1 flex-wrap justify-end">
           <button onClick={() => setShowMilAir(!showMilAir)} className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
-            style={{ color: showMilAir ? '#00aaff' : 'var(--text-secondary)', borderColor: showMilAir ? '#00aaff' : 'var(--border-color)', background: showMilAir ? 'rgba(0,170,255,0.1)' : 'transparent' }}>
+            style={{ color: showMilAir ? 'var(--blue)' : 'var(--text-secondary)', borderColor: showMilAir ? 'var(--blue)' : 'var(--border-color)', background: showMilAir ? 'rgba(0,170,255,0.1)' : 'transparent' }}>
             ✈ AIR {flights?.military || 0}
           </button>
           <button onClick={() => setShowNaval(!showNaval)} className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
-            style={{ color: showNaval ? '#00d4ff' : 'var(--text-secondary)', borderColor: showNaval ? '#00d4ff' : 'var(--border-color)', background: showNaval ? 'rgba(0,212,255,0.1)' : 'transparent' }}>
+            style={{ color: showNaval ? 'var(--cyan)' : 'var(--text-secondary)', borderColor: showNaval ? 'var(--cyan)' : 'var(--border-color)', background: showNaval ? 'rgba(0,212,255,0.1)' : 'transparent' }}>
             ⛴ NAV {naval?.ships?.length || 0}
           </button>
           <button onClick={() => setShowStrikes(!showStrikes)} className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
-            style={{ color: showStrikes ? '#ff6600' : 'var(--text-secondary)', borderColor: showStrikes ? '#ff6600' : 'var(--border-color)', background: showStrikes ? 'rgba(255,102,0,0.1)' : 'transparent' }}>
+            style={{ color: showStrikes ? 'var(--orange)' : 'var(--text-secondary)', borderColor: showStrikes ? 'var(--orange)' : 'var(--border-color)', background: showStrikes ? 'rgba(255,102,0,0.1)' : 'transparent' }}>
             💥 STRIKES
           </button>
           <button onClick={() => setShowRangeRings(!showRangeRings)} className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
-            style={{ color: showRangeRings ? '#ff3366' : 'var(--text-secondary)', borderColor: showRangeRings ? '#ff3366' : 'var(--border-color)', background: showRangeRings ? 'rgba(255,51,102,0.1)' : 'transparent' }}>
+            style={{ color: showRangeRings ? 'var(--red)' : 'var(--text-secondary)', borderColor: showRangeRings ? 'var(--red)' : 'var(--border-color)', background: showRangeRings ? 'rgba(255,51,102,0.1)' : 'transparent' }}>
             ◎ RANGE
           </button>
           <button onClick={() => setShowCities(!showCities)} className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
-            style={{ color: showCities ? '#999' : 'var(--text-secondary)', borderColor: showCities ? '#666' : 'var(--border-color)', background: showCities ? 'rgba(150,150,150,0.1)' : 'transparent' }}>
+            style={{ color: showCities ? 'var(--neutral-on)' : 'var(--text-secondary)', borderColor: showCities ? 'var(--neutral-on-border)' : 'var(--border-color)', background: showCities ? 'rgba(150,150,150,0.1)' : 'transparent' }}>
             CITIES
           </button>
           <button onClick={() => { setMeasureMode(!measureMode); if (measureMode && measureLayerRef.current) measureLayerRef.current.clearLayers(); }}
             className="text-[8px] px-1.5 py-0.5 rounded-sm border transition-colors"
-            style={{ color: measureMode ? '#ffaa00' : 'var(--text-secondary)', borderColor: measureMode ? '#ffaa00' : 'var(--border-color)', background: measureMode ? 'rgba(255,170,0,0.15)' : 'transparent' }}>
+            style={{ color: measureMode ? 'var(--amber)' : 'var(--text-secondary)', borderColor: measureMode ? 'var(--amber)' : 'var(--border-color)', background: measureMode ? 'rgba(255,170,0,0.15)' : 'transparent' }}>
             📏 DIST
           </button>
         </div>
@@ -880,12 +900,12 @@ export default function ConflictMap({ className }: MapProps) {
       <div className="relative flex-1 min-h-0">
         {!mounted ? <div className="loading-shimmer w-full h-full" /> : <div id="conflict-map" className="w-full h-full" />}
         {showStrikes && (
-          <div className="absolute bottom-2 left-2 z-1000 text-[9px] px-2 py-1 rounded-sm" style={{ background: 'rgba(10,14,23,0.9)', color: '#ff9955' }}>
+          <div className="absolute bottom-2 left-2 z-1000 text-[9px] px-2 py-1 rounded-sm" style={{ background: 'rgba(var(--bg-primary-rgb), 0.9)', color: 'var(--orange-soft)' }}>
             💥 Strike pins show approximate places, not exact incident sites.
           </div>
         )}
         {measureMode && (
-          <div className="absolute top-2 left-2 z-1000 text-[9px] px-2 py-1 rounded-sm" style={{ background: 'rgba(10,14,23,0.9)', border: '1px solid #ffaa00', color: '#ffaa00' }}>
+          <div className="absolute top-2 left-2 z-1000 text-[9px] px-2 py-1 rounded-sm" style={{ background: 'rgba(var(--bg-primary-rgb), 0.9)', border: '1px solid var(--amber)', color: 'var(--amber)' }}>
             MEASURE MODE — Click two points to measure distance. Click DIST again to exit.
           </div>
         )}
@@ -893,9 +913,9 @@ export default function ConflictMap({ className }: MapProps) {
 
       <style jsx global>{`
         .city-label, .aircraft-label, .naval-label, .drone-label {
-          background: rgba(10, 14, 23, 0.9) !important;
-          border: 1px solid rgba(30, 58, 95, 0.5) !important;
-          color: #94a3b8 !important;
+          background: rgba(var(--bg-primary-rgb), 0.9) !important;
+          border: 1px solid rgba(var(--border-rgb), 0.5) !important;
+          color: var(--text-secondary) !important;
           font-family: 'JetBrains Mono', monospace !important;
           font-size: 9px !important;
           padding: 1px 4px !important;
@@ -903,11 +923,12 @@ export default function ConflictMap({ className }: MapProps) {
           box-shadow: none !important;
         }
         .city-label::before, .aircraft-label::before, .naval-label::before, .drone-label::before {
-          border-right-color: rgba(30, 58, 95, 0.5) !important;
+          border-right-color: rgba(var(--border-rgb), 0.5) !important;
         }
-        .aircraft-label { color: #00aaff !important; }
-        .naval-label { color: #00d4ff !important; }
+        .aircraft-label { color: var(--blue) !important; }
+        .naval-label { color: var(--cyan) !important; }
         .drone-label { color: #ff5588 !important; }
+        [data-mode="light"] .drone-label { color: var(--red) !important; }
         .mil-aircraft-marker, .naval-marker, .strike-marker, .measure-label, .drone-marker { background: none !important; border: none !important; }
         .missile-arc { filter: drop-shadow(0 0 4px #ff3366); }
       `}</style>

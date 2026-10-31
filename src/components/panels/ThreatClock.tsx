@@ -34,7 +34,7 @@ export default function ThreatClock() {
     <div className="flex items-center gap-4 px-4 py-1.5 overflow-x-auto">
       <div className="flex items-center gap-2 shrink-0">
         <span className="text-[9px] text-(--text-secondary) tracking-widest">ZULU</span>
-        <span className="text-xs font-bold text-(--cyan) glow-text font-mono">{utc}Z</span>
+        <span className="text-xs font-bold text-(--accent) glow-text font-mono">{utc}Z</span>
       </div>
       <div className="h-4 w-px bg-(--border-color)" />
       {TIME_ZONES.map((tz, i) => {

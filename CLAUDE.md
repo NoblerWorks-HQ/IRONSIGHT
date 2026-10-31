@@ -9,7 +9,8 @@ Real-time OSINT command center for monitoring active conflicts - two theaters, I
 - **Cloud**: None
 
 ## Tech Stack
-- Next.js + TypeScript + Tailwind CSS; maps: Leaflet
+- Next.js + TypeScript + Tailwind CSS; maps: Leaflet over bundled Natural Earth land (`world-atlas`, no tile server)
+- Themes: accent presets + light/dark are `[data-theme]` / `[data-mode]` blocks in `src/app/globals.css` (ids in `src/lib/theme.ts`); use `var(--accent)` for chrome, never for status/data colours
 - Data: RSS feeds, Telegram scraping, Yahoo Finance, NASA FIRMS
 - No database and no separate backend - upstream calls are proxied by Next API routes (`src/app/api/*/route.ts`)
 

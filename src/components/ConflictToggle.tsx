@@ -21,8 +21,8 @@ export default function ConflictToggle() {
               onClick={() => setConflict(k)}
               className="text-[9px] font-bold tracking-[1px] px-2 py-1 transition-colors"
               style={{
-                color: active ? '#0a0e17' : 'var(--text-secondary)',
-                background: active ? 'var(--cyan)' : 'transparent',
+                color: active ? 'var(--on-accent)' : 'var(--text-secondary)',
+                background: active ? 'var(--accent)' : 'transparent',
               }}
               title={`Switch dashboard to ${CONFLICTS[k].label}`}
             >

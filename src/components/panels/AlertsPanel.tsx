@@ -96,9 +96,9 @@ export default function AlertsPanel() {
             }}
             className="text-[9px] px-1.5 py-0.5 rounded-sm border transition-colors"
             style={{
-              color: soundEnabled ? 'var(--cyan)' : 'var(--text-secondary)',
-              borderColor: soundEnabled ? 'var(--cyan)' : 'var(--border-color)',
-              background: soundEnabled ? 'rgba(0,212,255,0.1)' : 'transparent',
+              color: soundEnabled ? 'var(--accent)' : 'var(--text-secondary)',
+              borderColor: soundEnabled ? 'var(--accent)' : 'var(--border-color)',
+              background: soundEnabled ? 'rgba(var(--accent-rgb), 0.1)' : 'transparent',
             }}
             title={soundEnabled ? 'Sound alerts ON' : 'Sound alerts OFF'}
           >
@@ -197,7 +197,7 @@ export default function AlertsPanel() {
             <div className="text-[8px] text-(--text-secondary) mt-2">
               Polling every 5s • Last: {data?.lastChecked ? new Date(data.lastChecked).toLocaleTimeString() : '...'}
             </div>
-            <div className="text-[8px] mt-1" style={{ color: soundEnabled ? 'var(--cyan)' : 'var(--text-secondary)' }}>
+            <div className="text-[8px] mt-1" style={{ color: soundEnabled ? 'var(--accent)' : 'var(--text-secondary)' }}>
               Sound: {soundEnabled ? 'ON' : 'OFF'} {!hasInteracted && soundEnabled ? '(click anywhere to enable)' : ''}
             </div>
           </div>

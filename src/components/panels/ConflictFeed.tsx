@@ -2,6 +2,7 @@
 
 import { useConflictFeed, timeAgo, useTick } from '@/lib/hooks';
 import type { ConflictEvent } from '@/types';
+import { withAlpha } from '@/lib/color';
 
 const TYPE_COLORS: Record<string, string> = {
   STRIKE: 'var(--red)',
@@ -51,8 +52,8 @@ export default function ConflictFeed() {
                     className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm"
                     style={{
                       color,
-                      backgroundColor: `${color}15`,
-                      border: `1px solid ${color}30`,
+                      backgroundColor: withAlpha(color, '15'),
+                      border: `1px solid ${withAlpha(color, '30')}`,
                     }}
                   >
                     {event.type}

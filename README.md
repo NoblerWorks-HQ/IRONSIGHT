@@ -45,9 +45,10 @@ Built with Next.js, TypeScript, Tailwind CSS, and Leaflet. **No API keys require
 ## Features
 
 - **Conflict Toggle** — Switch the whole dashboard between the Iran/Israel and Russia/Ukraine theaters; selection persists in the browser
+- **Themes** - Six accent presets (Cyan default, Amber, NVG, Red, Violet, Ice) and a light / dark mode, from the header beside the theater toggle; alert red, ok green and warning amber keep their meaning in every theme
 - **Live Intel Feed** — Per-theater RSS news aggregation with relevance filtering and sports/entertainment noise removal
 - **Telegram OSINT** — Public Telegram channels scraped in real time with auto-translation (Hebrew/Arabic/Farsi and Ukrainian/Russian Cyrillic)
-- **Theater Map** — Interactive Leaflet map with military aircraft, naval vessels, strike markers from news and Telegram, missile trajectory arcs, range rings, country-border overlay, and a distance-measurement tool
+- **Theater Map** — Interactive Leaflet map with military aircraft, naval vessels, strike markers from news and Telegram, missile trajectory arcs, range rings and a distance-measurement tool, over land and borders drawn from bundled Natural Earth data (no tile server)
 - **Live Drone / Missile Tracker** *(Russia/Ukraine)* — Real-time Shahed drone, cruise/ballistic missile, and glide-bomb (KAB) tracks with heading, movement trails, and confidence, rendered on the map and listed in the alert panel
 - **Air-Raid Alert Status** — Israeli Home Front Command (Pikud HaOref) sirens for the Middle East, and Ukrainian oblast air-raid alerts for Eastern Europe, with audio notifications and on-map sirens/arcs
 - **Conflict Monitor** - Categorized events (strike, defense, military, diplomatic, nuclear, drone, report) with per-theater location tagging
@@ -94,8 +95,7 @@ Full feature list and the API route table: [docs/FEATURES.md](docs/FEATURES.md).
 
 | Layer | Provider | License |
 |-------|----------|---------|
-| Dark basemap tiles | [CARTO](https://carto.com/) Dark Matter, data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors | ODbL / CARTO attribution |
-| Country border lines | [Natural Earth](https://www.naturalearthdata.com/) `ne_50m_admin_0_boundary_lines_land` | Public domain |
+| Land, coastlines and country borders | [Natural Earth](https://www.naturalearthdata.com/) 1:50m countries, bundled via [world-atlas](https://github.com/topojson/world-atlas) + [topojson-client](https://github.com/topojson/topojson-client) (no tile server, no key) | Public domain (data), ISC (packages) |
 | Map engine | [Leaflet](https://leafletjs.com/) | BSD-2-Clause |
 
 ### News RSS Feeds
@@ -212,7 +212,7 @@ IRONSIGHT is a **viewer**, not a data owner. Every feed, dataset, headline, aler
 - **Aircraft:** [adsb.lol](https://www.adsb.lol) community ADS-B network
 - **Satellite thermal:** [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/)
 - **Markets / energy:** Yahoo Finance; **crypto:** [CoinGecko](https://www.coingecko.com/); **prediction markets:** [Polymarket](https://polymarket.com/)
-- **Maps:** [Leaflet](https://leafletjs.com/), basemap by [CARTO](https://carto.com/) with data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, borders from [Natural Earth](https://www.naturalearthdata.com/)
+- **Maps:** [Leaflet](https://leafletjs.com/); land, coastlines and borders from [Natural Earth](https://www.naturalearthdata.com/) via [world-atlas](https://github.com/topojson/world-atlas)
 - **Translation:** Google Translate (unofficial endpoint)
 - **Social OSINT:** public Telegram channels, owned by their respective operators
 
@@ -256,7 +256,7 @@ Military aircraft tracking data is provided by [adsb.lol](https://www.adsb.lol) 
 
 ### Map Data Attribution
 
-Basemap tiles © [CARTO](https://carto.com/attribution), map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors. Country boundary lines from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
+Map land, coastlines and country borders from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
 
 ### No Endorsement
 

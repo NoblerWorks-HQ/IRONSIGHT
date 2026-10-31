@@ -48,7 +48,7 @@ export default function FlightsPanel() {
   return (
     <div className="panel h-full flex flex-col">
       <div className="panel-header">
-        <span className="status-dot" style={{ background: 'var(--cyan)' }} />
+        <span className="status-dot" style={{ background: 'var(--accent)' }} />
         MIL AIRSPACE
         <span className="ml-auto text-[9px] text-(--text-secondary) font-normal normal-case tracking-normal">
           {data?.military || 0} mil / {data?.total || 0} total // adsb.lol

@@ -2,13 +2,14 @@
 
 import { useConflictFeed, timeAgo, useTick } from '@/lib/hooks';
 import type { StrikeEvent } from '@/lib/types/api';
+import { withAlpha } from '@/lib/color';
 
 const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
   MISSILE: { icon: '🚀', color: 'var(--red)' },
   INTERCEPTION: { icon: '🛡', color: 'var(--green)' },
   DRONE: { icon: '✈', color: 'var(--amber)' },
   AIRSTRIKE: { icon: '💥', color: 'var(--red)' },
-  ROCKET: { icon: '🎯', color: '#ff6600' },
+  ROCKET: { icon: '🎯', color: 'var(--orange)' },
   STRIKE: { icon: '⚡', color: 'var(--amber)' },
   REPORT: { icon: '📡', color: 'var(--blue)' },
 };
@@ -16,7 +17,7 @@ const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
 const SEVERITY_COLORS: Record<string, string> = {
   low: 'var(--text-secondary)',
   medium: 'var(--amber)',
-  high: '#ff6600',
+  high: 'var(--orange)',
   critical: 'var(--red)',
 };
 
@@ -84,8 +85,8 @@ export default function StrikesPanel() {
                     className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm"
                     style={{
                       color: config.color,
-                      backgroundColor: `${config.color}15`,
-                      border: `1px solid ${config.color}30`,
+                      backgroundColor: withAlpha(config.color, '15'),
+                      border: `1px solid ${withAlpha(config.color, '30')}`,
                     }}
                   >
                     {strike.category}

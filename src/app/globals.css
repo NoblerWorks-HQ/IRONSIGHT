@@ -19,22 +19,146 @@
 }
 
 :root {
+  /* Surfaces (dark mode, the default). */
   --bg-primary: #0a0e17;
+  --bg-primary-rgb: 10, 14, 23;
   --bg-secondary: #111827;
   --bg-panel: #1a1f2e;
   --bg-panel-header: #141924;
-  --border-color: #1e3a5f;
-  --border-glow: #00d4ff;
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
-  --text-accent: #00d4ff;
+  /* Neutral tint for hovers and tracks: white on dark, slate on light. */
+  --tint-rgb: 255, 255, 255;
+
+  /* Accent: chrome only (logo, panel headers, glow lines, toggles, hovers).
+     Each [data-theme] block below overrides --accent, --accent-rgb, --border-color,
+     --border-rgb, --on-accent and --map-border; everything else derives from them. */
+  --accent: #00d4ff;
+  --accent-rgb: 0, 212, 255;
+  --on-accent: #0a0e17;
+  --border-color: #1e3a5f;
+  --border-rgb: 30, 58, 95;
+  --border-glow: var(--accent);
+  --text-accent: var(--accent);
+
+  /* Semantic and data colours: fixed meaning in every accent preset; mode only
+     changes their shade (darker in light mode, for WCAG AA on light panels). */
   --green: #00ff88;
   --red: #ff3366;
   --amber: #ffaa00;
+  --orange: #ff6600;
+  --orange-soft: #ff9955;
   --blue: #00aaff;
   --cyan: #00d4ff;
   --purple: #aa66ff;
+  --neutral-on: #999999;
+  --neutral-on-border: #666666;
+  --alert-flash-lo: rgba(127, 29, 29, 0.3);
+  --alert-flash-hi: rgba(127, 29, 29, 0.6);
+
+  /* Map (drawn from bundled Natural Earth geometry, no tile server). */
+  --map-ocean: #070b12;
+  --map-land: #151b28;
+  --map-coast: #2a3a55;
+  --map-border: #5578a8;
 }
+
+/* Light mode: a light HUD palette, not an inversion. */
+[data-mode="light"] {
+  --bg-primary: #e8edf3;
+  --bg-primary-rgb: 232, 237, 243;
+  --bg-secondary: #f4f6f9;
+  --bg-panel: #ffffff;
+  --bg-panel-header: #eef2f6;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --tint-rgb: 15, 23, 42;
+
+  --accent: #00728a;
+  --accent-rgb: 0, 114, 138;
+  --on-accent: #ffffff;
+  --border-color: #bdcadb;
+  --border-rgb: 189, 202, 219;
+
+  --green: #007a41;
+  --red: #d40035;
+  --amber: #8f5f00;
+  --orange: #b24700;
+  --orange-soft: #b24700;
+  --blue: #006ea6;
+  --cyan: #00728a;
+  --purple: #892bff;
+  --neutral-on: #475569;
+  --neutral-on-border: #94a3b8;
+  /* Kept faint so --red text on the flashing banner stays at AA. */
+  --alert-flash-lo: rgba(212, 0, 53, 0.04);
+  --alert-flash-hi: rgba(212, 0, 53, 0.1);
+
+  --map-ocean: #cdd9e5;
+  --map-land: #f6f8fb;
+  --map-coast: #93a6bd;
+  --map-border: #8aa0bd;
+}
+
+/* Accent presets (ids match ACCENT_PRESETS in src/lib/theme.ts). Cyan is the
+   default and is :root above. Hues that sit next to a semantic colour (amber
+   warning, green ok, red threat, purple/blue data) are paler in dark mode and
+   desaturated in light mode, so the accent never reads as a status. */
+[data-theme="amber"] {
+  --accent: #e6cf7a; --accent-rgb: 230, 207, 122; --on-accent: #0a0e17;
+  --border-color: #51471f; --border-rgb: 81, 71, 31; --map-border: #a89757;
+}
+[data-mode="light"][data-theme="amber"] {
+  --accent: #746941; --accent-rgb: 116, 105, 65; --on-accent: #ffffff;
+  --border-color: #dbd5bd; --border-rgb: 219, 213, 189; --map-border: #b6ac86;
+}
+[data-theme="nvg"] {
+  --accent: #a6ff4d; --accent-rgb: 166, 255, 77; --on-accent: #0a0e17;
+  --border-color: #38511f; --border-rgb: 56, 81, 31; --map-border: #80a857;
+}
+[data-mode="light"][data-theme="nvg"] {
+  --accent: #49751d; --accent-rgb: 73, 117, 29; --on-accent: #ffffff;
+  --border-color: #ccdbbd; --border-rgb: 204, 219, 189; --map-border: #9eb686;
+}
+[data-theme="red"] {
+  --accent: #ff7a5c; --accent-rgb: 255, 122, 92; --on-accent: #0a0e17;
+  --border-color: #51281f; --border-rgb: 81, 40, 31; --map-border: #a86657;
+}
+[data-mode="light"][data-theme="red"] {
+  --accent: #aa4e39; --accent-rgb: 170, 78, 57; --on-accent: #ffffff;
+  --border-color: #dbc2bd; --border-rgb: 219, 194, 189; --map-border: #b68f86;
+}
+[data-theme="violet"] {
+  --accent: #c3a6ff; --accent-rgb: 195, 166, 255; --on-accent: #0a0e17;
+  --border-color: #2f1f51; --border-rgb: 47, 31, 81; --map-border: #7157a8;
+}
+[data-mode="light"][data-theme="violet"] {
+  --accent: #765ab0; --accent-rgb: 118, 90, 176; --on-accent: #ffffff;
+  --border-color: #c7bddb; --border-rgb: 199, 189, 219; --map-border: #9686b6;
+}
+[data-theme="ice"] {
+  --accent: #bfe9ff; --accent-rgb: 191, 233, 255; --on-accent: #0a0e17;
+  --border-color: #1f4051; --border-rgb: 31, 64, 81; --map-border: #578ca8;
+}
+[data-mode="light"][data-theme="ice"] {
+  --accent: #4c6e7f; --accent-rgb: 76, 110, 127; --on-accent: #ffffff;
+  --border-color: #bdd1db; --border-rgb: 189, 209, 219; --map-border: #86a6b6;
+}
+
+/* Light mode: the dark Tailwind tints behind status chips (EMERG, NORDO, NOTABLE,
+   possible-explosion rows, the alert banner) become light washes of the same colour. */
+[data-mode="light"] .bg-red-900\/30 { background-color: rgba(212, 0, 53, 0.1); }
+[data-mode="light"] .bg-red-900\/10 { background-color: rgba(212, 0, 53, 0.05); }
+[data-mode="light"] .border-red-800\/50 { border-color: rgba(212, 0, 53, 0.3); }
+[data-mode="light"] .bg-amber-900\/30 { background-color: rgba(143, 95, 0, 0.1); }
+[data-mode="light"] .bg-purple-900\/30 { background-color: rgba(137, 43, 255, 0.1); }
+
+/* Map land and borders: Leaflet sets SVG presentation attributes, which CSS
+   overrides, so the geometry follows the theme without a redraw. */
+#conflict-map.leaflet-container { background: var(--map-ocean); }
+.map-land { fill: var(--map-land); fill-opacity: 1; stroke: none; }
+.map-coast { stroke: var(--map-coast); stroke-width: 1; fill: none; }
+.map-border { stroke: var(--map-border); stroke-opacity: 0.55; stroke-width: 1; fill: none; }
 
 * {
   scrollbar-width: thin;
@@ -59,8 +183,8 @@ body {
     0deg,
     transparent,
     transparent 2px,
-    rgba(0, 212, 255, 0.015) 2px,
-    rgba(0, 212, 255, 0.015) 4px
+    rgba(var(--accent-rgb), 0.015) 2px,
+    rgba(var(--accent-rgb), 0.015) 4px
   );
   pointer-events: none;
   z-index: 9999;
@@ -127,13 +251,13 @@ body {
 .threat-low { color: var(--green); }
 .threat-guarded { color: var(--blue); }
 .threat-elevated { color: var(--amber); }
-.threat-high { color: #ff6600; }
+.threat-high { color: var(--orange); }
 .threat-critical { color: var(--red); }
 
 /* Alert flash animation */
 @keyframes alert-flash {
-  0%, 100% { background-color: rgba(127, 29, 29, 0.3); }
-  50% { background-color: rgba(127, 29, 29, 0.6); }
+  0%, 100% { background-color: var(--alert-flash-lo); }
+  50% { background-color: var(--alert-flash-hi); }
 }
 
 .alert-flash {
@@ -168,14 +292,14 @@ body {
 
 /* Data table styles */
 .data-row {
-  border-bottom: 1px solid rgba(30, 58, 95, 0.3);
+  border-bottom: 1px solid rgba(var(--border-rgb), 0.3);
   padding: 6px 12px;
   font-size: 12px;
   transition: background 0.15s;
 }
 
 .data-row:hover {
-  background: rgba(0, 212, 255, 0.05);
+  background: rgba(var(--accent-rgb), 0.05);
 }
 
 /* Positive/negative indicators */
@@ -190,7 +314,15 @@ body {
 }
 
 .loading-shimmer {
-  background: linear-gradient(90deg, var(--bg-panel) 25%, rgba(0,212,255,0.08) 50%, var(--bg-panel) 75%);
+  background: linear-gradient(90deg, var(--bg-panel) 25%, rgba(var(--accent-rgb), 0.08) 50%, var(--bg-panel) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* Map credit (Natural Earth), styled to the HUD instead of Leaflet's white box. */
+#conflict-map .leaflet-control-attribution {
+  background: rgba(var(--bg-primary-rgb), 0.7);
+  color: var(--text-secondary);
+  font-size: 8px;
+}
+#conflict-map .leaflet-control-attribution a { color: var(--text-secondary); }
