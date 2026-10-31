@@ -8,7 +8,7 @@ Working task list for **IRONSIGHT**. Read this at the start of a work session an
 
 - [x] 2026-10-31 Patrick ordered every open PR cleared: #32 #41 #43 landed on main, #1 #2 #20 #42 closed with reasons.
 
-- [ ] 2026-11-02 needs Patrick: post the issue close note for #7 and triage replies (#5 #6 #9 #23 #24) from `/home/plw/.cache/ironsight-community-replies-2026-10-28.md` (#8 #25 #26 close with the 10-31 fixes).
+- [ ] 2026-11-02 needs Patrick: post the issue close note for #7 and triage replies (#5 #6 #9 #23 #24) from `/home/plw/.cache/ironsight-community-replies-2026-10-28.md`; close #25 + #26 as fixed by #43 (a6764b0) - #8 auto-closed.
 - [x] 2026-10-31 Dependabot #44-#51 #54 cleared: in-range + xmldom 0.9, ESLint 10, TS 7 (tsc via @typescript/native), Tailwind 4 landed; @types/node held at 22 to match the Node 22 runtime.
 - [ ] 2026-11-30: re-check typescript-eslint TS 7 support (typescript-eslint#10940); when released, drop the `typescript` -> @typescript/typescript6 alias.
 - [ ] Node 26 LTS: move `.nvmrc`, Dockerfile and `@types/node` to 26 together (Dependabot #50 closed 2026-10-31 for the runtime mismatch).
