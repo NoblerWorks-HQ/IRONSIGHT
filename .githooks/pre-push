@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Runs the CI gate before code leaves the machine. GENERATED - canonical source
+# is engineering-standards/scripts/templates/pre-push. See scripts/check-ci-local.mjs
+# for why this exists and what it covers.
+#
+# PRE-PUSH, not pre-commit, on purpose: we commit straight to main/master, often
+# many times an hour. A per-commit gate gets bypassed by the end of the first
+# afternoon; the push boundary runs it once per batch, when the work becomes
+# everyone else's problem.
+#
+# git feeds us "<local ref> <local sha> <remote ref> <remote sha>" on stdin.
+set -uo pipefail
+ROOT="$(git rev-parse --show-toplevel)"
+Z="0000000000000000000000000000000000000000"
+
+# EVERY pushed ref is gated, not just the first: `git push origin a b` or `--all`
+# used to run the gate for the first ref only and let the rest through unchecked.
+# A ref whose sha was already gated in this push is not run twice.
+refs=()
+while read -r _lref lsha _rref rsha; do
+    [ "$lsha" = "$Z" ] && continue                 # branch deletion, nothing to check
+    r=""
+    [ "$rsha" = "$Z" ] || r="${rsha}..${lsha}"     # new branch => empty => check everything
+    refs+=("${r}|${lsha}|${_rref}")
+done
+
+command -v node >/dev/null 2>&1 || {
+    echo "[local-ci] UNCHECKED: node not on PATH - refusing to report a pass." >&2; exit 1; }
+
+# The pushed sha lets the gate refuse its pass cache when the commit being
+# pushed is not the checkout it is about to test. The remote ref is the branch
+# GitHub will see: the gate stands down only if ci.yml runs on a push to it.
+# A push that only deletes refs has nothing to gate by ref; keep the old behaviour of
+# one gate run with no arguments.
+[ "${#refs[@]}" -eq 0 ] && refs=("||")
+seen=" "
+for entry in "${refs[@]}"; do
+    IFS='|' read -r range pushed rref <<<"$entry"
+    if [ -n "$pushed" ]; then
+        case "$seen" in *" $pushed "*) continue ;; esac
+        seen="$seen$pushed "
+    fi
+    node "$ROOT/scripts/check-ci-local.mjs" "$range" "$pushed" "$rref" || exit $?
+done
+exit 0

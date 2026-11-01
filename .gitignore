@@ -30,3 +30,8 @@ Thumbs.db
 # claude code
 .claude/
 graphify-out/
+
+# Local CI pass marker (scripts/ci-local-verdict.sh) - per-machine, never committed
+.local-ci-pass.json
+# Local CI pass cache (scripts/check-ci-local.mjs) - per-machine, never committed
+.local-ci-cache.json
