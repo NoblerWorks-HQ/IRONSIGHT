@@ -66,3 +66,6 @@ _None tracked yet - add items as `- [ ] task`, grouped by priority or theme. Mar
 - [ ] `src/app/page.tsx` footer names GDELT/OPENSKY/OCHA feeds no route uses, and shows polling "5s / 2m / 5m" (real: 15 s / 90 s / 10 min)
 - [ ] Iran/Israel clock labelled "MSK" uses `Asia/Shanghai` with a China flag
 - [ ] Header THREAT LEVEL is hard-coded "ELEVATED"
+
+## Public API ideas (2026-11-01) - from github.com/public-apis/public-apis; check license + commercial terms before use
+- [ ] GDELT, USGS earthquake feed, NASA FIRMS fires: free, no key, fit the OSINT terminal.
