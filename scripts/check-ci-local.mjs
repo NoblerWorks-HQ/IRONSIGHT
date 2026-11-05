@@ -118,6 +118,18 @@
  * LOCAL_CI_TMPDIR), so jest's cache and every test's mkdtemp land on disk.
  * Entries untouched for 14 days are pruned at gate start.
  *
+ * RELATED TESTS FIRST (2026-11-05). In 14 days, 89 failed gates took over 5 minutes
+ * each (20 h) to report a failure in code the change usually touched. Before a full
+ * jest/vitest step the gate runs the tests related to the changed files, plus what
+ * failed last time. Red stops there; green or inconclusive runs the full step, so a
+ * pass proves exactly what it always did. A step given `relatedCmd` runs that instead
+ * (`$LOCAL_CI_BASE` = the commit to compare with). Capped by relatedTimeoutS (120).
+ * Opt out: "relatedFirst": false, or LOCAL_CI_NO_RELATED=1.
+ *
+ * ONE SLOT STAYS FREE OF LOOPS (2026-11-05). A run with LOCAL_CI_LOOP=1, or from a
+ * checkout under ~/.cache/loops, never takes slot 1, so unattended work can't hold
+ * every slot while someone is waiting on a fix.
+ *
  * THE MACHINE-WIDE GATE QUEUE (2026-10-15). At most LOCAL_CI_SLOTS (default 2)
  * gates, across every repo and session on this machine, run their steps at once:
  * each takes a `flock` on ~/.cache/local-ci/slot-<n>.lock before its first
@@ -231,6 +243,38 @@ const LOCK_NAMES = ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'bun.loc
 // The two hashes the pass marker pins. Defined once and used by BOTH the
 // writer (end of this file) and the --verdict reader below, so the check can
 // never drift from the thing it checks.
+// The marker is also kept per commit in git's common dir (2026-11-05), which every
+// worktree of a clone shares, because a marker in one checkout was invisible to the
+// deploy in another: half of all gates run in worktrees, and nobler-os main had 290
+// passes in 14 days with its own marker 6 days old. Same hashes, same checks.
+const MARKER_KEEP = 200;
+const sharedMarkerDir = () => {
+  const c = gitOut(['rev-parse', '--path-format=absolute', '--git-common-dir']);
+  return c ? join(c, 'local-ci-pass') : null;
+};
+/** The nearest marker at or behind `head` in this clone, else this checkout's own. */
+function findMarker(head) {
+  const d = sharedMarkerDir();
+  if (d && existsSync(d)) {
+    for (const sha of gitOut(['rev-list', `--max-count=${MARKER_KEEP}`, head]).split('\n').filter(Boolean)) {
+      const m = readJson(join(d, `${sha}.json`));
+      if (m) return m;
+    }
+  }
+  return readJson(join(ROOT, '.local-ci-pass.json'));
+}
+function writeSharedMarker(marker) {
+  const d = sharedMarkerDir();
+  if (!d) return;
+  mkdirSync(d, { recursive: true });
+  writeFileSync(join(d, `${marker.sha}.json`), JSON.stringify(marker) + '\n');
+  const names = readdirSync(d);
+  if (names.length > MARKER_KEEP) {
+    names.map((n) => [n, statSync(join(d, n)).mtimeMs]).sort((a, b) => a[1] - b[1])
+      .slice(0, names.length - MARKER_KEEP).forEach(([n]) => rmSync(join(d, n), { force: true }));
+  }
+}
+
 const lockHash = () =>
   hashOf(dirs.flatMap((d) => LOCK_NAMES.map((n) => join(ROOT, d, n))));
 const gateHash = () =>
@@ -268,7 +312,7 @@ if (process.argv.includes('--verdict')) {
   const head = gitOut(['rev-parse', 'HEAD']);
   if (!head) no('cannot resolve HEAD.');
 
-  const m = readJson(join(ROOT, '.local-ci-pass.json'));
+  const m = findMarker(head);
   if (!m) no('no pass marker (this gate has not passed here for a clean tree).');
   if (m.v !== 1) no(`marker version ${JSON.stringify(m.v)} is not one this script understands.`);
   // DOCS-ONLY COMMITS CARRY THE MARKER FORWARD (2026-09-24). A `TODO.md` line
@@ -572,6 +616,26 @@ const PICK = [
   { key: 'build',     names: ['build'],                                      mode: 'block' },
 ];
 
+/**
+ * How to run a step's related tests, or null. Only a script that is literally
+ * `[ENV=x ...] jest|vitest <flags>` qualifies; turbo and chains declare `relatedCmd`.
+ */
+function relatedRunner(script, cwd) {
+  const m = script.match(/^((?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*)(jest|vitest)(\s.*)?$/);
+  if (!m || !existsSync(join(cwd, 'node_modules', '.bin', m[2]))) return null;
+  const env = {};
+  for (const kv of (m[1] || '').trim().split(/\s+/).filter(Boolean)) {
+    const i = kv.indexOf('='); env[kv.slice(0, i)] = kv.slice(i + 1);
+  }
+  const words = (m[3] || '').trim().split(/\s+/).filter(Boolean);
+  const keep = [];
+  words.forEach((w, i) => {
+    if (/^--config=/.test(w) || /^--testTimeout=/.test(w)) keep.push(w);
+    else if ((w === '--config' || w === '-c') && words[i + 1]) keep.push(w, words[i + 1]);
+  });
+  return { runner: m[2], env, keep };
+}
+
 const steps = [];
 const missingPkg = [];
 for (const d of dirs) {
@@ -611,6 +675,7 @@ for (const d of dirs) {
       // that is literally `[ENV=x ...] jest <flags>` is rewritten; anything else
       // (turbo, vitest, a chain) runs as written. `--runInBand` must be REMOVED
       // rather than overridden: jest lets it win over --maxWorkers.
+      if (key === 'test' && typeof scripts[hit] === 'string') step.related = relatedRunner(scripts[hit], abs);
       const m = key === 'test' && jestWorkers > 1 && typeof scripts[hit] === 'string'
         ? scripts[hit].match(/^((?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*)jest(\s.*)?$/) : null;
       const bin = join(abs, 'node_modules', '.bin', 'jest');
@@ -651,6 +716,7 @@ for (const s of extraSteps) {
     // reads sibling repos, so a tree hash of this one can never vouch for it.
     inputs: Array.isArray(s.inputs) ? [s.dir || '.', ...s.inputs] : null,
     timeoutMin: s.timeoutMin,
+    relatedCmd: s.relatedCmd,
   });
 }
 
@@ -802,6 +868,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const secs = (ms) => (ms / 1000).toFixed(0);
 
 const results = new Map(); // label -> { state: pass|warn|fail|unchecked|cached, seconds, at? }
+const relatedRuns = new Map(); // label -> { s, outcome, files? }
 const failed = [], warned = [];
 const running = new Set();
 let lastStart = 0;
@@ -858,6 +925,8 @@ const NO_QUEUE = process.env.LOCAL_CI_NO_QUEUE === '1' ? 'LOCAL_CI_NO_QUEUE=1'
   : null;
 const CPUS = cpus().length || 1;
 const REPO = COMMON_DIR && basename(COMMON_DIR) === '.git' ? basename(dirname(COMMON_DIR)) : basename(ROOT);
+const IS_LOOP = process.env.LOCAL_CI_LOOP === '1' || /\/\.cache\/loops\//.test(ROOT);
+const FIRST_SLOT = IS_LOOP && SLOTS > 1 ? 2 : 1;
 const pidAlive = (pid) => {
   if (!Number.isInteger(pid) || pid <= 0) return false;
   try { process.kill(pid, 0); return true; } catch (e) { return e.code === 'EPERM'; }
@@ -924,7 +993,7 @@ async function acquireSlot() {
   let said = false, useFlock = true;
   for (;;) {
     const limit = SLOTS + (burstOpen() ? BURST_SLOTS : 0);
-    for (let n = 1; n <= limit && !slot; n++) {
+    for (let n = FIRST_SLOT; n <= limit && !slot; n++) {
       if (useFlock) {
         const r = await tryFlock(join(QUEUE_DIR, `slot-${n}.lock`));
         if (r === 'noflock') {
@@ -973,7 +1042,7 @@ const startLoad = +loadavg()[0].toFixed(2);
 const startFreeMB = Math.round(freemem() / 1048576);
 
 let recorded = false;
-function recordRun(outcome) {
+function recordRun(outcome, signal) {
   if (recorded) return;
   recorded = true;
   try {
@@ -981,7 +1050,15 @@ function recordRun(outcome) {
     appendFileSync(join(QUEUE_DIR, 'runs.jsonl'), JSON.stringify({
       v: 1, repo: REPO, root: ROOT, sha: head || null,
       start: new Date(t0).toISOString(), wallS: +((Date.now() - t0) / 1000).toFixed(1), outcome,
-      steps: Object.fromEntries([...results].map(([l, r]) => [l, { s: r.ms != null ? +(r.ms / 1000).toFixed(1) : r.seconds, state: r.state }])),
+      steps: Object.fromEntries([...results].map(([l, r]) => [l, {
+        s: r.ms != null ? +(r.ms / 1000).toFixed(1) : r.seconds, state: r.state,
+        ...(r.err ? { err: r.err } : {}), ...(r.tests?.length ? { tests: r.tests } : {}),
+      }])),
+      related: Object.fromEntries(relatedRuns),
+      // What the 2026-11-05 review could not tell apart: a fail-then-pass on one
+      // commit is a flake, an uncommitted fix or another session's edit.
+      trigger: range || pushedSha ? 'push' : 'hand', dirty: dirtyUnder().length, loop: IS_LOOP,
+      ...(signal ? { signal } : {}),
       running: [...running].map((r) => r.label),
       load1: startLoad, cpus: CPUS, freeMB: startFreeMB,
       slotWaitS, slot: slot?.n ?? null, slots: NO_QUEUE ? 0 : SLOTS, niceness: appliedNice,
@@ -991,7 +1068,7 @@ function recordRun(outcome) {
 for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
   process.on(sig, () => {
     for (const r of running) killTree(r.child, sig);
-    recordRun('killed');
+    recordRun('killed', sig);
     releaseSlot();
     process.exit(128 + (osConstants.signals[sig] || 1));
   });
@@ -1089,6 +1166,7 @@ function runStep(s, key) {
       } else if (code === 0) {
         printResult(s.label, `${C.g}pass${C.n} ${C.d}(${dt}s${how ? `, ${how}` : ''})${C.n}`);
         results.set(s.label, { state: 'pass', seconds: +dt });
+        if (s.related) setLastFailed(s.label, []);
         if (key) cache[key] = { label: s.label, at: new Date().toISOString(), seconds: +dt, sha: head };
       } else if (s.mode === 'warn') {
         printResult(s.label, `${C.y}warn${C.n} ${C.d}(${dt}s)${C.n}`);
@@ -1097,7 +1175,9 @@ function runStep(s, key) {
       } else {
         printResult(s.label, `${C.r}FAIL${C.n} ${C.d}(${dt}s)${C.n}`);
         failed.push(s.label);
-        results.set(s.label, { state: 'fail', seconds: +dt });
+        const digest = failureDigest(tail);
+        results.set(s.label, { state: 'fail', seconds: +dt, ...digest });
+        if (s.related) setLastFailed(s.label, digest.tests);
         console.log(tail.trimEnd().split('\n').slice(-25).map((l) => `      ${l}`).join('\n'));
       }
       const r = results.get(s.label);
@@ -1107,6 +1187,95 @@ function runStep(s, key) {
     child.on('error', (err) => finish(null, err, null));
     child.on('close', (code, signal) => finish(code, null, signal));
   });
+}
+
+const ANSI = /\u001b\[[0-9;]*m/g;
+/** What a human needs from a red step's output. Bookkeeping only: never decides a verdict. */
+function failureDigest(text) {
+  const lines = String(text).replace(ANSI, '').split('\n');
+  const tests = [...new Set(lines.map((l) => l.match(/^\s*(?:FAIL|×|❯)\s+(\S+?\.(?:test|spec)\.[cm]?[jt]sx?)/)?.[1]).filter(Boolean))].slice(0, 20);
+  const first = lines.find((l) => /\b(?:error|failed|failure|exception|assert\w*)\b|[✕●×]/i.test(l))?.trim().slice(0, 200) ?? null;
+  return { err: first, tests };
+}
+
+const LASTFAIL_FILE = COMMON_DIR ? join(COMMON_DIR, 'local-ci-lastfail.json') : null;
+function lastFailed(label) { return (LASTFAIL_FILE && readJson(LASTFAIL_FILE)?.[label]) || []; }
+function setLastFailed(label, tests) {
+  if (!LASTFAIL_FILE) return;
+  try {
+    const all = readJson(LASTFAIL_FILE) || {};
+    if (tests.length) all[label] = tests; else if (all[label]) delete all[label]; else return;
+    const tmp = `${LASTFAIL_FILE}.${process.pid}.tmp`;
+    writeFileSync(tmp, JSON.stringify(all) + '\n');
+    renameSync(tmp, LASTFAIL_FILE);
+  } catch { /* bookkeeping never fails a gate */ }
+}
+
+const RELATED_OFF = process.env.LOCAL_CI_NO_RELATED === '1' || cfg.relatedFirst === false;
+const RELATED_TIMEOUT_S = Number(process.env.LOCAL_CI_RELATED_TIMEOUT_S) || cfg.relatedTimeoutS || 120;
+const RELATED_MAX_FILES = 200;
+const CODE_FILE = /\.(?:[cm]?[jt]sx?|json|snap)$/;
+/** The commit a push is compared with: the hook's range, else the upstream's merge base. */
+function relatedBase() {
+  const fromRange = range.split('..')[0];
+  if (/^[0-9a-f]{40}$/.test(fromRange)) return fromRange;
+  return gitOut(['merge-base', 'HEAD', '@{u}']) || '';
+}
+
+/** Runs a step's related tests. True = red, the step is reported failed and the full run skipped. */
+async function runRelatedFirst(s) {
+  if (RELATED_OFF || (!s.related && !s.relatedCmd)) return false;
+  const base = relatedBase();
+  let cmd, args, env = {}, files = 0;
+  if (s.relatedCmd) {
+    if (!base) return false;
+    cmd = 'bash'; args = ['-c', s.relatedCmd]; env = { LOCAL_CI_BASE: base };
+  } else {
+    const changed = base ? gitOut(['diff', '--name-only', base, 'HEAD']).split('\n').filter(Boolean) : [];
+    const within = changed.map((f) => join(ROOT, f))
+      .filter((f) => CODE_FILE.test(f) && existsSync(f) && !relative(s.cwd, f).startsWith('..'));
+    const prior = lastFailed(s.label).map((f) => resolve(s.cwd, f)).filter(existsSync);
+    const list = [...new Set([...prior, ...within])];
+    files = list.length;
+    if (!files || files > RELATED_MAX_FILES) return false;
+    const r = s.related;
+    env = r.env;
+    cmd = join('node_modules', '.bin', r.runner);
+    args = r.runner === 'jest'
+      ? [...r.keep, '--findRelatedTests', ...list, '--passWithNoTests', '--coverage=false', `--maxWorkers=${Math.max(jestWorkers, 1)}`, '--workerIdleMemoryLimit=1GB']
+      : ['related', ...list, '--run', '--passWithNoTests', '--coverage.enabled=false', ...r.keep];
+  }
+  const st = Date.now();
+  const entry = { label: `${s.label} (related)`, st, child: null };
+  running.add(entry);
+  const result = await new Promise((done) => {
+    let out = '';
+    const keep = (b) => { out = (out + b.toString('utf8')).slice(-TAIL_BYTES); };
+    const child = spawn(cmd, args, { cwd: s.cwd, env: stepEnv(env), detached: process.platform !== 'win32', stdio: ['ignore', 'pipe', 'pipe'] });
+    entry.child = child;
+    let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; killTree(child, 'SIGTERM'); setTimeout(() => killTree(child, 'SIGKILL'), 5000).unref(); }, RELATED_TIMEOUT_S * 1000);
+    timer.unref();
+    child.stdout.on('data', keep);
+    child.stderr.on('data', keep);
+    child.on('error', () => { clearTimeout(timer); done({ code: null, out, timedOut }); });
+    child.on('close', (code, signal) => { clearTimeout(timer); done({ code: signal ? null : code, out, timedOut }); });
+  });
+  running.delete(entry);
+  const ms = Date.now() - st;
+  const digest = failureDigest(result.out);
+  // Fail-safe: only a run that exited non-zero AND named a failing test (or a
+  // declared relatedCmd that exited non-zero on its own) stops the gate. A timeout,
+  // a signal, a config error or a missing tool says nothing, so the full step runs.
+  const red = !result.timedOut && result.code && (s.relatedCmd || digest.tests.length);
+  relatedRuns.set(s.label, { s: +(ms / 1000).toFixed(1), outcome: result.timedOut ? 'timeout' : red ? 'red' : result.code === 0 ? 'green' : 'inconclusive', files });
+  if (!red) return false;
+  printResult(s.label, `${C.r}FAIL${C.n} ${C.d}(related tests, ${secs(ms)}s; full step not run - LOCAL_CI_NO_RELATED=1 runs it)${C.n}`);
+  failed.push(s.label);
+  results.set(s.label, { state: 'fail', seconds: +secs(ms), ms, ...digest });
+  setLastFailed(s.label, digest.tests);
+  console.log(result.out.trimEnd().split('\n').slice(-25).map((l) => `      ${l}`).join('\n'));
+  return true;
 }
 
 async function runLane(queue) {
@@ -1121,6 +1290,7 @@ async function runLane(queue) {
     }
     if (s.lane !== '(early)') await ensureSlot();
     await memoryTurn();
+    if (await runRelatedFirst(s)) continue;
     await runStep(s, key);
   }
 }
@@ -1297,6 +1467,7 @@ try {
       cached: [...results].filter(([, r]) => r.state === 'cached').map(([l]) => l).sort(),
     };
     writeFileSync(join(ROOT, '.local-ci-pass.json'), JSON.stringify(marker, null, 2) + '\n');
+    writeSharedMarker(marker);
     console.log(`${C.d}[local-ci] pass marker written for ${head.slice(0, 8)} - deploy preflight may reuse it${C.n}`);
   }
 } catch {
