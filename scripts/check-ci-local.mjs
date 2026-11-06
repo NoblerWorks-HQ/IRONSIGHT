@@ -118,6 +118,21 @@
  * LOCAL_CI_TMPDIR), so jest's cache and every test's mkdtemp land on disk.
  * Entries untouched for 14 days are pruned at gate start.
  *
+ * FAST TIER (2026-11-06). Every package's typecheck and lint run after the early steps and
+ * before anything else. Any red there is reported with every other fast failure and the
+ * rest is not started: on 2026-11-05/06, 15 of 52 failed gates failed one of these, and
+ * one spent 98 s on coverage after typecheck went red at 12 s. They keep a gate slot, since
+ * they are too heavy for the unqueued early lane. LOCAL_CI_KEEP_GOING=1 runs everything.
+ * LOCAL_CI_FAST_ONLY=1 runs only the early and fast steps, writes no pass marker, and exits
+ * 20 on a red check (`ship` runs this before queuing a commit); the pass cache still applies.
+ *
+ * PRE-QUEUE TESTS (2026-11-06). 26 of 32 failed gates on 11-06 were on commits that never
+ * passed, and a failing test turned a batch of 7 red for 23 minutes. So fast-only also runs
+ * test steps the commit touches: the related tests of a step that has them (never its full
+ * run, which stays with the batch gate), and in full a step marked "precheck": true.
+ * Untouched steps do not run. LOCAL_CI_PRECHECK_BASE is the commit to compare with; with no
+ * base nothing counts as touched, so this tier can only ever add a catch, never a false red.
+ *
  * RELATED TESTS FIRST (2026-11-05). In 14 days, 89 failed gates took over 5 minutes
  * each (20 h) to report a failure in code the change usually touched. Before a full
  * jest/vitest step the gate runs the tests related to the changed files, plus what
@@ -664,7 +679,10 @@ for (const d of dirs) {
       ?? (ciScripts.size ? null : names.find((n) => scripts[n]));
     if (hit) {
       const inputs = inputsCfg[`${d}:${key}`] ?? inputsCfg[d] ?? ['.'];
-      const step = { label: label(hit), cmd: pm, args: ['run', hit], cwd: abs, mode, lane: d, inputs: [d, ...inputs] };
+      // The root lane's own dir is the whole tree, so a declared non-empty list REPLACES it there.
+      const step = { label: label(hit), cmd: pm, args: ['run', hit], cwd: abs, mode, lane: d,
+        fast: key === 'typecheck' || key === 'lint',
+        inputs: d === '.' && inputs.length ? inputs : [d, ...inputs] };
       // ── two workers (2026-09-13) ─────────────────────────────────────────
       // Rule 1 keeps `--runInBand` in every test SCRIPT: CI and deploys run it
       // serially and nothing there changes. This gate runs at every push, on a
@@ -714,10 +732,20 @@ for (const s of extraSteps) {
     lane: s.early ? '(early)' : '(extra)',
     // Cached only when the manifest says what the command reads. `fleet parity`
     // reads sibling repos, so a tree hash of this one can never vouch for it.
-    inputs: Array.isArray(s.inputs) ? [s.dir || '.', ...s.inputs] : null,
+    inputs: !Array.isArray(s.inputs) ? null
+      : (s.dir || '.') === '.' && s.inputs.length ? s.inputs : [s.dir || '.', ...s.inputs],
     timeoutMin: s.timeoutMin,
     relatedCmd: s.relatedCmd,
+    precheck: s.precheck === true,
   });
+}
+
+const FAST_ONLY = process.env.LOCAL_CI_FAST_ONLY === '1';
+if (FAST_ONLY) {
+  const keep = steps.filter((s) => s.fast || s.lane === '(early)' || s.precheck || s.related || s.relatedCmd);
+  steps.length = 0;
+  steps.push(...keep);
+  if (!steps.length) { console.log('[local-ci] fast only: this repo has no fast steps'); process.exit(0); }
 }
 
 // ── refuse to report a pass we did not earn ──────────────────────────────────
@@ -1057,7 +1085,7 @@ function recordRun(outcome, signal) {
       related: Object.fromEntries(relatedRuns),
       // What the 2026-11-05 review could not tell apart: a fail-then-pass on one
       // commit is a flake, an uncommitted fix or another session's edit.
-      trigger: range || pushedSha ? 'push' : 'hand', dirty: dirtyUnder().length, loop: IS_LOOP,
+      trigger: FAST_ONLY ? 'precheck' : range || pushedSha ? 'push' : 'hand', dirty: dirtyUnder().length, loop: IS_LOOP,
       ...(signal ? { signal } : {}),
       running: [...running].map((r) => r.label),
       load1: startLoad, cpus: CPUS, freeMB: startFreeMB,
@@ -1217,6 +1245,7 @@ const RELATED_MAX_FILES = 200;
 const CODE_FILE = /\.(?:[cm]?[jt]sx?|json|snap)$/;
 /** The commit a push is compared with: the hook's range, else the upstream's merge base. */
 function relatedBase() {
+  if (process.env.LOCAL_CI_PRECHECK_BASE) return process.env.LOCAL_CI_PRECHECK_BASE;
   const fromRange = range.split('..')[0];
   if (/^[0-9a-f]{40}$/.test(fromRange)) return fromRange;
   return gitOut(['merge-base', 'HEAD', '@{u}']) || '';
@@ -1278,8 +1307,21 @@ async function runRelatedFirst(s) {
   return true;
 }
 
+/** Fast-only: does this commit change what a test step reads? Docs do not count. */
+function touchedByCommit(s) {
+  const base = relatedBase();
+  if (!base || !s.inputs) return false;
+  return gitOut(['diff', '--name-only', base, 'HEAD', '--', ...s.inputs, ':(exclude,glob)**/*.md']).trim() !== '';
+}
+
 async function runLane(queue) {
   for (const s of queue) {
+    const preQueueTest = FAST_ONLY && !s.fast && s.lane !== '(early)';
+    if (preQueueTest && failed.length) continue; // Already red: the ship stops, so finish sooner.
+    if (preQueueTest && !touchedByCommit(s)) {
+      results.set(s.label, { state: 'untouched', seconds: 0 });
+      continue;
+    }
     const { key } = stepKey(s);
     const hit = key && cache[key];
     if (hit) {
@@ -1291,20 +1333,28 @@ async function runLane(queue) {
     if (s.lane !== '(early)') await ensureSlot();
     await memoryTurn();
     if (await runRelatedFirst(s)) continue;
+    if (preQueueTest && !s.precheck) {
+      // Green or inconclusive: the full run belongs to the batch gate.
+      printResult(s.label, `${C.d}related tests not red; the batch gate runs the full step${C.n}`);
+      results.set(s.label, { state: 'related-only', seconds: 0 });
+      continue;
+    }
     await runStep(s, key);
   }
 }
 
 const lanes = new Map();
+const fastLanes = new Map();
 for (const s of steps) {
   const lane = s.lane === '(early)' ? '(early)' : parallel ? s.lane : 'serial';
-  if (!lanes.has(lane)) lanes.set(lane, []);
-  lanes.get(lane).push(s);
+  const into = s.fast ? fastLanes : lanes;
+  if (!into.has(lane)) into.set(lane, []);
+  into.get(lane).push(s);
 }
 const packageLanes = [...lanes].filter(([k]) => k !== '(extra)' && k !== '(early)').map(([, q]) => q);
 const extraLane = lanes.get('(extra)');
 const earlyLane = lanes.get('(early)');
-console.log(`${C.d}           ${steps.length} steps, ${earlyLane ? `${earlyLane.length} early check(s) first, then ` : ''}${parallel ? `${packageLanes.length} package lane(s) side by side, extra steps after` : 'one at a time'}${C.n}`);
+console.log(`${C.d}           ${steps.length} steps, ${earlyLane ? `${earlyLane.length} early check(s) first, then ` : ''}${fastLanes.size ? 'typecheck + lint, then ' : ''}${parallel ? `${packageLanes.length} package lane(s) side by side, extra steps after` : 'one at a time'}${C.n}`);
 console.log('');
 
 // A long silent step is indistinguishable from a hung one. Say what is running.
@@ -1314,9 +1364,11 @@ const heartbeat = setInterval(() => {
 }, HEARTBEAT_MS);
 let notRun = [];
 if (earlyLane) await runLane(earlyLane);
-if (earlyLane && failed.length && process.env.LOCAL_CI_KEEP_GOING !== '1') {
+const stopHere = () => failed.length && process.env.LOCAL_CI_KEEP_GOING !== '1';
+if (!stopHere()) await Promise.all([...fastLanes.values()].map(runLane));
+if (stopHere()) {
   notRun = steps.filter((s) => !results.has(s.label)).map((s) => s.label);
-  console.log(`${C.y}  an early check failed - not starting the other ${notRun.length} step(s)${C.n}`);
+  console.log(`${C.y}  a fast check failed - not starting the other ${notRun.length} step(s)${C.n}`);
 } else {
   await Promise.all(packageLanes.map(runLane));
   if (extraLane) await runLane(extraLane);
@@ -1402,10 +1454,11 @@ for (const [label, r] of results) {
 if (warned.length) console.log(`${C.y}[local-ci] warnings (not blocking): ${warned.join(', ')}${C.n}`);
 if (failed.length) {
   console.log(`${C.r}[local-ci] FAILED in ${total}s: ${failed.join(', ')}${C.n}`);
-  if (notRun.length) console.log(`${C.y}           NOT RUN (an early check failed first): ${notRun.join(', ')} - LOCAL_CI_KEEP_GOING=1 runs them anyway${C.n}`);
+  if (notRun.length) console.log(`${C.y}           NOT RUN (a fast check failed first): ${notRun.join(', ')} - LOCAL_CI_KEEP_GOING=1 runs them anyway${C.n}`);
   console.log(`${C.y}           Push blocked. Fix, or bypass with: git push --no-verify${C.n}`);
-  process.exit(1);
+  process.exit(FAST_ONLY && [...results.values()].some((r) => r.state === 'fail') ? 20 : 1);
 }
+if (FAST_ONLY) { console.log(`${C.g}[local-ci] fast checks passed in ${total}s${C.n}`); process.exit(0); }
 console.log(`${C.g}[local-ci] gate passed in ${total}s${C.n}`);
 
 // ─────────────────────────────────────────────────────────────────────────────
