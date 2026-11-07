@@ -33,6 +33,7 @@ jobs:
             --accept 200,206,403,429,999
             --exclude-loopback
             --scheme https
+            --exclude-path site/404.html
             './site/*.html'
             './README.md'
           fail: false

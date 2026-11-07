@@ -207,7 +207,7 @@ Each conflict is a config object under `src/lib/conflicts/` describing everythin
 IRONSIGHT is a **viewer**, not a data owner. Every feed, dataset, headline, alert, track, tile, and post surfaced by this dashboard is the property of its respective provider and is used here, unmodified in substance, purely to point back to the original source. We claim **no ownership or credit** for any third-party data or open-source project listed below, and we are grateful to the people and communities who make them freely available:
 
 - **News:** the news organizations and wire services listed above, via their public RSS feeds
-- **Air-raid alerts:** [Pikud HaOref](https://www.oref.org.il/) via the community Tzeva Adom mirror; Ukrainian oblast alerts via [alerts.com.ua](https://alerts.com.ua/)
+- **Air-raid alerts:** [Pikud HaOref](https://www.oref.org.il/) via the community Tzeva Adom mirror; Ukrainian oblast alerts via [alerts.com.ua](https://alerts.com.ua/api/states)
 - **Drone / missile tracking:** [Neptun](https://neptun.in.ua/) (neptun.in.ua)
 - **Aircraft:** [adsb.lol](https://www.adsb.lol) community ADS-B network
 - **Satellite thermal:** [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/)

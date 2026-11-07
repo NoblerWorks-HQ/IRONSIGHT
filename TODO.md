@@ -16,7 +16,7 @@ Working task list for **IRONSIGHT**. Read this at the start of a work session an
 - [x] 2026-10-31 App favicon (`src/app/icon.svg`, `apple-icon.png`, `favicon.ico`) and colour themes (6 accents x light/dark) landed; AA pinned by `tests/theme-contrast.test.mjs`.
 - [ ] low - Dark alert banner: `--red` on the flashing `alert-flash` peak is 3.67:1 (below AA, pre-existing; kept for the pixel-identical default). Lighter peak or brighter text.
 - [ ] low - Header overflows below ~1440 px wide (THREAT LEVEL runs into THEATER; pre-existing at 1366, the theme control adds ~60 px): let MetricsBar shrink or drop tiles.
-- [ ] Link check #53: README alerts.com.ua is 404; `site/404.html` root-relative links are a lychee false positive (needs a root dir). Close #52 as superseded.
+- [x] 2026-11-06 README alerts link now the live API; `site/404.html` excluded from lychee (root-relative false positive); #52 closed as superseded.
 
 
 ## Domain (2026-10-21)
@@ -63,8 +63,8 @@ _None tracked yet - add items as `- [ ] task`, grouped by priority or theme. Mar
 - [x] 2026-10-20 relock (loop): postcss-selector-parser 6.1.4 -> 7.1.6 (#63) ✅ 2026-10-28 held, no override: tailwind 3 + postcss-nested need ^6; advisory withdrawn (410). <!-- relock:#63 -->
 
 ## Code mismatches found by the docs pass (2026-10-30) - [FEATURES.md](docs/FEATURES.md)
-- [ ] `src/app/page.tsx` footer names GDELT/OPENSKY/OCHA feeds no route uses, and shows polling "5s / 2m / 5m" (real: 15 s / 90 s / 10 min)
-- [ ] Iran/Israel clock labelled "MSK" uses `Asia/Shanghai` with a China flag
+- [x] 2026-11-06 footer lists only real feeds and real polling (15 s / 90 s / 10 min); alerts panel text too.
+- [x] 2026-11-06 Iran/Israel clock relabelled BJS (zone and flag were already China).
 - [ ] Header THREAT LEVEL is hard-coded "ELEVATED"
 
 ## Public API ideas (2026-11-01) - from github.com/public-apis/public-apis; check license + commercial terms before use

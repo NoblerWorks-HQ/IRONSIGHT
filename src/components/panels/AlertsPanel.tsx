@@ -195,7 +195,7 @@ export default function AlertsPanel() {
               No active alerts from {alertSystemName}
             </div>
             <div className="text-[8px] text-(--text-secondary) mt-2">
-              Polling every 5s • Last: {data?.lastChecked ? new Date(data.lastChecked).toLocaleTimeString() : '...'}
+              Polling every 15s • Last: {data?.lastChecked ? new Date(data.lastChecked).toLocaleTimeString() : '...'}
             </div>
             <div className="text-[8px] mt-1" style={{ color: soundEnabled ? 'var(--accent)' : 'var(--text-secondary)' }}>
               Sound: {soundEnabled ? 'ON' : 'OFF'} {!hasInteracted && soundEnabled ? '(click anywhere to enable)' : ''}

@@ -140,9 +140,9 @@ export default function Dashboard() {
 
       {/* Bottom status bar */}
       <footer className="border-t border-(--border-color) bg-(--bg-secondary) px-4 py-1 flex items-center justify-between text-[9px] text-(--text-secondary) shrink-0">
-        <span>FEEDS: NEWS | GDELT | TELEGRAM | OPENSKY | OCHA | YAHOO FIN | {config.client.alertSystemName.toUpperCase()} | NASA FIRMS | ADSB.LOL</span>
+        <span>FEEDS: NEWS | TELEGRAM | YAHOO FIN | {config.client.alertSystemName.toUpperCase()} | NASA FIRMS | ADSB.LOL</span>
         <div className="flex items-center gap-4">
-          <span>ALERTS: 5s | NEWS: 2m | MARKETS: 5m</span>
+          <span>ALERTS: 15s | NEWS: 90s | MARKETS: 10m</span>
           <span>ALL DATA: PUBLIC / OSINT</span>
           <span>CLASSIFICATION: UNCLASSIFIED // FOUO</span>
         </div>

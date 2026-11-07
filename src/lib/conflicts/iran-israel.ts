@@ -125,7 +125,7 @@ export const iranIsrael: ConflictConfig = {
       { label: 'TLV', zone: 'Asia/Jerusalem', flag: '🇮🇱' },
       { label: 'THR', zone: 'Asia/Tehran', flag: '🇮🇷' },
       { label: 'RYD', zone: 'Asia/Riyadh', flag: '🇸🇦' },
-      { label: 'MSK', zone: 'Asia/Shanghai', flag: '🇨🇳' },
+      { label: 'BJS', zone: 'Asia/Shanghai', flag: '🇨🇳' },
     ],
 
     sourceColors: {
