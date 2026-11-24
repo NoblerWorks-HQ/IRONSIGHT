@@ -5,7 +5,7 @@ Real-time OSINT command center for monitoring active conflicts - two theaters, I
 
 ## Environment
 - **Status**: Open Source / Development
-- **Live URL**: Local only (no hosted version; `npm run dev` or `docker compose up --build`)
+- **Live URL**: App is local only (`npm run dev` or `docker compose up --build`); the static project page `site/` is on GitHub Pages at ironsight.noblerworks.com
 - **Cloud**: None
 
 ## Tech Stack
